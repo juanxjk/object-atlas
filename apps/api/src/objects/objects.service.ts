@@ -78,13 +78,17 @@ export class ObjectsService implements OnModuleInit {
     return mapObjectRow(rows[0]);
   }
 
-  async list(): Promise<ObjectRecord[]> {
+  async list(searchQuery?: string): Promise<ObjectRecord[]> {
+    const normalizedQuery = searchQuery?.trim();
+    const hasQuery = Boolean(normalizedQuery);
     const { rows } = await this.databaseService.getPool().query(
       `
         SELECT *
         FROM objects
+        WHERE ($1::text IS NULL OR title ILIKE '%' || $1 || '%')
         ORDER BY updated_at DESC
-      `
+      `,
+      [hasQuery ? normalizedQuery : null]
     );
 
     return rows.map(mapObjectRow);

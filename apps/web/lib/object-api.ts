@@ -28,8 +28,14 @@ export type PublicObjectRecord = Pick<
 
 const apiBaseUrl = process.env.API_URL ?? 'http://localhost:3001';
 
-export async function getObjects(): Promise<ObjectRecord[]> {
-  const response = await fetch(`${apiBaseUrl}/api/objects`, {
+export async function getObjects(searchQuery?: string): Promise<ObjectRecord[]> {
+  const url = new URL(`${apiBaseUrl}/api/objects`);
+
+  if (searchQuery?.trim()) {
+    url.searchParams.set('q', searchQuery.trim());
+  }
+
+  const response = await fetch(url, {
     cache: 'no-store'
   });
 

@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors
 } from '@nestjs/common';
@@ -29,8 +30,8 @@ export class ObjectsController {
   }
 
   @Get()
-  listObjects() {
-    return this.objectsService.list();
+  listObjects(@Query('q') searchQuery?: string) {
+    return this.objectsService.list(searchQuery);
   }
 
   @Get(':id')

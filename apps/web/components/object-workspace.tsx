@@ -56,12 +56,16 @@ export function ObjectWorkspace({
   const [selectedId, setSelectedId] = useState<string | null>(initialObjects[0]?.id ?? null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [mediaItems, setMediaItems] = useState<ObjectMediaRecord[]>([]);
   const [isLoadingMedia, setIsLoadingMedia] = useState(false);
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
   const [mediaError, setMediaError] = useState<string | null>(null);
 
   const selectedObject = objects.find((object) => object.id === selectedId) ?? null;
+  const filteredObjects = objects.filter((object) =>
+    object.title.toLowerCase().includes(searchQuery.trim().toLowerCase())
+  );
 
   useEffect(() => {
     async function loadMedia(): Promise<void> {
@@ -192,13 +196,29 @@ export function ObjectWorkspace({
           </button>
         </div>
 
+        <label className="mt-5 block">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-ink/55">
+            Search by title
+          </span>
+          <input
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search object titles"
+            className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
+          />
+        </label>
+
         <div className="mt-5 space-y-3">
           {objects.length === 0 ? (
             <div className="rounded-2xl bg-clay px-4 py-4 text-sm text-ink/70">
               No object records yet. Start by creating the first one.
             </div>
+          ) : filteredObjects.length === 0 ? (
+            <div className="rounded-2xl bg-clay px-4 py-4 text-sm text-ink/70">
+              No objects match that title search.
+            </div>
           ) : (
-            objects.map((object) => {
+            filteredObjects.map((object) => {
               const isSelected = object.id === selectedId;
 
               return (

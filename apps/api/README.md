@@ -12,6 +12,7 @@ Current scaffold includes:
 - filesystem-backed media storage abstraction
 - object media upload and listing endpoints
 - public object retrieval by public identifier
+- title-based object listing and search
 
 Planned responsibilities:
 
