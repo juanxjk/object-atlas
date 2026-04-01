@@ -1,6 +1,13 @@
 # API App
 
-This directory will contain the NestJS backend for ObjectAtlas.
+This directory contains the NestJS backend for ObjectAtlas.
+
+Current scaffold includes:
+
+- NestJS application entrypoint
+- PostgreSQL pool provider using `DATABASE_URL`
+- health endpoint
+- base object module structure
 
 Planned responsibilities:
 
