@@ -44,3 +44,4 @@ Important rule:
 - The main detail pane now shows object information, attachments, and QR access without an inline edit form
 - The QR code surface now opens from a quick action instead of staying expanded in the main pane
 - Primary navigation and object actions now use Lucide icons instead of text-only affordances
+- Create, edit, and QR modals now close when the user clicks the backdrop

@@ -486,8 +486,14 @@ export function ObjectWorkspace({
       </div>
 
       {isCreateModalOpen ? (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-ink/35 px-4 py-6">
-          <div className="w-full max-w-xl rounded-soft border border-black/5 bg-white p-5 sm:p-6">
+        <div
+          className="fixed inset-0 z-30 flex items-center justify-center bg-ink/35 px-4 py-6"
+          onClick={() => setIsCreateModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-xl rounded-soft border border-black/5 bg-white p-5 sm:p-6"
+            onClick={(event) => event.stopPropagation()}
+          >
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
@@ -592,8 +598,17 @@ export function ObjectWorkspace({
       ) : null}
 
       {isEditModalOpen && editingObject ? (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-ink/35 px-4 py-6">
-          <div className="w-full max-w-xl rounded-soft border border-black/5 bg-white p-5 sm:p-6">
+        <div
+          className="fixed inset-0 z-30 flex items-center justify-center bg-ink/35 px-4 py-6"
+          onClick={() => {
+            setIsEditModalOpen(false);
+            setEditingObjectId(null);
+          }}
+        >
+          <div
+            className="w-full max-w-xl rounded-soft border border-black/5 bg-white p-5 sm:p-6"
+            onClick={(event) => event.stopPropagation()}
+          >
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
@@ -704,8 +719,14 @@ export function ObjectWorkspace({
       ) : null}
 
       {isQrModalOpen && selectedObject ? (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-ink/35 px-4 py-6">
-          <div className="w-full max-w-xl">
+        <div
+          className="fixed inset-0 z-30 flex items-center justify-center bg-ink/35 px-4 py-6"
+          onClick={() => setIsQrModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-xl"
+            onClick={(event) => event.stopPropagation()}
+          >
             <ObjectQrCard
               publicId={selectedObject.publicId}
               title={selectedObject.title}
