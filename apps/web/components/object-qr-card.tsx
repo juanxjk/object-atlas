@@ -1,5 +1,6 @@
 'use client';
 
+import { Link2 } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState, type ReactNode } from 'react';
 import QRCode from 'qrcode';
@@ -75,7 +76,8 @@ export function ObjectQrCard({
         )}
 
         <div className="w-full rounded-2xl border border-black/5 bg-white px-4 py-3 text-sm text-ink">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+          <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+            <Link2 size={14} strokeWidth={2.1} />
             Public URL
           </p>
           <p className="mt-2 break-all">{publicObjectUrl}</p>

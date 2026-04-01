@@ -1,16 +1,19 @@
 'use client';
 
+import { BookOpen, Menu, Package2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
 const navigationItems = [
   {
     href: '/#object-listing',
-    label: 'Object listing'
+    label: 'Object listing',
+    icon: Package2
   },
   {
     href: '/about',
-    label: 'About'
+    label: 'About',
+    icon: BookOpen
   }
 ];
 
@@ -35,7 +38,7 @@ export function WorkspaceNavbar() {
             onClick={() => setIsMenuOpen((current) => !current)}
             className="inline-flex items-center gap-2 rounded-full border border-sand bg-clay px-4 py-2 text-sm font-semibold text-ink lg:hidden"
           >
-            <span className="text-base leading-none">≡</span>
+            <Menu size={16} strokeWidth={2.2} />
             Menu
           </button>
 
@@ -44,8 +47,9 @@ export function WorkspaceNavbar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-full border border-sand bg-clay px-4 py-2 text-sm font-semibold text-ink"
+                className="inline-flex items-center gap-2 rounded-full border border-sand bg-clay px-4 py-2 text-sm font-semibold text-ink"
               >
+                <item.icon size={16} strokeWidth={2.1} />
                 {item.label}
               </Link>
             ))}
@@ -59,8 +63,9 @@ export function WorkspaceNavbar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsMenuOpen(false)}
-                className="block rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-ink"
+                className="inline-flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-ink"
               >
+                <item.icon size={16} strokeWidth={2.1} />
                 {item.label}
               </Link>
             ))}

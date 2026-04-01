@@ -1,5 +1,6 @@
 'use client';
 
+import { Pencil, Plus, QrCode, Search, Upload, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { ObjectMediaRecord, ObjectRecord } from '@object-atlas/types';
 
@@ -234,8 +235,9 @@ export function ObjectWorkspace({
             <button
               type="button"
               onClick={handleCreateMode}
-              className="rounded-full bg-ember px-4 py-2 text-sm font-semibold text-white"
+              className="inline-flex items-center gap-2 rounded-full bg-ember px-4 py-2 text-sm font-semibold text-white"
             >
+              <Plus size={16} strokeWidth={2.2} />
               New object
             </button>
           </div>
@@ -244,12 +246,15 @@ export function ObjectWorkspace({
             <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-ink/55">
               Search by title
             </span>
-            <input
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search object titles"
-              className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
-            />
+            <div className="flex items-center gap-3 rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink">
+              <Search size={16} strokeWidth={2.1} className="shrink-0 text-ink/55" />
+              <input
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search object titles"
+                className="w-full bg-transparent text-sm text-ink outline-none ring-0 placeholder:text-ink/45"
+              />
+            </div>
           </label>
 
           <div className="mt-5 space-y-3">
@@ -300,8 +305,9 @@ export function ObjectWorkspace({
                       <button
                         type="button"
                         onClick={() => handleEditMode(object)}
-                        className="rounded-full border border-sand bg-white/80 px-4 py-2 text-sm font-semibold text-ink"
+                        className="inline-flex items-center gap-2 rounded-full border border-sand bg-white/80 px-4 py-2 text-sm font-semibold text-ink"
                       >
+                        <Pencil size={16} strokeWidth={2.1} />
                         Edit
                       </button>
                     </div>
@@ -339,16 +345,18 @@ export function ObjectWorkspace({
                     <button
                       type="button"
                       onClick={() => setIsQrModalOpen(true)}
-                      className="rounded-full border border-sand bg-white px-5 py-3 text-sm font-semibold text-ink"
+                      className="inline-flex items-center gap-2 rounded-full border border-sand bg-white px-5 py-3 text-sm font-semibold text-ink"
                     >
+                      <QrCode size={16} strokeWidth={2.1} />
                       Show QR code
                     </button>
 
                     <button
                       type="button"
                       onClick={() => handleEditMode(selectedObject)}
-                      className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white"
+                      className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white"
                     >
+                      <Pencil size={16} strokeWidth={2.1} />
                       Edit object
                     </button>
                   </div>
@@ -405,12 +413,13 @@ export function ObjectWorkspace({
                 </div>
 
                 <label
-                  className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${
                     selectedObject
                       ? 'cursor-pointer bg-moss text-white'
                       : 'cursor-not-allowed bg-sand text-ink/55'
                   }`}
                 >
+                  <Upload size={16} strokeWidth={2.1} />
                   Add file
                   <input
                     type="file"
@@ -496,8 +505,9 @@ export function ObjectWorkspace({
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
-                className="rounded-full border border-sand px-3 py-2 text-sm font-semibold text-ink"
+                className="inline-flex items-center gap-2 rounded-full border border-sand px-3 py-2 text-sm font-semibold text-ink"
               >
+                <X size={16} strokeWidth={2.1} />
                 Close
               </button>
             </div>
@@ -561,16 +571,18 @@ export function ObjectWorkspace({
                 <button
                   type="submit"
                   disabled={isCreating}
-                  className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:opacity-70"
+                  className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:opacity-70"
                 >
+                  <Plus size={16} strokeWidth={2.1} />
                   {isCreating ? 'Creating...' : 'Create object'}
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
+                  className="inline-flex items-center gap-2 rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
                 >
+                  <X size={16} strokeWidth={2.1} />
                   Cancel
                 </button>
               </div>
@@ -602,8 +614,9 @@ export function ObjectWorkspace({
                   setIsEditModalOpen(false);
                   setEditingObjectId(null);
                 }}
-                className="rounded-full border border-sand px-3 py-2 text-sm font-semibold text-ink"
+                className="inline-flex items-center gap-2 rounded-full border border-sand px-3 py-2 text-sm font-semibold text-ink"
               >
+                <X size={16} strokeWidth={2.1} />
                 Close
               </button>
             </div>
@@ -667,8 +680,9 @@ export function ObjectWorkspace({
                 <button
                   type="submit"
                   disabled={isEditingFromModal}
-                  className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:opacity-70"
+                  className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:opacity-70"
                 >
+                  <Pencil size={16} strokeWidth={2.1} />
                   {isEditingFromModal ? 'Saving...' : 'Save changes'}
                 </button>
 
@@ -678,8 +692,9 @@ export function ObjectWorkspace({
                     setIsEditModalOpen(false);
                     setEditingObjectId(null);
                   }}
-                  className="rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
+                  className="inline-flex items-center gap-2 rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
                 >
+                  <X size={16} strokeWidth={2.1} />
                   Cancel
                 </button>
               </div>
@@ -698,8 +713,9 @@ export function ObjectWorkspace({
                 <button
                   type="button"
                   onClick={() => setIsQrModalOpen(false)}
-                  className="rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
+                  className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
                 >
+                  <X size={16} strokeWidth={2.1} />
                   Close
                 </button>
               }
