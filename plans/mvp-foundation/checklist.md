@@ -56,3 +56,4 @@ Important rule:
 - Image attachments now show an inline preview inside the object detail cards
 - Clicking an attachment preview now opens a modal with full-image viewing and zoom controls
 - Uploaded binaries now compute a content hash so duplicate files can reuse the same stored file record
+- Database string columns and object validation now use explicit length limits instead of unbounded text fields

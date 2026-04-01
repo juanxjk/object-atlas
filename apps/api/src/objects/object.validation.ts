@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 
+import { OBJECTS_LIMITS } from '../database/schema-limits';
 import { CreateObjectInput, UpdateObjectInput } from './object.types';
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -23,7 +24,19 @@ function asOptionalString(value: unknown, fieldName: string): string | null {
     throw new BadRequestException(`${fieldName} must be a string`);
   }
 
-  return value.trim();
+  const normalized = value.trim();
+  const maxLength =
+    fieldName === 'description'
+      ? OBJECTS_LIMITS.description
+      : fieldName === 'story'
+        ? OBJECTS_LIMITS.story
+        : null;
+
+  if (maxLength && normalized.length > maxLength) {
+    throw new BadRequestException(`${fieldName} must be at most ${maxLength} characters`);
+  }
+
+  return normalized;
 }
 
 function asRequiredTitle(value: unknown): string {
@@ -35,6 +48,10 @@ function asRequiredTitle(value: unknown): string {
 
   if (!normalized) {
     throw new BadRequestException('title is required');
+  }
+
+  if (normalized.length > OBJECTS_LIMITS.title) {
+    throw new BadRequestException(`title must be at most ${OBJECTS_LIMITS.title} characters`);
   }
 
   return normalized;

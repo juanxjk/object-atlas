@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { OBJECTS_LIMITS } from '../database/schema-limits';
 import { validateCreateObject, validateUpdateObject } from './object.validation';
 
 describe('object validation', () => {
@@ -39,5 +40,29 @@ describe('object validation', () => {
 
   it('rejects empty update payloads', () => {
     expect(() => validateUpdateObject({})).toThrow('at least one field must be provided');
+  });
+
+  it('rejects titles longer than the schema limit', () => {
+    expect(() =>
+      validateCreateObject({
+        title: 'a'.repeat(OBJECTS_LIMITS.title + 1)
+      })
+    ).toThrow(`title must be at most ${OBJECTS_LIMITS.title} characters`);
+  });
+
+  it('rejects descriptions longer than the schema limit', () => {
+    expect(() =>
+      validateUpdateObject({
+        description: 'a'.repeat(OBJECTS_LIMITS.description + 1)
+      })
+    ).toThrow(`description must be at most ${OBJECTS_LIMITS.description} characters`);
+  });
+
+  it('rejects stories longer than the schema limit', () => {
+    expect(() =>
+      validateUpdateObject({
+        story: 'a'.repeat(OBJECTS_LIMITS.story + 1)
+      })
+    ).toThrow(`story must be at most ${OBJECTS_LIMITS.story} characters`);
   });
 });

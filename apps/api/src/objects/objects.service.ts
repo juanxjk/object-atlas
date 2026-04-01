@@ -5,6 +5,7 @@ import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/com
 import { sql } from 'drizzle-orm';
 import { PublicObjectRecord } from '@object-atlas/types';
 
+import { FILES_LIMITS, OBJECTS_LIMITS } from '../database/schema-limits';
 import { DatabaseService } from '../database/database.service';
 import { STORAGE_SERVICE } from '../storage/storage.constants';
 import { StorageService } from '../storage/storage.types';
@@ -65,10 +66,10 @@ export class ObjectsService implements OnModuleInit {
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS objects (
         id UUID PRIMARY KEY,
-        public_id TEXT NOT NULL UNIQUE,
-        title TEXT NOT NULL,
-        description TEXT,
-        story TEXT,
+        public_id VARCHAR(${sql.raw(String(OBJECTS_LIMITS.publicId))}) NOT NULL UNIQUE,
+        title VARCHAR(${sql.raw(String(OBJECTS_LIMITS.title))}) NOT NULL,
+        description VARCHAR(${sql.raw(String(OBJECTS_LIMITS.description))}),
+        story VARCHAR(${sql.raw(String(OBJECTS_LIMITS.story))}),
         metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -78,10 +79,10 @@ export class ObjectsService implements OnModuleInit {
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS files (
         id UUID PRIMARY KEY,
-        original_filename TEXT NOT NULL,
-        storage_path TEXT NOT NULL UNIQUE,
-        content_hash TEXT,
-        mime_type TEXT NOT NULL,
+        original_filename VARCHAR(${sql.raw(String(FILES_LIMITS.originalFilename))}) NOT NULL,
+        storage_path VARCHAR(${sql.raw(String(FILES_LIMITS.storagePath))}) NOT NULL UNIQUE,
+        content_hash VARCHAR(${sql.raw(String(FILES_LIMITS.contentHash))}),
+        mime_type VARCHAR(${sql.raw(String(FILES_LIMITS.mimeType))}) NOT NULL,
         size INTEGER NOT NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
@@ -91,9 +92,9 @@ export class ObjectsService implements OnModuleInit {
       CREATE TABLE IF NOT EXISTS object_media (
         id UUID PRIMARY KEY,
         object_id UUID NOT NULL REFERENCES objects(id) ON DELETE CASCADE,
-        original_filename TEXT NOT NULL,
-        storage_path TEXT NOT NULL,
-        mime_type TEXT NOT NULL,
+        original_filename VARCHAR(${sql.raw(String(FILES_LIMITS.originalFilename))}) NOT NULL,
+        storage_path VARCHAR(${sql.raw(String(FILES_LIMITS.storagePath))}) NOT NULL,
+        mime_type VARCHAR(${sql.raw(String(FILES_LIMITS.mimeType))}) NOT NULL,
         size INTEGER NOT NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
@@ -116,7 +117,30 @@ export class ObjectsService implements OnModuleInit {
 
     await db.execute(sql`
       ALTER TABLE files
-      ADD COLUMN IF NOT EXISTS content_hash TEXT
+      ADD COLUMN IF NOT EXISTS content_hash VARCHAR(${sql.raw(String(FILES_LIMITS.contentHash))})
+    `);
+
+    await db.execute(sql`
+      ALTER TABLE objects
+      ALTER COLUMN public_id TYPE VARCHAR(${sql.raw(String(OBJECTS_LIMITS.publicId))}),
+      ALTER COLUMN title TYPE VARCHAR(${sql.raw(String(OBJECTS_LIMITS.title))}),
+      ALTER COLUMN description TYPE VARCHAR(${sql.raw(String(OBJECTS_LIMITS.description))}),
+      ALTER COLUMN story TYPE VARCHAR(${sql.raw(String(OBJECTS_LIMITS.story))})
+    `);
+
+    await db.execute(sql`
+      ALTER TABLE files
+      ALTER COLUMN original_filename TYPE VARCHAR(${sql.raw(String(FILES_LIMITS.originalFilename))}),
+      ALTER COLUMN storage_path TYPE VARCHAR(${sql.raw(String(FILES_LIMITS.storagePath))}),
+      ALTER COLUMN content_hash TYPE VARCHAR(${sql.raw(String(FILES_LIMITS.contentHash))}),
+      ALTER COLUMN mime_type TYPE VARCHAR(${sql.raw(String(FILES_LIMITS.mimeType))})
+    `);
+
+    await db.execute(sql`
+      ALTER TABLE object_media
+      ALTER COLUMN original_filename TYPE VARCHAR(${sql.raw(String(FILES_LIMITS.originalFilename))}),
+      ALTER COLUMN storage_path TYPE VARCHAR(${sql.raw(String(FILES_LIMITS.storagePath))}),
+      ALTER COLUMN mime_type TYPE VARCHAR(${sql.raw(String(FILES_LIMITS.mimeType))})
     `);
 
     await db.execute(sql`

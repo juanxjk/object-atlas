@@ -5,6 +5,7 @@
 The MVP should use practical, low-complexity protections that are enough for early development and limited usage.
 
 - Validate required fields
+- Enforce bounded lengths for user-facing text and file metadata fields
 - Restrict upload types and size
 - Avoid exposing filesystem paths directly
 - Keep management routes separate from public object routes
@@ -30,6 +31,7 @@ After the MVP, security can be improved with:
 
 - Require title and basic descriptive content
 - Validate uploaded MIME types and file size
+- Reject text fields that exceed the schema length limits before they reach the database
 - Reject malformed object identifiers
 - Sanitize or safely render user-provided story content
 

@@ -8,6 +8,7 @@ Implement a single deployable monorepo with:
 - `apps/api` for the NestJS API
 - PostgreSQL for persistent object metadata
 - Drizzle schema definitions as the typed source of truth for PostgreSQL tables
+- bounded varchar limits for user-facing and file metadata columns
 - filesystem-backed media storage behind a storage service interface
 - simple object-centric APIs without authentication in the MVP
 
