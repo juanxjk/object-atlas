@@ -33,3 +33,4 @@ Important rule:
 - If implementation reveals a large step, split it into smaller commits before coding
 - Keep post-MVP hardening separate from the first usable release
 - Runtime verification revealed a few required setup fixes: `pnpm-workspace.yaml`, local `workspace:*` package links, `@types/pg`, and explicit `ObjectsModule` imports for database and storage providers
+- Mobile navigation now includes a hamburger menu with an object listing option in the management workspace

@@ -52,6 +52,10 @@ export function ObjectWorkspace({
 }: {
   initialObjects: ObjectRecord[];
 }) {
+  const [mobileView, setMobileView] = useState<'list' | 'editor'>(
+    initialObjects[0]?.id ? 'editor' : 'list'
+  );
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [objects, setObjects] = useState<ObjectRecord[]>(initialObjects);
   const [formState, setFormState] = useState<ObjectFormState>(emptyFormState);
   const [selectedId, setSelectedId] = useState<string | null>(initialObjects[0]?.id ?? null);
@@ -96,6 +100,8 @@ export function ObjectWorkspace({
     setSelectedId(object.id);
     setFormState(toFormState(object));
     setError(null);
+    setMobileView('editor');
+    setIsMenuOpen(false);
   };
 
   const handleCreateMode = () => {
@@ -104,6 +110,8 @@ export function ObjectWorkspace({
     setError(null);
     setMediaItems([]);
     setMediaError(null);
+    setMobileView('editor');
+    setIsMenuOpen(false);
   };
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -165,6 +173,7 @@ export function ObjectWorkspace({
         setObjects((current) => [created, ...current]);
         setSelectedId(created.id);
         setFormState(toFormState(created));
+        setMobileView('editor');
       }
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'Unable to save object');
@@ -174,82 +183,141 @@ export function ObjectWorkspace({
   };
 
   return (
-    <section className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
-      <article className="rounded-soft border border-black/5 bg-white/85 p-5 shadow-card sm:p-6">
+    <section className="space-y-4">
+      <div className="rounded-soft border border-black/5 bg-white/85 p-4 shadow-card lg:hidden">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">
-              Object records
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-moss">
+              Mobile navigation
             </p>
-            <h2 className="mt-1 font-[family-name:var(--font-display)] text-2xl text-ink">
-              Manage the first collection slice
-            </h2>
+            <p className="mt-1 text-sm text-ink/70">
+              Open the menu to switch between object listing and editing.
+            </p>
           </div>
 
           <button
             type="button"
-            onClick={handleCreateMode}
-            className="rounded-full bg-ember px-4 py-2 text-sm font-semibold text-white"
+            onClick={() => setIsMenuOpen((current) => !current)}
+            className="inline-flex items-center gap-2 rounded-full border border-sand bg-clay px-4 py-2 text-sm font-semibold text-ink"
           >
-            New object
+            <span className="text-base leading-none">≡</span>
+            Menu
           </button>
         </div>
 
-        <label className="mt-5 block">
-          <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-ink/55">
-            Search by title
-          </span>
-          <input
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search object titles"
-            className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
-          />
-        </label>
+        {isMenuOpen ? (
+          <div className="mt-4 space-y-2 rounded-3xl border border-sand bg-clay p-3">
+            <button
+              type="button"
+              onClick={() => {
+                setMobileView('list');
+                setIsMenuOpen(false);
+              }}
+              className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold ${
+                mobileView === 'list' ? 'bg-white text-ink' : 'text-ink/70'
+              }`}
+            >
+              Object listing
+            </button>
 
-        <div className="mt-5 space-y-3">
-          {objects.length === 0 ? (
-            <div className="rounded-2xl bg-clay px-4 py-4 text-sm text-ink/70">
-              No object records yet. Start by creating the first one.
-            </div>
-          ) : filteredObjects.length === 0 ? (
-            <div className="rounded-2xl bg-clay px-4 py-4 text-sm text-ink/70">
-              No objects match that title search.
-            </div>
-          ) : (
-            filteredObjects.map((object) => {
-              const isSelected = object.id === selectedId;
+            <button
+              type="button"
+              onClick={() => {
+                setMobileView('editor');
+                setIsMenuOpen(false);
+              }}
+              className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold ${
+                mobileView === 'editor' ? 'bg-white text-ink' : 'text-ink/70'
+              }`}
+            >
+              {selectedObject ? 'Current object' : 'Create object'}
+            </button>
+          </div>
+        ) : null}
+      </div>
 
-              return (
-                <button
-                  key={object.id}
-                  type="button"
-                  onClick={() => handleSelect(object)}
-                  className={`w-full rounded-2xl border px-4 py-4 text-left transition ${
-                    isSelected
-                      ? 'border-ember bg-[#fff7f1] shadow-card'
-                      : 'border-sand bg-clay'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-semibold text-ink">{object.title}</p>
-                      <p className="mt-1 text-sm text-ink/65">
-                        {object.description ?? 'No description yet'}
-                      </p>
+      <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
+        <article
+          className={`rounded-soft border border-black/5 bg-white/85 p-5 shadow-card sm:p-6 ${
+            mobileView === 'list' ? 'block' : 'hidden lg:block'
+          }`}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">
+                Object records
+              </p>
+              <h2 className="mt-1 font-[family-name:var(--font-display)] text-2xl text-ink">
+                Manage the first collection slice
+              </h2>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleCreateMode}
+              className="rounded-full bg-ember px-4 py-2 text-sm font-semibold text-white"
+            >
+              New object
+            </button>
+          </div>
+
+          <label className="mt-5 block">
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-ink/55">
+              Search by title
+            </span>
+            <input
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search object titles"
+              className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
+            />
+          </label>
+
+          <div className="mt-5 space-y-3">
+            {objects.length === 0 ? (
+              <div className="rounded-2xl bg-clay px-4 py-4 text-sm text-ink/70">
+                No object records yet. Start by creating the first one.
+              </div>
+            ) : filteredObjects.length === 0 ? (
+              <div className="rounded-2xl bg-clay px-4 py-4 text-sm text-ink/70">
+                No objects match that title search.
+              </div>
+            ) : (
+              filteredObjects.map((object) => {
+                const isSelected = object.id === selectedId;
+
+                return (
+                  <button
+                    key={object.id}
+                    type="button"
+                    onClick={() => handleSelect(object)}
+                    className={`w-full rounded-2xl border px-4 py-4 text-left transition ${
+                      isSelected
+                        ? 'border-ember bg-[#fff7f1] shadow-card'
+                        : 'border-sand bg-clay'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-semibold text-ink">{object.title}</p>
+                        <p className="mt-1 text-sm text-ink/65">
+                          {object.description ?? 'No description yet'}
+                        </p>
+                      </div>
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+                        {isSelected ? 'Editing' : 'Open'}
+                      </span>
                     </div>
-                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
-                      {isSelected ? 'Editing' : 'Open'}
-                    </span>
-                  </div>
-                </button>
-              );
-            })
-          )}
-        </div>
-      </article>
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </article>
 
-      <div className="space-y-4">
+      <div
+        className={`space-y-4 ${mobileView === 'editor' ? 'block' : 'hidden lg:block'}`}
+      >
         <article className="rounded-soft border border-black/5 bg-white/90 p-5 shadow-card sm:p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
             {selectedObject ? 'Edit object' : 'Create object'}
@@ -427,6 +495,7 @@ export function ObjectWorkspace({
         {selectedObject ? (
           <ObjectQrCard publicId={selectedObject.publicId} title={selectedObject.title} />
         ) : null}
+      </div>
       </div>
     </section>
   );

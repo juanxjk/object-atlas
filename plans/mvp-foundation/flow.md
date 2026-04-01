@@ -3,16 +3,18 @@
 ## Flow 1: Create Object and Publish Public Page
 
 1. The user opens the management interface
-2. The user starts the create object flow
-3. The system shows a short mobile-first form with essential fields
-4. The user enters the object title, short description, story, and basic metadata
-5. The user uploads one or more media files
-6. The system validates the input and uploaded files
-7. The system stores the object in PostgreSQL
-8. The system stores media files through the storage abstraction backed by the local filesystem
-9. The system generates a public identifier and QR code for the object
-10. The system returns the saved object detail view
-11. The user sees the object detail page with the QR code and public page link
+2. The user opens the hamburger menu
+3. The user chooses the object listing option
+4. The user starts the create object flow
+5. The system shows a short mobile-first form with essential fields
+6. The user enters the object title, short description, story, and basic metadata
+7. The user uploads one or more media files
+8. The system validates the input and uploaded files
+9. The system stores the object in PostgreSQL
+10. The system stores media files through the storage abstraction backed by the local filesystem
+11. The system generates a public identifier and QR code for the object
+12. The system returns the saved object detail view
+13. The user sees the object detail page with the QR code and public page link
 
 ## Flow 2: View Public Object Page from QR Code
 
@@ -22,17 +24,29 @@
 4. The system returns the public object page
 5. The visitor sees the object title, story, media, and key metadata on a mobile-friendly page
 
-## Flow 3: Edit Existing Object
+## Flow 3: Open Object Listing from Mobile Navigation
 
 1. The user opens the management interface
-2. The user searches for an object by title
-3. The system returns matching results
-4. The user opens the object detail page
-5. The user updates object information or uploads more media
-6. The system validates and persists the changes
-7. The updated public object page reflects the new data
+2. The user opens the hamburger menu
+3. The user chooses the object listing option
+4. The system shows the list of available object records
+5. The user searches or selects an object from the list
+6. The system opens the selected object detail page
 
-## Flow 4: Invalid Upload or Validation Failure
+## Flow 4: Edit Existing Object
+
+1. The user opens the management interface
+2. The user opens the hamburger menu
+3. The user chooses the object listing option
+4. The system shows the list of available object records
+5. The user searches for an object by title
+6. The system returns matching results
+7. The user opens the object detail page
+8. The user updates object information or uploads more media
+9. The system validates and persists the changes
+10. The updated public object page reflects the new data
+
+## Flow 5: Invalid Upload or Validation Failure
 
 1. The user submits missing required data or an invalid file
 2. The system rejects the request
