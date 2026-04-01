@@ -32,6 +32,13 @@ const emptyFormState: ObjectFormState = {
   story: ''
 };
 
+const fieldLimits = {
+  title: 160,
+  description: 500,
+  story: 10000,
+  uploadSizeMb: 10
+} as const;
+
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 const publicAppUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
@@ -549,7 +556,7 @@ export function ObjectWorkspace({
                   </p>
                   <p className="mt-1 text-sm text-ink/65">
                     {selectedObject
-                      ? 'Upload images or PDFs for this object record.'
+                      ? `Upload images or PDFs for this object record. Files up to ${fieldLimits.uploadSizeMb} MB.`
                       : 'Create an object first, then attach media.'}
                   </p>
                 </div>
@@ -739,9 +746,15 @@ export function ObjectWorkspace({
 
             <form className="mt-6 space-y-4" onSubmit={handleCreateSubmit}>
               <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-ink">Title</span>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <span className="block text-sm font-semibold text-ink">Title</span>
+                  <span className="text-xs font-medium text-ink/55">
+                    {createFormState.title.length}/{fieldLimits.title}
+                  </span>
+                </div>
                 <input
                   required
+                  maxLength={fieldLimits.title}
                   value={createFormState.title}
                   onChange={(event) =>
                     setCreateFormState((current) => ({
@@ -752,11 +765,20 @@ export function ObjectWorkspace({
                   className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
                   placeholder="Object title"
                 />
+                <p className="mt-2 text-xs text-ink/55">
+                  Up to {fieldLimits.title} characters.
+                </p>
               </label>
 
               <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-ink">Description</span>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <span className="block text-sm font-semibold text-ink">Description</span>
+                  <span className="text-xs font-medium text-ink/55">
+                    {createFormState.description.length}/{fieldLimits.description}
+                  </span>
+                </div>
                 <textarea
+                  maxLength={fieldLimits.description}
                   value={createFormState.description}
                   onChange={(event) =>
                     setCreateFormState((current) => ({
@@ -768,11 +790,20 @@ export function ObjectWorkspace({
                   className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
                   placeholder="Short summary for management and public display"
                 />
+                <p className="mt-2 text-xs text-ink/55">
+                  Up to {fieldLimits.description} characters.
+                </p>
               </label>
 
               <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-ink">Story</span>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <span className="block text-sm font-semibold text-ink">Story</span>
+                  <span className="text-xs font-medium text-ink/55">
+                    {createFormState.story.length}/{fieldLimits.story}
+                  </span>
+                </div>
                 <textarea
+                  maxLength={fieldLimits.story}
                   value={createFormState.story}
                   onChange={(event) =>
                     setCreateFormState((current) => ({
@@ -784,6 +815,9 @@ export function ObjectWorkspace({
                   className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
                   placeholder="Historical context, significance, or narrative"
                 />
+                <p className="mt-2 text-xs text-ink/55">
+                  Up to {fieldLimits.story} characters.
+                </p>
               </label>
 
               {createError ? (
@@ -920,9 +954,15 @@ export function ObjectWorkspace({
 
             <form className="mt-6 space-y-4" onSubmit={handleEditSubmit}>
               <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-ink">Title</span>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <span className="block text-sm font-semibold text-ink">Title</span>
+                  <span className="text-xs font-medium text-ink/55">
+                    {editFormState.title.length}/{fieldLimits.title}
+                  </span>
+                </div>
                 <input
                   required
+                  maxLength={fieldLimits.title}
                   value={editFormState.title}
                   onChange={(event) =>
                     setEditFormState((current) => ({
@@ -933,11 +973,20 @@ export function ObjectWorkspace({
                   className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
                   placeholder="Object title"
                 />
+                <p className="mt-2 text-xs text-ink/55">
+                  Up to {fieldLimits.title} characters.
+                </p>
               </label>
 
               <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-ink">Description</span>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <span className="block text-sm font-semibold text-ink">Description</span>
+                  <span className="text-xs font-medium text-ink/55">
+                    {editFormState.description.length}/{fieldLimits.description}
+                  </span>
+                </div>
                 <textarea
+                  maxLength={fieldLimits.description}
                   value={editFormState.description}
                   onChange={(event) =>
                     setEditFormState((current) => ({
@@ -949,11 +998,20 @@ export function ObjectWorkspace({
                   className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
                   placeholder="Short summary for management and public display"
                 />
+                <p className="mt-2 text-xs text-ink/55">
+                  Up to {fieldLimits.description} characters.
+                </p>
               </label>
 
               <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-ink">Story</span>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <span className="block text-sm font-semibold text-ink">Story</span>
+                  <span className="text-xs font-medium text-ink/55">
+                    {editFormState.story.length}/{fieldLimits.story}
+                  </span>
+                </div>
                 <textarea
+                  maxLength={fieldLimits.story}
                   value={editFormState.story}
                   onChange={(event) =>
                     setEditFormState((current) => ({
@@ -965,6 +1023,9 @@ export function ObjectWorkspace({
                   className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
                   placeholder="Historical context, significance, or narrative"
                 />
+                <p className="mt-2 text-xs text-ink/55">
+                  Up to {fieldLimits.story} characters.
+                </p>
               </label>
 
               {editError ? (

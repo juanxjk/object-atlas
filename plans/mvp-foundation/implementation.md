@@ -33,6 +33,7 @@ After the MVP, the implementation can evolve toward:
 - Dedicated About page for implementation and project-context content
 - Modal-based object creation flow
 - Object-card edit action opening a dedicated edit modal
+- Create and edit forms surface the current text-length limits in the UI
 - Object detail screen focused on reading, attachments, and QR access
 - Object detail header includes a direct button to open the public page URL
 - QR code surface opened from a quick action instead of always rendering inline
