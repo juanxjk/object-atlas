@@ -28,6 +28,7 @@ After the MVP, the implementation can evolve toward:
 - Always-visible management navbar
 - Hamburger menu for primary mobile navigation
 - Object listing option inside the hamburger menu
+- Dedicated About page for implementation and project-context content
 - Modal-based object creation flow
 - Object editing screen
 - Object detail management screen

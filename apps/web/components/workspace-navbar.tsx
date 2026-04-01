@@ -5,8 +5,12 @@ import { useState } from 'react';
 
 const navigationItems = [
   {
-    href: '#object-listing',
+    href: '/#object-listing',
     label: 'Object listing'
+  },
+  {
+    href: '/about',
+    label: 'About'
   }
 ];
 
@@ -19,10 +23,10 @@ export function WorkspaceNavbar() {
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-moss">
-              Workspace navigation
+              ObjectAtlas
             </p>
             <p className="mt-1 truncate text-sm text-ink/70">
-              Jump between object listing and editor from a persistent top bar.
+              Browse records and learn more about the project.
             </p>
           </div>
 
