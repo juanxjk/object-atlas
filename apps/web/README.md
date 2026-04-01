@@ -10,6 +10,7 @@ Current scaffold includes:
 - shared global styling for the MVP workspace
 - object creation and editing flow connected to the API scaffold
 - media upload UI connected to the object media endpoints
+- public object page route backed by public object retrieval
 
 Planned responsibilities:
 

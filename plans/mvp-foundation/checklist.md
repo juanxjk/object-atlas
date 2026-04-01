@@ -19,7 +19,7 @@ Important rule:
 - [x] `feat:` Implement object create and edit flow in the web app
 - [x] `feat:` Add filesystem-backed media storage abstraction and upload endpoint
 - [x] `feat:` Add media upload UI to the object detail flow
-- [ ] `feat:` Implement public object page and public object retrieval endpoint
+- [x] `feat:` Implement public object page and public object retrieval endpoint
 - [ ] `feat:` Generate and display QR code linked to the public object page
 - [ ] `feat:` Add basic object listing and title search in the management interface
 - [ ] `test:` Add automated coverage for core object, media, and public page flows

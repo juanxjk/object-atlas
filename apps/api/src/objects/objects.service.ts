@@ -7,6 +7,7 @@ import { STORAGE_SERVICE } from '../storage/storage.constants';
 import { StorageService } from '../storage/storage.types';
 import { mapObjectMediaRow } from './object-media.mapper';
 import { mapObjectRow } from './object.mapper';
+import { PublicObjectRecord } from './public-object.types';
 import {
   CreateObjectInput,
   ObjectMediaRecord,
@@ -194,5 +195,40 @@ export class ObjectsService implements OnModuleInit {
     );
 
     return rows.map(mapObjectMediaRow);
+  }
+
+  async getByPublicId(publicId: string): Promise<ObjectRecord> {
+    const { rows } = await this.databaseService.getPool().query(
+      `
+        SELECT *
+        FROM objects
+        WHERE public_id = $1
+      `,
+      [publicId]
+    );
+
+    const object = rows[0];
+
+    if (!object) {
+      throw new NotFoundException(`public object ${publicId} was not found`);
+    }
+
+    return mapObjectRow(object);
+  }
+
+  async getPublicObject(publicId: string): Promise<PublicObjectRecord> {
+    const object = await this.getByPublicId(publicId);
+    const media = await this.listMedia(object.id);
+
+    return {
+      id: object.id,
+      publicId: object.publicId,
+      title: object.title,
+      description: object.description,
+      story: object.story,
+      createdAt: object.createdAt,
+      updatedAt: object.updatedAt,
+      media
+    };
   }
 }

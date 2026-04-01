@@ -19,6 +19,13 @@ export type ObjectMediaRecord = {
   createdAt: string;
 };
 
+export type PublicObjectRecord = Pick<
+  ObjectRecord,
+  'id' | 'publicId' | 'title' | 'description' | 'story' | 'createdAt' | 'updatedAt'
+> & {
+  media: ObjectMediaRecord[];
+};
+
 const apiBaseUrl = process.env.API_URL ?? 'http://localhost:3001';
 
 export async function getObjects(): Promise<ObjectRecord[]> {
@@ -31,4 +38,16 @@ export async function getObjects(): Promise<ObjectRecord[]> {
   }
 
   return (await response.json()) as ObjectRecord[];
+}
+
+export async function getPublicObject(publicId: string): Promise<PublicObjectRecord | null> {
+  const response = await fetch(`${apiBaseUrl}/api/public/objects/${publicId}`, {
+    cache: 'no-store'
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  return (await response.json()) as PublicObjectRecord;
 }
