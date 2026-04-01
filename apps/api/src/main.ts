@@ -1,5 +1,7 @@
 import 'reflect-metadata';
 
+import { resolve } from 'node:path';
+
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
@@ -15,6 +17,9 @@ async function bootstrap(): Promise<void> {
     origin: publicAppUrl,
     methods: ['GET', 'POST', 'PATCH'],
     allowedHeaders: ['Content-Type']
+  });
+  app.useStaticAssets(resolve(process.env.STORAGE_FILESYSTEM_ROOT ?? './uploads'), {
+    prefix: '/uploads/'
   });
 
   await app.listen(port);

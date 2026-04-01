@@ -4,6 +4,7 @@ export type ObjectRecord = {
   title: string;
   description: string | null;
   story: string | null;
+  thumbnailPath: string | null;
   metadata: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;

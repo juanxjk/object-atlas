@@ -33,6 +33,7 @@ After the MVP, the implementation can evolve toward:
 - Object-card edit action opening a dedicated edit modal
 - Object detail screen focused on reading, attachments, and QR access
 - QR code surface opened from a quick action instead of always rendering inline
+- Object listing cards can show a thumbnail when the record already has an image attachment
 - Public object page routed by public identifier
 - Basic search input by title
 - QR code display within the object detail screen

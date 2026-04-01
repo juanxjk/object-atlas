@@ -6,6 +6,7 @@ type DatabaseObjectRow = {
   title: string;
   description: string | null;
   story: string | null;
+  thumbnail_path?: string | null;
   metadata: Record<string, unknown> | null;
   created_at: Date | string;
   updated_at: Date | string;
@@ -18,6 +19,7 @@ export function mapObjectRow(row: DatabaseObjectRow): ObjectRecord {
     title: row.title,
     description: row.description,
     story: row.story,
+    thumbnailPath: row.thumbnail_path ?? null,
     metadata: row.metadata ?? {},
     createdAt: new Date(row.created_at).toISOString(),
     updatedAt: new Date(row.updated_at).toISOString()

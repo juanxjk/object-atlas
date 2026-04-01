@@ -48,6 +48,14 @@ function toFormState(object: ObjectRecord): ObjectFormState {
   };
 }
 
+function getThumbnailUrl(thumbnailPath: string | null): string | null {
+  if (!thumbnailPath) {
+    return null;
+  }
+
+  return `${apiBaseUrl}/uploads/${thumbnailPath}`;
+}
+
 export function ObjectWorkspace({
   initialObjects
 }: {
@@ -175,6 +183,18 @@ export function ObjectWorkspace({
 
       const uploaded = (await response.json()) as ObjectMediaRecord;
       setMediaItems((current) => [uploaded, ...current]);
+      if (uploaded.mimeType.startsWith('image/')) {
+        setObjects((current) =>
+          current.map((object) =>
+            object.id === selectedId
+              ? {
+                  ...object,
+                  thumbnailPath: object.thumbnailPath ?? uploaded.storagePath
+                }
+              : object
+          )
+        );
+      }
       event.target.value = '';
     } catch (requestError) {
       setMediaError(requestError instanceof Error ? requestError.message : 'Unable to upload media');
@@ -282,16 +302,34 @@ export function ObjectWorkspace({
                       onClick={() => handleSelect(object)}
                       className="w-full text-left"
                     >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="font-semibold text-ink">{object.title}</p>
-                          <p className="mt-1 text-sm text-ink/65">
-                            {object.description ?? 'No description yet'}
-                          </p>
+                      <div className="flex items-start gap-3">
+                        {object.thumbnailPath ? (
+                          <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-black/5 bg-white">
+                            <img
+                              src={getThumbnailUrl(object.thumbnailPath) ?? ''}
+                              alt={`Thumbnail for ${object.title}`}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-dashed border-sand bg-white/70 text-xs font-semibold uppercase tracking-[0.12em] text-ink/40">
+                            No image
+                          </div>
+                        )}
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="truncate font-semibold text-ink">{object.title}</p>
+                              <p className="mt-1 text-sm text-ink/65">
+                                {object.description ?? 'No description yet'}
+                              </p>
+                            </div>
+                            <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+                              {isSelected ? 'Open' : 'View'}
+                            </span>
+                          </div>
                         </div>
-                        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
-                          {isSelected ? 'Open' : 'View'}
-                        </span>
                       </div>
                     </button>
 

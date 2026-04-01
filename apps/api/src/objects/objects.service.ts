@@ -83,7 +83,16 @@ export class ObjectsService implements OnModuleInit {
     const hasQuery = Boolean(normalizedQuery);
     const { rows } = await this.databaseService.getPool().query(
       `
-        SELECT *
+        SELECT
+          objects.*,
+          (
+            SELECT storage_path
+            FROM object_media
+            WHERE object_id = objects.id
+              AND mime_type LIKE 'image/%'
+            ORDER BY created_at ASC
+            LIMIT 1
+          ) AS thumbnail_path
         FROM objects
         WHERE ($1::text IS NULL OR title ILIKE '%' || $1 || '%')
         ORDER BY updated_at DESC
