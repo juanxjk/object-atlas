@@ -14,7 +14,8 @@ export class FilesystemStorageService implements StorageService {
     const objectDirectory = join(this.rootDirectory, 'objects', input.objectId);
     await mkdir(objectDirectory, { recursive: true });
 
-    const sanitizedExtension = extname(input.originalFilename).replace(/[^a-zA-Z0-9.]/g, '');
+    const safeFilename = basename(input.originalFilename).trim();
+    const sanitizedExtension = extname(safeFilename).replace(/[^a-zA-Z0-9.]/g, '');
     const filename = `${randomUUID()}${sanitizedExtension}`;
     const diskPath = join(objectDirectory, filename);
 

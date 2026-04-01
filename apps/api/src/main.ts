@@ -12,7 +12,9 @@ async function bootstrap(): Promise<void> {
 
   app.setGlobalPrefix('api');
   app.enableCors({
-    origin: publicAppUrl
+    origin: publicAppUrl,
+    methods: ['GET', 'POST', 'PATCH'],
+    allowedHeaders: ['Content-Type']
   });
 
   await app.listen(port);

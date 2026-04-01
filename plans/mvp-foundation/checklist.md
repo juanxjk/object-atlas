@@ -25,7 +25,7 @@ Important rule:
 - [x] `test:` Add automated coverage for core object, media, and public page flows
 - [x] `chore:` Final MVP cleanup, docs, and validation pass
 - [x] `refactor:` Optional post-MVP extraction of shared contracts and UI primitives
-- [ ] `chore:` Optional post-MVP hardening for auth, upload restrictions, and operational polish
+- [x] `chore:` Optional post-MVP hardening for auth, upload restrictions, and operational polish
 
 ## Notes
 

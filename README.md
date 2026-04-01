@@ -149,6 +149,7 @@ Note:
 
 - the media storage driver is filesystem-based for the MVP
 - the web app expects the API to allow requests from `PUBLIC_APP_URL`
+- media uploads are currently limited to JPEG, PNG, WEBP, and PDF up to 10 MB
 - automated tests are present in the repo, but they require dependencies to be installed before running `npm test`
 
 ---

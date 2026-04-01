@@ -15,6 +15,7 @@ Current scaffold includes:
 - title-based object listing and search
 - lightweight automated coverage for validation and mappers
 - shared object contracts imported from `packages/types`
+- basic hardening for CORS and file upload limits
 
 Planned responsibilities:
 

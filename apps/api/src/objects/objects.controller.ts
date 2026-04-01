@@ -19,6 +19,13 @@ import { ObjectsService } from './objects.service';
 export class ObjectsController {
   constructor(private readonly objectsService: ObjectsService) {}
 
+  private static readonly allowedMimeTypes = new Set([
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'application/pdf'
+  ]);
+
   @Get('_module')
   getModuleStatus() {
     return this.objectsService.getModuleStatus();
@@ -45,7 +52,14 @@ export class ObjectsController {
   }
 
   @Post(':id/media')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: {
+        fileSize: 10 * 1024 * 1024,
+        files: 1
+      }
+    })
+  )
   uploadMedia(
     @Param('id') id: string,
     @UploadedFile()
@@ -60,12 +74,16 @@ export class ObjectsController {
       throw new BadRequestException('file is required');
     }
 
-    if (!['image/jpeg', 'image/png', 'image/webp', 'application/pdf'].includes(file.mimetype)) {
+    if (!ObjectsController.allowedMimeTypes.has(file.mimetype)) {
       throw new BadRequestException('unsupported file type');
     }
 
     if (file.size > 10 * 1024 * 1024) {
       throw new BadRequestException('file is too large');
+    }
+
+    if (!file.originalname.trim()) {
+      throw new BadRequestException('file name is required');
     }
 
     return this.objectsService.addMedia(id, file);
