@@ -40,3 +40,4 @@ Important rule:
 - Shared site chrome now links to the public GitHub repository for project transparency
 - User-facing copy now keeps product principles implicit instead of repeating them in the UI
 - Shared surfaces now rely more on borders and contrast than repeated card shadows
+- Each object card now exposes an explicit edit action that opens a modal with the core fields

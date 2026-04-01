@@ -41,10 +41,12 @@
 4. The system shows the list of available object records
 5. The user searches for an object by title
 6. The system returns matching results
-7. The user opens the object detail page
-8. The user updates object information or uploads more media
-9. The system validates and persists the changes
-10. The updated public object page reflects the new data
+7. The user taps the edit action on an object card
+8. The system opens an edit modal with the core fields already filled
+9. The user updates object information and saves
+10. The system validates and persists the changes
+11. The system closes the modal and returns the user to the object detail view
+12. The updated public object page reflects the new data
 
 ## Flow 5: Invalid Upload or Validation Failure
 

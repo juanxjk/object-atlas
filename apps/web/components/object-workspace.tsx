@@ -58,12 +58,17 @@ export function ObjectWorkspace({
   const [objects, setObjects] = useState<ObjectRecord[]>(initialObjects);
   const [formState, setFormState] = useState<ObjectFormState>(emptyFormState);
   const [createFormState, setCreateFormState] = useState<ObjectFormState>(emptyFormState);
+  const [editFormState, setEditFormState] = useState<ObjectFormState>(emptyFormState);
   const [selectedId, setSelectedId] = useState<string | null>(initialObjects[0]?.id ?? null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [editingObjectId, setEditingObjectId] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isEditingFromModal, setIsEditingFromModal] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [mediaItems, setMediaItems] = useState<ObjectMediaRecord[]>([]);
   const [isLoadingMedia, setIsLoadingMedia] = useState(false);
@@ -71,6 +76,7 @@ export function ObjectWorkspace({
   const [mediaError, setMediaError] = useState<string | null>(null);
 
   const selectedObject = objects.find((object) => object.id === selectedId) ?? null;
+  const editingObject = objects.find((object) => object.id === editingObjectId) ?? null;
   const filteredObjects = filterObjectsByTitle(objects, searchQuery);
 
   useEffect(() => {
@@ -110,6 +116,13 @@ export function ObjectWorkspace({
     setCreateFormState(emptyFormState);
     setCreateError(null);
     setIsCreateModalOpen(true);
+  };
+
+  const handleEditMode = (object: ObjectRecord) => {
+    setEditingObjectId(object.id);
+    setEditFormState(toFormState(object));
+    setEditError(null);
+    setIsEditModalOpen(true);
   };
 
   const handleCreateSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -199,6 +212,41 @@ export function ObjectWorkspace({
     }
   };
 
+  const handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!editingObjectId) {
+      return;
+    }
+
+    setIsEditingFromModal(true);
+    setEditError(null);
+
+    try {
+      const updated = await requestObject<ObjectRecord>(`/api/objects/${editingObjectId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(editFormState)
+      });
+
+      setObjects((current) =>
+        current.map((object) => (object.id === updated.id ? updated : object))
+      );
+
+      if (selectedId === updated.id) {
+        setFormState(toFormState(updated));
+      }
+
+      setSelectedId(updated.id);
+      setIsEditModalOpen(false);
+      setEditingObjectId(null);
+      setMobileView('editor');
+    } catch (requestError) {
+      setEditError(requestError instanceof Error ? requestError.message : 'Unable to save object');
+    } finally {
+      setIsEditingFromModal(false);
+    }
+  };
+
   return (
     <section className="space-y-4">
       <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
@@ -253,28 +301,46 @@ export function ObjectWorkspace({
                 const isSelected = object.id === selectedId;
 
                 return (
-                  <button
+                  <div
                     key={object.id}
-                    type="button"
-                    onClick={() => handleSelect(object)}
-                    className={`w-full rounded-2xl border px-4 py-4 text-left transition ${
-                      isSelected
-                        ? 'border-ember bg-[#fff7f1]'
-                        : 'border-sand bg-clay'
+                    className={`w-full rounded-2xl border px-4 py-4 transition ${
+                      isSelected ? 'border-ember bg-[#fff7f1]' : 'border-sand bg-clay'
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleSelect(object)}
+                      className="w-full text-left"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-semibold text-ink">{object.title}</p>
+                          <p className="mt-1 text-sm text-ink/65">
+                            {object.description ?? 'No description yet'}
+                          </p>
+                        </div>
+                        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+                          {isSelected ? 'Open' : 'View'}
+                        </span>
+                      </div>
+                    </button>
+
+                    <div className="mt-4 flex items-center justify-between gap-3 border-t border-black/5 pt-3">
                       <div>
-                        <p className="font-semibold text-ink">{object.title}</p>
-                        <p className="mt-1 text-sm text-ink/65">
-                          {object.description ?? 'No description yet'}
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ink/45">
+                          Quick actions
                         </p>
                       </div>
-                      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
-                        {isSelected ? 'Editing' : 'Open'}
-                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => handleEditMode(object)}
+                        className="rounded-full border border-sand bg-white/80 px-4 py-2 text-sm font-semibold text-ink"
+                      >
+                        Edit
+                      </button>
                     </div>
-                  </button>
+                  </div>
                 );
               })
             )}
@@ -557,6 +623,115 @@ export function ObjectWorkspace({
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
+                  className="rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
+
+      {isEditModalOpen && editingObject ? (
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-ink/35 px-4 py-6">
+          <div className="w-full max-w-xl rounded-soft border border-black/5 bg-white p-5 sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
+                  Edit object
+                </p>
+                <h2 className="mt-1 font-[family-name:var(--font-display)] text-3xl text-ink">
+                  {editingObject.title}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-ink/70">
+                  Update the core information here, then return to the detail view for attachments
+                  and QR access.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setEditingObjectId(null);
+                }}
+                className="rounded-full border border-sand px-3 py-2 text-sm font-semibold text-ink"
+              >
+                Close
+              </button>
+            </div>
+
+            <form className="mt-6 space-y-4" onSubmit={handleEditSubmit}>
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-ink">Title</span>
+                <input
+                  required
+                  value={editFormState.title}
+                  onChange={(event) =>
+                    setEditFormState((current) => ({
+                      ...current,
+                      title: event.target.value
+                    }))
+                  }
+                  className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
+                  placeholder="Object title"
+                />
+              </label>
+
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-ink">Description</span>
+                <textarea
+                  value={editFormState.description}
+                  onChange={(event) =>
+                    setEditFormState((current) => ({
+                      ...current,
+                      description: event.target.value
+                    }))
+                  }
+                  rows={3}
+                  className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
+                  placeholder="Short summary for management and public display"
+                />
+              </label>
+
+              <label className="block">
+                <span className="mb-2 block text-sm font-semibold text-ink">Story</span>
+                <textarea
+                  value={editFormState.story}
+                  onChange={(event) =>
+                    setEditFormState((current) => ({
+                      ...current,
+                      story: event.target.value
+                    }))
+                  }
+                  rows={6}
+                  className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
+                  placeholder="Historical context, significance, or narrative"
+                />
+              </label>
+
+              {editError ? (
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {editError}
+                </div>
+              ) : null}
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="submit"
+                  disabled={isEditingFromModal}
+                  className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:opacity-70"
+                >
+                  {isEditingFromModal ? 'Saving...' : 'Save changes'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditModalOpen(false);
+                    setEditingObjectId(null);
+                  }}
                   className="rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
                 >
                   Cancel
