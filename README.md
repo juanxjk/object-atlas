@@ -118,6 +118,41 @@ This creates a simple bridge between the physical and digital world, allowing an
 
 ---
 
+## 🧪 Current MVP Status
+
+The repository now includes the first end-to-end MVP slice:
+
+- NestJS API scaffold with PostgreSQL connectivity
+- Next.js and Tailwind CSS mobile-first web app
+- Object creation and editing
+- Filesystem-backed media upload
+- Public object pages by public identifier
+- QR code generation for public object URLs
+- Basic object listing and title search
+
+---
+
+## ▶️ Getting Started
+
+1. Copy `.env.example` to `.env`
+2. Start PostgreSQL with `docker compose up -d`
+3. Install dependencies with `npm install`
+4. Run the API with `npm run dev:api`
+5. Run the web app with `npm run dev:web`
+
+Default local URLs:
+
+- Web: `http://localhost:3000`
+- API: `http://localhost:3001/api`
+
+Note:
+
+- the media storage driver is filesystem-based for the MVP
+- the web app expects the API to allow requests from `PUBLIC_APP_URL`
+- automated tests are present in the repo, but they require dependencies to be installed before running `npm test`
+
+---
+
 ## 📄 License
 
 MIT

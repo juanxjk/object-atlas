@@ -8,8 +8,12 @@ import { AppModule } from './app.module';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   const port = Number(process.env.PORT ?? '3001');
+  const publicAppUrl = process.env.PUBLIC_APP_URL ?? 'http://localhost:3000';
 
   app.setGlobalPrefix('api');
+  app.enableCors({
+    origin: publicAppUrl
+  });
 
   await app.listen(port);
 
