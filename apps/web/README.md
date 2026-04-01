@@ -9,6 +9,7 @@ Current scaffold includes:
 - mobile-first dashboard shell
 - shared global styling for the MVP workspace
 - object creation and editing flow connected to the API scaffold
+- media upload UI connected to the object media endpoints
 
 Planned responsibilities:
 

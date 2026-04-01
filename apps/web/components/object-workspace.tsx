@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import type { ObjectRecord } from '../lib/object-api';
+import type { ObjectMediaRecord, ObjectRecord } from '../lib/object-api';
 
 type ObjectFormState = {
   title: string;
@@ -55,8 +55,38 @@ export function ObjectWorkspace({
   const [selectedId, setSelectedId] = useState<string | null>(initialObjects[0]?.id ?? null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mediaItems, setMediaItems] = useState<ObjectMediaRecord[]>([]);
+  const [isLoadingMedia, setIsLoadingMedia] = useState(false);
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const [mediaError, setMediaError] = useState<string | null>(null);
 
   const selectedObject = objects.find((object) => object.id === selectedId) ?? null;
+
+  useEffect(() => {
+    async function loadMedia(): Promise<void> {
+      if (!selectedId) {
+        setMediaItems([]);
+        setMediaError(null);
+        return;
+      }
+
+      setIsLoadingMedia(true);
+      setMediaError(null);
+
+      try {
+        const items = await requestObject<ObjectMediaRecord[]>(`/api/objects/${selectedId}/media`);
+        setMediaItems(items);
+      } catch (requestError) {
+        setMediaError(
+          requestError instanceof Error ? requestError.message : 'Unable to load attachments'
+        );
+      } finally {
+        setIsLoadingMedia(false);
+      }
+    }
+
+    void loadMedia();
+  }, [selectedId]);
 
   const handleSelect = (object: ObjectRecord) => {
     setSelectedId(object.id);
@@ -68,6 +98,42 @@ export function ObjectWorkspace({
     setSelectedId(null);
     setFormState(emptyFormState);
     setError(null);
+    setMediaItems([]);
+    setMediaError(null);
+  };
+
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file || !selectedId) {
+      return;
+    }
+
+    setIsUploadingMedia(true);
+    setMediaError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch(`${apiBaseUrl}/api/objects/${selectedId}/media`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => null)) as { message?: string } | null;
+        throw new Error(payload?.message ?? 'Unable to upload media');
+      }
+
+      const uploaded = (await response.json()) as ObjectMediaRecord;
+      setMediaItems((current) => [uploaded, ...current]);
+      event.target.value = '';
+    } catch (requestError) {
+      setMediaError(requestError instanceof Error ? requestError.message : 'Unable to upload media');
+    } finally {
+      setIsUploadingMedia(false);
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -254,6 +320,87 @@ export function ObjectWorkspace({
             ) : null}
           </div>
         </form>
+
+        <div className="mt-8 border-t border-black/5 pt-6">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">
+                Attachments
+              </p>
+              <p className="mt-1 text-sm text-ink/65">
+                {selectedObject
+                  ? 'Upload images or PDFs for this object record.'
+                  : 'Create an object first, then attach media.'}
+              </p>
+            </div>
+
+            <label
+              className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                selectedObject
+                  ? 'cursor-pointer bg-moss text-white'
+                  : 'cursor-not-allowed bg-sand text-ink/55'
+              }`}
+            >
+              Add file
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,application/pdf"
+                disabled={!selectedObject || isUploadingMedia}
+                onChange={handleUpload}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            {isLoadingMedia ? (
+              <div className="rounded-2xl bg-clay px-4 py-3 text-sm text-ink/70">
+                Loading attachments...
+              </div>
+            ) : null}
+
+            {isUploadingMedia ? (
+              <div className="rounded-2xl bg-[#edf5ef] px-4 py-3 text-sm text-moss">
+                Uploading file...
+              </div>
+            ) : null}
+
+            {mediaError ? (
+              <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {mediaError}
+              </div>
+            ) : null}
+
+            {!selectedObject ? (
+              <div className="rounded-2xl bg-clay px-4 py-3 text-sm text-ink/70">
+                Select or create an object to manage attachments.
+              </div>
+            ) : mediaItems.length === 0 && !isLoadingMedia ? (
+              <div className="rounded-2xl bg-clay px-4 py-3 text-sm text-ink/70">
+                No attachments yet. Upload the first image or document.
+              </div>
+            ) : (
+              mediaItems.map((mediaItem) => (
+                <div
+                  key={mediaItem.id}
+                  className="rounded-2xl border border-sand bg-clay px-4 py-4 text-sm text-ink"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-semibold">{mediaItem.originalFilename}</p>
+                      <p className="mt-1 text-xs uppercase tracking-[0.16em] text-ink/55">
+                        {mediaItem.mimeType}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+                      {(mediaItem.size / 1024).toFixed(1)} KB
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </article>
     </section>
   );

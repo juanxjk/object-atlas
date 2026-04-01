@@ -9,6 +9,16 @@ export type ObjectRecord = {
   updatedAt: string;
 };
 
+export type ObjectMediaRecord = {
+  id: string;
+  objectId: string;
+  originalFilename: string;
+  storagePath: string;
+  mimeType: string;
+  size: number;
+  createdAt: string;
+};
+
 const apiBaseUrl = process.env.API_URL ?? 'http://localhost:3001';
 
 export async function getObjects(): Promise<ObjectRecord[]> {
