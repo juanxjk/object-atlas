@@ -1,14 +1,15 @@
 import { randomUUID } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
-import { basename, extname, join, resolve } from 'node:path';
+import { basename, extname, join } from 'node:path';
 
 import { Injectable } from '@nestjs/common';
 
 import { StorageService, StoreFileInput, StoredFile } from './storage.types';
+import { resolveStorageRoot } from './storage-path';
 
 @Injectable()
 export class FilesystemStorageService implements StorageService {
-  private readonly rootDirectory = resolve(process.env.STORAGE_FILESYSTEM_ROOT ?? './uploads');
+  private readonly rootDirectory = resolveStorageRoot(process.env.STORAGE_FILESYSTEM_ROOT);
 
   async store(input: StoreFileInput): Promise<StoredFile> {
     const objectDirectory = join(this.rootDirectory, 'objects', input.objectId);

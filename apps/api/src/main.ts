@@ -1,17 +1,17 @@
 import 'reflect-metadata';
 
-import { resolve } from 'node:path';
-
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 import { AppModule } from './app.module';
+import { resolveStorageRoot } from './storage/storage-path';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const port = Number(process.env.PORT ?? '3001');
   const publicAppUrl = process.env.PUBLIC_APP_URL ?? 'http://localhost:3000';
+  const storageRoot = resolveStorageRoot(process.env.STORAGE_FILESYSTEM_ROOT);
 
   app.setGlobalPrefix('api');
   app.enableCors({
@@ -19,7 +19,7 @@ async function bootstrap(): Promise<void> {
     methods: ['GET', 'POST', 'PATCH'],
     allowedHeaders: ['Content-Type']
   });
-  app.useStaticAssets(resolve(process.env.STORAGE_FILESYSTEM_ROOT ?? './uploads'), {
+  app.useStaticAssets(storageRoot, {
     prefix: '/uploads/'
   });
 

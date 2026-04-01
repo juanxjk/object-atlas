@@ -50,3 +50,4 @@ Important rule:
 - The API database layer now uses Drizzle schema definitions and a typed Drizzle provider
 - Public object pages now present image attachments through a carousel instead of only a file list
 - Object detail now includes a direct action to open the public page URL without opening the QR modal
+- Filesystem uploads and `/uploads` static serving now resolve from the API package root instead of depending on the launch cwd

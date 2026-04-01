@@ -79,6 +79,7 @@ Validation should remain practical and focused on obvious bad input for the MVP.
 - Provide a filesystem implementation first
 - Store media metadata in PostgreSQL
 - Keep public URLs or file-serving behavior simple
+- Resolve the filesystem storage root relative to the API package so uploads do not depend on the shell cwd
 - Restrict accepted file types and size with lightweight validation
 
 ## QR Impact
