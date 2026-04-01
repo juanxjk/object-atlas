@@ -53,3 +53,4 @@ Important rule:
 - Filesystem uploads and `/uploads` static serving now resolve from the API package root instead of depending on the launch cwd
 - Attachments can now be removed from the object detail flow, with primary-image fallback and cleanup of unreferenced files
 - The current main image can also be removed directly from the attachment card without changing it first
+- Image attachments now show an inline preview inside the object detail cards

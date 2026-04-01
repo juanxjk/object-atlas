@@ -581,6 +581,16 @@ export function ObjectWorkspace({
                       key={mediaItem.id}
                       className="rounded-2xl border border-sand bg-clay px-4 py-4 text-sm text-ink"
                     >
+                      {mediaItem.mimeType.startsWith('image/') ? (
+                        <div className="mb-4 overflow-hidden rounded-2xl border border-black/5 bg-white">
+                          <img
+                            src={getThumbnailUrl(mediaItem.storagePath) ?? ''}
+                            alt={mediaItem.originalFilename}
+                            className="h-48 w-full object-cover sm:h-56"
+                          />
+                        </div>
+                      ) : null}
+
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="font-semibold">{mediaItem.originalFilename}</p>
