@@ -5,6 +5,7 @@ export const filesTable = pgTable('files', {
   id: uuid('id').primaryKey(),
   originalFilename: text('original_filename').notNull(),
   storagePath: text('storage_path').notNull().unique(),
+  contentHash: text('content_hash'),
   mimeType: text('mime_type').notNull(),
   size: integer('size').notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()

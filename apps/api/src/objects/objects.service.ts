@@ -1,4 +1,5 @@
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 
 import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { sql } from 'drizzle-orm';
@@ -41,6 +42,16 @@ type DatabaseObjectMediaRow = {
   created_at: Date | string;
 };
 
+type DatabaseFileRow = {
+  id: string;
+  original_filename: string;
+  storage_path: string;
+  content_hash: string | null;
+  mime_type: string;
+  size: number;
+  created_at: Date | string;
+};
+
 @Injectable()
 export class ObjectsService implements OnModuleInit {
   constructor(
@@ -69,6 +80,7 @@ export class ObjectsService implements OnModuleInit {
         id UUID PRIMARY KEY,
         original_filename TEXT NOT NULL,
         storage_path TEXT NOT NULL UNIQUE,
+        content_hash TEXT,
         mime_type TEXT NOT NULL,
         size INTEGER NOT NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -103,6 +115,11 @@ export class ObjectsService implements OnModuleInit {
     `);
 
     await db.execute(sql`
+      ALTER TABLE files
+      ADD COLUMN IF NOT EXISTS content_hash TEXT
+    `);
+
+    await db.execute(sql`
       INSERT INTO files (id, original_filename, storage_path, mime_type, size, created_at)
       SELECT id, original_filename, storage_path, mime_type, size, created_at
       FROM object_media
@@ -131,6 +148,36 @@ export class ObjectsService implements OnModuleInit {
       WHERE objects.id = first_image.object_id
         AND objects.primary_file_id IS NULL
     `);
+
+    await this.backfillFileHashes();
+  }
+
+  private computeFileHash(buffer: Buffer): string {
+    return createHash('sha256').update(buffer).digest('hex');
+  }
+
+  private async backfillFileHashes(): Promise<void> {
+    const db = this.databaseService.getDb();
+    const filesWithoutHash = await db.execute<DatabaseFileRow>(sql`
+      SELECT id, original_filename, storage_path, content_hash, mime_type, size, created_at
+      FROM files
+      WHERE content_hash IS NULL
+    `);
+
+    for (const file of filesWithoutHash.rows) {
+      try {
+        const fileBuffer = await readFile(this.storageService.resolvePath(file.storage_path));
+        const contentHash = this.computeFileHash(fileBuffer);
+
+        await db.execute(sql`
+          UPDATE files
+          SET content_hash = ${contentHash}
+          WHERE id = ${file.id}
+        `);
+      } catch {
+        continue;
+      }
+    }
   }
 
   private objectSelectSql() {
@@ -257,35 +304,57 @@ export class ObjectsService implements OnModuleInit {
   ): Promise<ObjectMediaRecord> {
     const db = this.databaseService.getDb();
     const object = await this.getById(objectId);
+    const contentHash = this.computeFileHash(file.buffer);
 
-    const storedFile = await this.storageService.store({
-      objectId,
-      originalFilename: file.originalname,
-      mimeType: file.mimetype,
-      buffer: file.buffer
-    });
-
-    const fileId = randomUUID();
-    const mediaId = randomUUID();
-
-    await db.execute(sql`
-      INSERT INTO files (
-        id,
-        original_filename,
-        storage_path,
-        mime_type,
-        size
-      )
-      VALUES (
-        ${fileId},
-        ${file.originalname},
-        ${storedFile.relativePath},
-        ${file.mimetype},
-        ${file.size}
-      )
+    const existingFileResult = await db.execute<DatabaseFileRow>(sql`
+      SELECT id, original_filename, storage_path, content_hash, mime_type, size, created_at
+      FROM files
+      WHERE content_hash = ${contentHash}
+      LIMIT 1
     `);
 
-    const relation = await db.execute<Pick<DatabaseObjectMediaRow, 'id' | 'object_id' | 'file_id' | 'created_at'>>(sql`
+    let fileId = existingFileResult.rows[0]?.id ?? null;
+    let storagePath = existingFileResult.rows[0]?.storage_path ?? null;
+    let mimeType = existingFileResult.rows[0]?.mime_type ?? file.mimetype;
+    let size = existingFileResult.rows[0]?.size ?? file.size;
+    const mediaId = randomUUID();
+
+    if (!fileId || !storagePath) {
+      const storedFile = await this.storageService.store({
+        objectId,
+        originalFilename: file.originalname,
+        mimeType: file.mimetype,
+        buffer: file.buffer
+      });
+
+      fileId = randomUUID();
+      storagePath = storedFile.relativePath;
+      mimeType = file.mimetype;
+      size = file.size;
+
+      await db.execute(sql`
+        INSERT INTO files (
+          id,
+          original_filename,
+          storage_path,
+          content_hash,
+          mime_type,
+          size
+        )
+        VALUES (
+          ${fileId},
+          ${file.originalname},
+          ${storagePath},
+          ${contentHash},
+          ${mimeType},
+          ${size}
+        )
+      `);
+    }
+
+    const relation = await db.execute<
+      Pick<DatabaseObjectMediaRow, 'id' | 'object_id' | 'file_id' | 'created_at'>
+    >(sql`
       INSERT INTO object_files (
         id,
         object_id,
@@ -296,10 +365,25 @@ export class ObjectsService implements OnModuleInit {
         ${objectId},
         ${fileId}
       )
+      ON CONFLICT (object_id, file_id) DO NOTHING
       RETURNING id, object_id, file_id, created_at
     `);
 
-    const shouldBecomePrimary = !object.primaryFileId && file.mimetype.startsWith('image/');
+    const resolvedRelation =
+      relation.rows[0] ??
+      (
+        await db.execute<
+          Pick<DatabaseObjectMediaRow, 'id' | 'object_id' | 'file_id' | 'created_at'>
+        >(sql`
+          SELECT id, object_id, file_id, created_at
+          FROM object_files
+          WHERE object_id = ${objectId}
+            AND file_id = ${fileId}
+          LIMIT 1
+        `)
+      ).rows[0];
+
+    const shouldBecomePrimary = !object.primaryFileId && mimeType.startsWith('image/');
 
     if (shouldBecomePrimary) {
       await db.execute(sql`
@@ -311,11 +395,11 @@ export class ObjectsService implements OnModuleInit {
     }
 
     return mapObjectMediaRow({
-      ...relation.rows[0],
-      original_filename: file.originalname,
-      storage_path: storedFile.relativePath,
-      mime_type: file.mimetype,
-      size: file.size,
+      ...resolvedRelation,
+      original_filename: existingFileResult.rows[0]?.original_filename ?? file.originalname,
+      storage_path: storagePath,
+      mime_type: mimeType,
+      size,
       is_primary: shouldBecomePrimary
     });
   }

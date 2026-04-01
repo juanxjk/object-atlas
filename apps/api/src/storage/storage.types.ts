@@ -16,4 +16,5 @@ export type StoredFile = {
 export interface StorageService {
   store(input: StoreFileInput): Promise<StoredFile>;
   delete(relativePath: string): Promise<void>;
+  resolvePath(relativePath: string): string;
 }

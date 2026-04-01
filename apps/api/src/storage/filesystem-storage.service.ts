@@ -11,6 +11,10 @@ import { resolveStorageRoot } from './storage-path';
 export class FilesystemStorageService implements StorageService {
   private readonly rootDirectory = resolveStorageRoot(process.env.STORAGE_FILESYSTEM_ROOT);
 
+  resolvePath(relativePath: string): string {
+    return join(this.rootDirectory, relativePath);
+  }
+
   async store(input: StoreFileInput): Promise<StoredFile> {
     const objectDirectory = join(this.rootDirectory, 'objects', input.objectId);
     await mkdir(objectDirectory, { recursive: true });
@@ -34,6 +38,6 @@ export class FilesystemStorageService implements StorageService {
   }
 
   async delete(relativePath: string): Promise<void> {
-    await rm(join(this.rootDirectory, relativePath), { force: true });
+    await rm(this.resolvePath(relativePath), { force: true });
   }
 }

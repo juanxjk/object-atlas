@@ -82,6 +82,7 @@ Validation should remain practical and focused on obvious bad input for the MVP.
 - Use a storage service interface in the API
 - Provide a filesystem implementation first
 - Store media metadata in PostgreSQL
+- Compute a content hash for each binary so repeated uploads reuse the same stored file record
 - Remove object-file relations and delete the underlying file only when no objects still reference it
 - Keep public URLs or file-serving behavior simple
 - Resolve the filesystem storage root relative to the API package so uploads do not depend on the shell cwd
