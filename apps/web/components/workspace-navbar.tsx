@@ -19,7 +19,7 @@ export function WorkspaceNavbar() {
 
   return (
     <header className="sticky top-4 z-20">
-      <nav className="rounded-soft border border-black/5 bg-white/90 px-4 py-3 shadow-card backdrop-blur sm:px-6">
+      <nav className="rounded-soft border border-black/5 bg-white/90 px-4 py-3 backdrop-blur sm:px-6">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-moss">

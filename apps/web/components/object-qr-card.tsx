@@ -39,7 +39,7 @@ export function ObjectQrCard({
   }, [publicObjectUrl]);
 
   return (
-    <div className="rounded-soft border border-black/5 bg-white/85 p-5 shadow-card sm:p-6">
+    <div className="rounded-soft border border-black/5 bg-white/85 p-5 sm:p-6">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">QR access</p>
       <h3 className="mt-2 font-[family-name:var(--font-display)] text-2xl text-ink">
         Public object link
@@ -64,7 +64,7 @@ export function ObjectQrCard({
           </div>
         )}
 
-        <div className="w-full rounded-2xl bg-white px-4 py-3 text-sm text-ink shadow-sm">
+        <div className="w-full rounded-2xl border border-black/5 bg-white px-4 py-3 text-sm text-ink">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-moss">
             Public URL
           </p>

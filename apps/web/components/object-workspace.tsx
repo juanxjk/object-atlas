@@ -204,7 +204,7 @@ export function ObjectWorkspace({
       <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
         <article
           id="object-listing"
-          className={`rounded-soft border border-black/5 bg-white/85 p-5 shadow-card sm:p-6 ${
+          className={`rounded-soft border border-black/5 bg-white/85 p-5 sm:p-6 ${
             mobileView === 'list' ? 'block' : 'hidden lg:block'
           }`}
         >
@@ -259,7 +259,7 @@ export function ObjectWorkspace({
                     onClick={() => handleSelect(object)}
                     className={`w-full rounded-2xl border px-4 py-4 text-left transition ${
                       isSelected
-                        ? 'border-ember bg-[#fff7f1] shadow-card'
+                        ? 'border-ember bg-[#fff7f1]'
                         : 'border-sand bg-clay'
                     }`}
                   >
@@ -286,7 +286,7 @@ export function ObjectWorkspace({
         >
           <article
             id="object-editor"
-            className="rounded-soft border border-black/5 bg-white/90 p-5 shadow-card sm:p-6"
+            className="rounded-soft border border-black/5 bg-white/90 p-5 sm:p-6"
           >
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
               {selectedObject ? 'Edit object' : 'Object details'}
@@ -466,7 +466,7 @@ export function ObjectWorkspace({
 
       {isCreateModalOpen ? (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-ink/35 px-4 py-6">
-          <div className="w-full max-w-xl rounded-soft border border-black/5 bg-white p-5 shadow-card sm:p-6">
+          <div className="w-full max-w-xl rounded-soft border border-black/5 bg-white p-5 sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">

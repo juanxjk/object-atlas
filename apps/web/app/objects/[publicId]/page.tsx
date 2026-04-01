@@ -56,7 +56,7 @@ export default async function PublicObjectPage({
   return (
     <main className="min-h-screen px-4 py-6 sm:px-6">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-        <section className="rounded-soft border border-black/5 bg-white/90 p-6 shadow-card sm:p-8">
+        <section className="rounded-soft border border-black/5 bg-white/90 p-6 sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
             Public object page
           </p>
@@ -84,14 +84,14 @@ export default async function PublicObjectPage({
           </div>
         </section>
 
-        <section className="rounded-soft border border-black/5 bg-white/85 p-6 shadow-card sm:p-8">
+        <section className="rounded-soft border border-black/5 bg-white/85 p-6 sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">Story</p>
           <div className="mt-4 rounded-2xl bg-clay px-4 py-4 text-sm leading-7 text-ink/80">
             {object.story ?? 'A story for this object has not been published yet.'}
           </div>
         </section>
 
-        <section className="rounded-soft border border-black/5 bg-white/85 p-6 shadow-card sm:p-8">
+        <section className="rounded-soft border border-black/5 bg-white/85 p-6 sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">Media</p>
           <div className="mt-4">
             <MediaList media={object.media} />

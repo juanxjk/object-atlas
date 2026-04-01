@@ -19,7 +19,7 @@ export default function AboutPage() {
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
         <WorkspaceNavbar />
 
-        <section className="rounded-soft border border-black/5 bg-white/90 px-5 py-6 shadow-card sm:px-8 sm:py-8">
+        <section className="rounded-soft border border-black/5 bg-white/90 px-5 py-6 sm:px-8 sm:py-8">
           <p className="text-sm font-medium uppercase tracking-[0.24em] text-ember">About</p>
           <h1 className="mt-3 max-w-3xl font-[family-name:var(--font-display)] text-4xl leading-tight text-ink sm:text-5xl">
             A transparent look at how ObjectAtlas is being shaped.
@@ -32,7 +32,7 @@ export default function AboutPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-[1.3fr_1fr]">
-          <article className="rounded-soft border border-black/5 bg-white/85 p-5 shadow-card sm:p-6">
+          <article className="rounded-soft border border-black/5 bg-white/85 p-5 sm:p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">
               Product direction
             </p>
@@ -45,7 +45,7 @@ export default function AboutPage() {
             </ul>
           </article>
 
-          <aside className="rounded-soft border border-black/5 bg-ink p-5 text-white shadow-card sm:p-6">
+          <aside className="rounded-soft border border-black/5 bg-ink p-5 text-white sm:p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sand">
               Implementation notes
             </p>

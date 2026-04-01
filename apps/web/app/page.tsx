@@ -16,7 +16,7 @@ export default async function HomePage() {
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
         <WorkspaceNavbar />
 
-        <section className="overflow-hidden rounded-soft border border-black/5 bg-white/90 shadow-card">
+        <section className="overflow-hidden rounded-soft border border-black/5 bg-white/90">
           <div className="flex flex-col gap-6 px-5 py-6 sm:px-8 sm:py-8">
             <div className="inline-flex w-fit items-center gap-2 rounded-full bg-ink px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
               ObjectAtlas
@@ -38,7 +38,7 @@ export default async function HomePage() {
         </section>
 
         <section className="grid gap-4 md:grid-cols-[1.4fr_1fr]">
-          <article className="rounded-soft border border-black/5 bg-white/85 p-5 shadow-card sm:p-6">
+          <article className="rounded-soft border border-black/5 bg-white/85 p-5 sm:p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">
               What you can do
             </p>
@@ -51,7 +51,7 @@ export default async function HomePage() {
             </ul>
           </article>
 
-          <aside className="rounded-soft border border-black/5 bg-ink p-5 text-white shadow-card sm:p-6">
+          <aside className="rounded-soft border border-black/5 bg-ink p-5 text-white sm:p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sand">
               Public experience
             </p>

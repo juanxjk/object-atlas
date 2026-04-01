@@ -39,3 +39,4 @@ Important rule:
 - Shared site chrome now includes a lightweight footer for primary navigation and product framing
 - Shared site chrome now links to the public GitHub repository for project transparency
 - User-facing copy now keeps product principles implicit instead of repeating them in the UI
+- Shared surfaces now rely more on borders and contrast than repeated card shadows
