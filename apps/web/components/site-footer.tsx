@@ -11,6 +11,8 @@ const footerLinks = [
   }
 ];
 
+const githubRepositoryUrl = 'https://github.com/juanxjk/object-atlas';
+
 export function SiteFooter() {
   return (
     <footer className="border-t border-black/8 bg-white/55">
@@ -23,6 +25,14 @@ export function SiteFooter() {
             <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/68">
               A calm mobile-first home for object records, public stories, and QR-linked pages.
             </p>
+            <a
+              href={githubRepositoryUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-3 inline-flex text-sm font-medium text-ember underline-offset-4 transition hover:underline"
+            >
+              View the GitHub repository
+            </a>
           </div>
 
           <nav className="flex flex-wrap items-center gap-3 text-sm text-ink/72">

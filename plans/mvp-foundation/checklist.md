@@ -37,3 +37,4 @@ Important rule:
 - New object creation now uses a dedicated modal instead of the inline editor
 - The main page now stays product-facing, while implementation context lives on a dedicated About page
 - Shared site chrome now includes a lightweight footer for primary navigation and product framing
+- Shared site chrome now links to the public GitHub repository for project transparency
