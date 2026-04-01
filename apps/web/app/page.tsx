@@ -1,9 +1,5 @@
-const quickActions = [
-  'Create object record',
-  'Upload object media',
-  'Open public page',
-  'Print QR label'
-];
+import { ObjectWorkspace } from '../components/object-workspace';
+import { getObjects } from '../lib/object-api';
 
 const priorities = [
   'Short mobile-first forms for object creation',
@@ -11,7 +7,9 @@ const priorities = [
   'Simple media handling before storage abstraction evolves'
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const objects = await getObjects();
+
   return (
     <main className="min-h-screen px-4 py-6 sm:px-6">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
@@ -29,20 +27,9 @@ export default function HomePage() {
                 A mobile-first workspace for object records, stories, and QR-linked public pages.
               </h1>
               <p className="max-w-2xl text-base leading-7 text-ink/70">
-                This starter dashboard will evolve into the curator surface for creating objects,
-                managing media, and opening the public history page for each piece.
+                The workspace below is now connected to the API scaffold, so the MVP can create
+                and update object records before media and public page work land in later steps.
               </p>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              {quickActions.map((action) => (
-                <div
-                  key={action}
-                  className="rounded-2xl border border-sand bg-clay px-4 py-4 text-sm font-medium text-ink"
-                >
-                  {action}
-                </div>
-              ))}
             </div>
           </div>
         </section>
@@ -68,10 +55,12 @@ export default function HomePage() {
             <div className="mt-4 space-y-3 text-sm leading-6 text-white/80">
               <p>Next.js App Router</p>
               <p>Tailwind CSS with a custom warm palette</p>
-              <p>Dashboard shell ready for object management flows</p>
+              <p>Object create and edit flow wired to the API</p>
             </div>
           </aside>
         </section>
+
+        <ObjectWorkspace initialObjects={objects} />
       </div>
     </main>
   );

@@ -8,6 +8,7 @@ Current scaffold includes:
 - Tailwind CSS configuration
 - mobile-first dashboard shell
 - shared global styling for the MVP workspace
+- object creation and editing flow connected to the API scaffold
 
 Planned responsibilities:
 
