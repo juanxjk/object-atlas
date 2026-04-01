@@ -24,7 +24,7 @@ Important rule:
 - [x] `feat:` Add basic object listing and title search in the management interface
 - [x] `test:` Add automated coverage for core object, media, and public page flows
 - [x] `chore:` Final MVP cleanup, docs, and validation pass
-- [ ] `refactor:` Optional post-MVP extraction of shared contracts and UI primitives
+- [x] `refactor:` Optional post-MVP extraction of shared contracts and UI primitives
 - [ ] `chore:` Optional post-MVP hardening for auth, upload restrictions, and operational polish
 
 ## Notes

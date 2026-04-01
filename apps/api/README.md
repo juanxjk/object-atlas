@@ -14,6 +14,7 @@ Current scaffold includes:
 - public object retrieval by public identifier
 - title-based object listing and search
 - lightweight automated coverage for validation and mappers
+- shared object contracts imported from `packages/types`
 
 Planned responsibilities:
 

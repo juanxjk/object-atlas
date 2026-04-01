@@ -1,13 +1,13 @@
 import { randomUUID } from 'node:crypto';
 
 import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { PublicObjectRecord } from '@object-atlas/types';
 
 import { DatabaseService } from '../database/database.service';
 import { STORAGE_SERVICE } from '../storage/storage.constants';
 import { StorageService } from '../storage/storage.types';
 import { mapObjectMediaRow } from './object-media.mapper';
 import { mapObjectRow } from './object.mapper';
-import { PublicObjectRecord } from './public-object.types';
 import {
   CreateObjectInput,
   ObjectMediaRecord,

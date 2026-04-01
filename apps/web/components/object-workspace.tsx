@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { ObjectMediaRecord, ObjectRecord } from '@object-atlas/types';
 
 import { ObjectQrCard } from './object-qr-card';
-import type { ObjectMediaRecord, ObjectRecord } from '../lib/object-api';
 import { filterObjectsByTitle } from '../lib/object-search';
 
 type ObjectFormState = {
