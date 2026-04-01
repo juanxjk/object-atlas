@@ -51,6 +51,11 @@ export class ObjectsController {
     return this.objectsService.update(id, validateUpdateObject(body));
   }
 
+  @Patch(':id/primary-media/:mediaId')
+  setPrimaryMedia(@Param('id') id: string, @Param('mediaId') mediaId: string) {
+    return this.objectsService.setPrimaryMedia(id, mediaId);
+  }
+
   @Post(':id/media')
   @UseInterceptors(
     FileInterceptor('file', {

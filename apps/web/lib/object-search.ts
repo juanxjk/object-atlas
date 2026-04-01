@@ -1,4 +1,4 @@
-import { ObjectRecord } from './object-api';
+import type { ObjectRecord } from '@object-atlas/types';
 
 export function filterObjectsByTitle(
   objects: ObjectRecord[],

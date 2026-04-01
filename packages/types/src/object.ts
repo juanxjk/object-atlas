@@ -4,6 +4,7 @@ export type ObjectRecord = {
   title: string;
   description: string | null;
   story: string | null;
+  primaryFileId: string | null;
   thumbnailPath: string | null;
   metadata: Record<string, unknown>;
   createdAt: string;
@@ -13,10 +14,12 @@ export type ObjectRecord = {
 export type ObjectMediaRecord = {
   id: string;
   objectId: string;
+  fileId: string;
   originalFilename: string;
   storagePath: string;
   mimeType: string;
   size: number;
+  isPrimary: boolean;
   createdAt: string;
 };
 

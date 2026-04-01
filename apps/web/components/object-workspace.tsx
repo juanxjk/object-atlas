@@ -1,6 +1,6 @@
 'use client';
 
-import { Pencil, Plus, QrCode, Search, Upload, X } from 'lucide-react';
+import { ImageIcon, Pencil, Plus, QrCode, Search, Star, Upload, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { ObjectMediaRecord, ObjectRecord } from '@object-atlas/types';
 
@@ -189,7 +189,11 @@ export function ObjectWorkspace({
             object.id === selectedId
               ? {
                   ...object,
-                  thumbnailPath: object.thumbnailPath ?? uploaded.storagePath
+                  primaryFileId: uploaded.isPrimary ? uploaded.fileId : object.primaryFileId,
+                  thumbnailPath:
+                    uploaded.isPrimary || !object.thumbnailPath
+                      ? uploaded.storagePath
+                      : object.thumbnailPath
                 }
               : object
           )
@@ -230,6 +234,35 @@ export function ObjectWorkspace({
       setEditError(requestError instanceof Error ? requestError.message : 'Unable to save object');
     } finally {
       setIsEditingFromModal(false);
+    }
+  };
+
+  const handleSetPrimaryImage = async (mediaItem: ObjectMediaRecord) => {
+    if (!selectedId || mediaItem.isPrimary) {
+      return;
+    }
+
+    try {
+      const updated = await requestObject<ObjectRecord>(
+        `/api/objects/${selectedId}/primary-media/${mediaItem.id}`,
+        {
+          method: 'PATCH'
+        }
+      );
+
+      setObjects((current) =>
+        current.map((object) => (object.id === updated.id ? updated : object))
+      );
+      setMediaItems((current) =>
+        current.map((item) => ({
+          ...item,
+          isPrimary: item.id === mediaItem.id
+        }))
+      );
+    } catch (requestError) {
+      setMediaError(
+        requestError instanceof Error ? requestError.message : 'Unable to set main image'
+      );
     }
   };
 
@@ -312,8 +345,9 @@ export function ObjectWorkspace({
                             />
                           </div>
                         ) : (
-                          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-dashed border-sand bg-white/70 text-xs font-semibold uppercase tracking-[0.12em] text-ink/40">
-                            No image
+                          <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-2xl border border-dashed border-sand bg-white/70 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/40">
+                            <ImageIcon size={16} strokeWidth={2} />
+                            <span className="mt-1">No image</span>
                           </div>
                         )}
 
@@ -509,10 +543,37 @@ export function ObjectWorkspace({
                             {mediaItem.mimeType}
                           </p>
                         </div>
-                        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
-                          {(mediaItem.size / 1024).toFixed(1)} KB
-                        </span>
+                        <div className="flex items-center gap-2">
+                          {mediaItem.isPrimary ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-ember">
+                              <Star size={12} strokeWidth={2.2} />
+                              Main
+                            </span>
+                          ) : null}
+                          <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+                            {(mediaItem.size / 1024).toFixed(1)} KB
+                          </span>
+                        </div>
                       </div>
+
+                      {mediaItem.mimeType.startsWith('image/') ? (
+                        <div className="mt-3 border-t border-black/5 pt-3">
+                          {mediaItem.isPrimary ? (
+                            <p className="text-xs font-medium text-ink/55">
+                              This image is currently used as the main thumbnail.
+                            </p>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleSetPrimaryImage(mediaItem)}
+                              className="inline-flex items-center gap-2 rounded-full border border-sand bg-white px-4 py-2 text-sm font-semibold text-ink"
+                            >
+                              <Star size={16} strokeWidth={2.1} />
+                              Set as main image
+                            </button>
+                          )}
+                        </div>
+                      ) : null}
                     </div>
                   ))
                 )}

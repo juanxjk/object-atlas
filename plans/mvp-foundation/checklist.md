@@ -46,3 +46,4 @@ Important rule:
 - Primary navigation and object actions now use Lucide icons instead of text-only affordances
 - Object listing cards now show a thumbnail when an image attachment exists
 - Create, edit, and QR modals now close when the user clicks the backdrop
+- Files are now stored in a reusable file table, and objects point to a chosen primary file for thumbnails

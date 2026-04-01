@@ -34,6 +34,7 @@ After the MVP, the implementation can evolve toward:
 - Object detail screen focused on reading, attachments, and QR access
 - QR code surface opened from a quick action instead of always rendering inline
 - Object listing cards can show a thumbnail when the record already has an image attachment
+- Attachments can mark one image as the main image for object listings
 - Public object page routed by public identifier
 - Basic search input by title
 - QR code display within the object detail screen
@@ -49,7 +50,9 @@ After the MVP, the implementation can evolve toward:
 ## Data Model Impact
 
 - `objects` table
-- `object_media` table
+- `files` table
+- `object_files` table
+- `objects.primary_file_id` foreign key pointing to the chosen main file
 - optional simple fields for title, slug or public id, description, story, metadata summary, and timestamps
 - relation between object and media records
 
@@ -62,6 +65,7 @@ No collections table is required in the MVP unless it becomes necessary during i
 - `GET /objects/:id`
 - `PATCH /objects/:id`
 - `POST /objects/:id/media`
+- `PATCH /objects/:id/primary-media/:mediaId`
 - `GET /public/objects/:publicId`
 
 Validation should remain practical and focused on obvious bad input for the MVP.

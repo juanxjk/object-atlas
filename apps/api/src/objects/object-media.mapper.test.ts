@@ -7,20 +7,24 @@ describe('mapObjectMediaRow', () => {
     const mapped = mapObjectMediaRow({
       id: 'media-1',
       object_id: 'object-1',
+      file_id: 'file-1',
       original_filename: 'lamp.jpg',
       storage_path: 'objects/object-1/lamp.jpg',
       mime_type: 'image/jpeg',
       size: 2048,
+      is_primary: true,
       created_at: '2026-04-01T00:00:00.000Z'
     });
 
     expect(mapped).toEqual({
       id: 'media-1',
       objectId: 'object-1',
+      fileId: 'file-1',
       originalFilename: 'lamp.jpg',
       storagePath: 'objects/object-1/lamp.jpg',
       mimeType: 'image/jpeg',
       size: 2048,
+      isPrimary: true,
       createdAt: '2026-04-01T00:00:00.000Z'
     });
   });

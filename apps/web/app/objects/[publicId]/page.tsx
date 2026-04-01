@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
+import type { PublicObjectRecord } from '@object-atlas/types';
 
-import { getPublicObject, type PublicObjectRecord } from '../../../lib/object-api';
+import { getPublicObject } from '../../../lib/object-api';
 
 function formatDate(value: string): string {
   return new Intl.DateTimeFormat('en', {
