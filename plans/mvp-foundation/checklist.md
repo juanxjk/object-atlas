@@ -52,3 +52,4 @@ Important rule:
 - Object detail now includes a direct action to open the public page URL without opening the QR modal
 - Filesystem uploads and `/uploads` static serving now resolve from the API package root instead of depending on the launch cwd
 - Attachments can now be removed from the object detail flow, with primary-image fallback and cleanup of unreferenced files
+- The current main image can also be removed directly from the attachment card without changing it first

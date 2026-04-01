@@ -604,9 +604,21 @@ export function ObjectWorkspace({
                       {mediaItem.mimeType.startsWith('image/') ? (
                         <div className="mt-3 border-t border-black/5 pt-3">
                           {mediaItem.isPrimary ? (
-                            <p className="text-xs font-medium text-ink/55">
-                              This image is currently used as the main thumbnail.
-                            </p>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="text-xs font-medium text-ink/55">
+                                This image is currently used as the main thumbnail.
+                              </p>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteMedia(mediaItem)}
+                                disabled={deletingMediaId === mediaItem.id}
+                                className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 disabled:opacity-60"
+                              >
+                                <Trash2 size={16} strokeWidth={2.1} />
+                                {deletingMediaId === mediaItem.id ? 'Removing...' : 'Remove'}
+                              </button>
+                            </div>
                           ) : (
                             <div className="flex flex-wrap items-center gap-2">
                               <button

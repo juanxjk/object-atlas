@@ -37,7 +37,7 @@ After the MVP, the implementation can evolve toward:
 - QR code surface opened from a quick action instead of always rendering inline
 - Object listing cards can show a thumbnail when the record already has an image attachment
 - Attachments can mark one image as the main image for object listings
-- Attachments can be removed from the object detail flow
+- Attachments can be removed from the object detail flow, including the current main image
 - Public object page routed by public identifier
 - Public object page includes an image carousel when image media is available
 - Basic search input by title
