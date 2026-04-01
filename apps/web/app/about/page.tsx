@@ -1,7 +1,7 @@
 import { WorkspaceNavbar } from '../../components/workspace-navbar';
 
 const productNotes = [
-  'ObjectAtlas is being built as a mobile-first web experience for documenting physical objects and connecting them to public pages.',
+  'ObjectAtlas is being built as a web experience for documenting physical objects and connecting them to public pages.',
   'The project is intentionally transparent about being developed with AI-assisted code generation under human guidance.',
   'The current direction focuses on a practical foundation first, with room to evolve storage, validation, and collaboration features over time.'
 ];

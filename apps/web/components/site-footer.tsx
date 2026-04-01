@@ -23,7 +23,7 @@ export function SiteFooter() {
               ObjectAtlas
             </p>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/68">
-              A calm mobile-first home for object records, public stories, and QR-linked pages.
+              A calm home for object records, public stories, and QR-linked pages.
             </p>
             <a
               href={githubRepositoryUrl}

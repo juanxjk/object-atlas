@@ -5,7 +5,7 @@ import { getObjects } from '../lib/object-api';
 const highlights = [
   'Capture the identity, story, and context of each object in one place',
   'Share a public page instantly through a QR code attached to the physical item',
-  'Keep records easy to browse and update from a phone or desktop browser'
+  'Keep records easy to browse and update as collections grow'
 ];
 
 export default async function HomePage() {
@@ -31,8 +31,7 @@ export default async function HomePage() {
               </h1>
               <p className="max-w-2xl text-base leading-7 text-ink/70">
                 ObjectAtlas connects physical objects to digital profiles with clear descriptions,
-                rich stories, attached media, and QR-linked public pages that work beautifully on
-                mobile.
+                rich stories, attached media, and QR-linked public pages.
               </p>
             </div>
           </div>
@@ -58,7 +57,7 @@ export default async function HomePage() {
             </p>
             <div className="mt-4 space-y-3 text-sm leading-6 text-white/80">
               <p>Open an object page from the attached QR code</p>
-              <p>Read the story, summary, and supporting context on mobile</p>
+              <p>Read the story, summary, and supporting context clearly</p>
               <p>Browse media connected to the object record</p>
             </div>
           </aside>

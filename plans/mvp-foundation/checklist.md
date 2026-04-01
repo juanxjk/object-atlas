@@ -38,3 +38,4 @@ Important rule:
 - The main page now stays product-facing, while implementation context lives on a dedicated About page
 - Shared site chrome now includes a lightweight footer for primary navigation and product framing
 - Shared site chrome now links to the public GitHub repository for project transparency
+- User-facing copy now keeps product principles implicit instead of repeating them in the UI
