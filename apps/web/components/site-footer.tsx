@@ -1,4 +1,4 @@
-import { Github, Home, Info } from 'lucide-react';
+import { FolderGit2, Home, Info } from 'lucide-react';
 import Link from 'next/link';
 
 const footerLinks = [
@@ -34,7 +34,7 @@ export function SiteFooter() {
               rel="noreferrer"
               className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-ember underline-offset-4 transition hover:underline"
             >
-              <Github size={16} strokeWidth={2.1} />
+              <FolderGit2 size={16} strokeWidth={2.1} />
               View the GitHub repository
             </a>
           </div>
