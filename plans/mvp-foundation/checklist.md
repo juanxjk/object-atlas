@@ -47,3 +47,4 @@ Important rule:
 - Object listing cards now show a thumbnail when an image attachment exists
 - Create, edit, and QR modals now close when the user clicks the backdrop
 - Files are now stored in a reusable file table, and objects point to a chosen primary file for thumbnails
+- The API database layer now uses Drizzle schema definitions and a typed Drizzle provider

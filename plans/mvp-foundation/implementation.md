@@ -7,6 +7,7 @@ Implement a single deployable monorepo with:
 - `apps/web` for the Next.js management and public web experience
 - `apps/api` for the NestJS API
 - PostgreSQL for persistent object metadata
+- Drizzle schema definitions as the typed source of truth for PostgreSQL tables
 - filesystem-backed media storage behind a storage service interface
 - simple object-centric APIs without authentication in the MVP
 

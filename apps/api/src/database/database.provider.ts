@@ -1,7 +1,9 @@
 import { Provider } from '@nestjs/common';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 
-import { DATABASE_POOL } from './database.constants';
+import { DATABASE_DB, DATABASE_POOL } from './database.constants';
+import { schema } from './schema';
 
 export const databasePoolProvider: Provider = {
   provide: DATABASE_POOL,
@@ -12,4 +14,10 @@ export const databasePoolProvider: Provider = {
       connectionString
     });
   }
+};
+
+export const databaseDrizzleProvider: Provider = {
+  provide: DATABASE_DB,
+  inject: [DATABASE_POOL],
+  useFactory: (pool: Pool) => drizzle(pool, { schema })
 };
