@@ -11,6 +11,7 @@ Current scaffold includes:
 - object creation and editing flow connected to the API scaffold
 - media upload UI connected to the object media endpoints
 - public object page route backed by public object retrieval
+- QR code card generated from the public object URL
 
 Planned responsibilities:
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { ObjectQrCard } from './object-qr-card';
 import type { ObjectMediaRecord, ObjectRecord } from '../lib/object-api';
 
 type ObjectFormState = {
@@ -229,179 +230,185 @@ export function ObjectWorkspace({
         </div>
       </article>
 
-      <article className="rounded-soft border border-black/5 bg-white/90 p-5 shadow-card sm:p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
-          {selectedObject ? 'Edit object' : 'Create object'}
-        </p>
-        <h2 className="mt-1 font-[family-name:var(--font-display)] text-3xl text-ink">
-          {selectedObject ? selectedObject.title : 'Start a new object record'}
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-ink/70">
-          Keep the first version lightweight: title, short description, and story. Media and
-          public presentation will connect to this flow in the next steps.
-        </p>
+      <div className="space-y-4">
+        <article className="rounded-soft border border-black/5 bg-white/90 p-5 shadow-card sm:p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
+            {selectedObject ? 'Edit object' : 'Create object'}
+          </p>
+          <h2 className="mt-1 font-[family-name:var(--font-display)] text-3xl text-ink">
+            {selectedObject ? selectedObject.title : 'Start a new object record'}
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-ink/70">
+            Keep the first version lightweight: title, short description, and story. Media and
+            public presentation will connect to this flow in the next steps.
+          </p>
 
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-          <label className="block">
-            <span className="mb-2 block text-sm font-semibold text-ink">Title</span>
-            <input
-              required
-              value={formState.title}
-              onChange={(event) =>
-                setFormState((current) => ({
-                  ...current,
-                  title: event.target.value
-                }))
-              }
-              className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
-              placeholder="Object title"
-            />
-          </label>
-
-          <label className="block">
-            <span className="mb-2 block text-sm font-semibold text-ink">Description</span>
-            <textarea
-              value={formState.description}
-              onChange={(event) =>
-                setFormState((current) => ({
-                  ...current,
-                  description: event.target.value
-                }))
-              }
-              rows={3}
-              className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
-              placeholder="Short summary for management and public display"
-            />
-          </label>
-
-          <label className="block">
-            <span className="mb-2 block text-sm font-semibold text-ink">Story</span>
-            <textarea
-              value={formState.story}
-              onChange={(event) =>
-                setFormState((current) => ({
-                  ...current,
-                  story: event.target.value
-                }))
-              }
-              rows={6}
-              className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
-              placeholder="Historical context, significance, or narrative"
-            />
-          </label>
-
-          {error ? (
-            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {error}
-            </div>
-          ) : null}
-
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:opacity-70"
-            >
-              {isSubmitting
-                ? 'Saving...'
-                : selectedObject
-                  ? 'Save changes'
-                  : 'Create object'}
-            </button>
-
-            {selectedObject ? (
-              <button
-                type="button"
-                onClick={() => handleSelect(selectedObject)}
-                className="rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
-              >
-                Reset fields
-              </button>
-            ) : null}
-          </div>
-        </form>
-
-        <div className="mt-8 border-t border-black/5 pt-6">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">
-                Attachments
-              </p>
-              <p className="mt-1 text-sm text-ink/65">
-                {selectedObject
-                  ? 'Upload images or PDFs for this object record.'
-                  : 'Create an object first, then attach media.'}
-              </p>
-            </div>
-
-            <label
-              className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                selectedObject
-                  ? 'cursor-pointer bg-moss text-white'
-                  : 'cursor-not-allowed bg-sand text-ink/55'
-              }`}
-            >
-              Add file
+          <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+            <label className="block">
+              <span className="mb-2 block text-sm font-semibold text-ink">Title</span>
               <input
-                type="file"
-                accept="image/png,image/jpeg,image/webp,application/pdf"
-                disabled={!selectedObject || isUploadingMedia}
-                onChange={handleUpload}
-                className="hidden"
+                required
+                value={formState.title}
+                onChange={(event) =>
+                  setFormState((current) => ({
+                    ...current,
+                    title: event.target.value
+                  }))
+                }
+                className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
+                placeholder="Object title"
               />
             </label>
-          </div>
 
-          <div className="mt-4 space-y-3">
-            {isLoadingMedia ? (
-              <div className="rounded-2xl bg-clay px-4 py-3 text-sm text-ink/70">
-                Loading attachments...
-              </div>
-            ) : null}
+            <label className="block">
+              <span className="mb-2 block text-sm font-semibold text-ink">Description</span>
+              <textarea
+                value={formState.description}
+                onChange={(event) =>
+                  setFormState((current) => ({
+                    ...current,
+                    description: event.target.value
+                  }))
+                }
+                rows={3}
+                className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
+                placeholder="Short summary for management and public display"
+              />
+            </label>
 
-            {isUploadingMedia ? (
-              <div className="rounded-2xl bg-[#edf5ef] px-4 py-3 text-sm text-moss">
-                Uploading file...
-              </div>
-            ) : null}
+            <label className="block">
+              <span className="mb-2 block text-sm font-semibold text-ink">Story</span>
+              <textarea
+                value={formState.story}
+                onChange={(event) =>
+                  setFormState((current) => ({
+                    ...current,
+                    story: event.target.value
+                  }))
+                }
+                rows={6}
+                className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
+                placeholder="Historical context, significance, or narrative"
+              />
+            </label>
 
-            {mediaError ? (
+            {error ? (
               <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                {mediaError}
+                {error}
               </div>
             ) : null}
 
-            {!selectedObject ? (
-              <div className="rounded-2xl bg-clay px-4 py-3 text-sm text-ink/70">
-                Select or create an object to manage attachments.
-              </div>
-            ) : mediaItems.length === 0 && !isLoadingMedia ? (
-              <div className="rounded-2xl bg-clay px-4 py-3 text-sm text-ink/70">
-                No attachments yet. Upload the first image or document.
-              </div>
-            ) : (
-              mediaItems.map((mediaItem) => (
-                <div
-                  key={mediaItem.id}
-                  className="rounded-2xl border border-sand bg-clay px-4 py-4 text-sm text-ink"
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:opacity-70"
+              >
+                {isSubmitting
+                  ? 'Saving...'
+                  : selectedObject
+                    ? 'Save changes'
+                    : 'Create object'}
+              </button>
+
+              {selectedObject ? (
+                <button
+                  type="button"
+                  onClick={() => handleSelect(selectedObject)}
+                  className="rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-semibold">{mediaItem.originalFilename}</p>
-                      <p className="mt-1 text-xs uppercase tracking-[0.16em] text-ink/55">
-                        {mediaItem.mimeType}
-                      </p>
-                    </div>
-                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
-                      {(mediaItem.size / 1024).toFixed(1)} KB
-                    </span>
-                  </div>
+                  Reset fields
+                </button>
+              ) : null}
+            </div>
+          </form>
+
+          <div className="mt-8 border-t border-black/5 pt-6">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">
+                  Attachments
+                </p>
+                <p className="mt-1 text-sm text-ink/65">
+                  {selectedObject
+                    ? 'Upload images or PDFs for this object record.'
+                    : 'Create an object first, then attach media.'}
+                </p>
+              </div>
+
+              <label
+                className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                  selectedObject
+                    ? 'cursor-pointer bg-moss text-white'
+                    : 'cursor-not-allowed bg-sand text-ink/55'
+                }`}
+              >
+                Add file
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,application/pdf"
+                  disabled={!selectedObject || isUploadingMedia}
+                  onChange={handleUpload}
+                  className="hidden"
+                />
+              </label>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              {isLoadingMedia ? (
+                <div className="rounded-2xl bg-clay px-4 py-3 text-sm text-ink/70">
+                  Loading attachments...
                 </div>
-              ))
-            )}
+              ) : null}
+
+              {isUploadingMedia ? (
+                <div className="rounded-2xl bg-[#edf5ef] px-4 py-3 text-sm text-moss">
+                  Uploading file...
+                </div>
+              ) : null}
+
+              {mediaError ? (
+                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {mediaError}
+                </div>
+              ) : null}
+
+              {!selectedObject ? (
+                <div className="rounded-2xl bg-clay px-4 py-3 text-sm text-ink/70">
+                  Select or create an object to manage attachments.
+                </div>
+              ) : mediaItems.length === 0 && !isLoadingMedia ? (
+                <div className="rounded-2xl bg-clay px-4 py-3 text-sm text-ink/70">
+                  No attachments yet. Upload the first image or document.
+                </div>
+              ) : (
+                mediaItems.map((mediaItem) => (
+                  <div
+                    key={mediaItem.id}
+                    className="rounded-2xl border border-sand bg-clay px-4 py-4 text-sm text-ink"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-semibold">{mediaItem.originalFilename}</p>
+                        <p className="mt-1 text-xs uppercase tracking-[0.16em] text-ink/55">
+                          {mediaItem.mimeType}
+                        </p>
+                      </div>
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+                        {(mediaItem.size / 1024).toFixed(1)} KB
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
+
+        {selectedObject ? (
+          <ObjectQrCard publicId={selectedObject.publicId} title={selectedObject.title} />
+        ) : null}
+      </div>
     </section>
   );
 }
