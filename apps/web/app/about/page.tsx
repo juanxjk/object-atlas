@@ -1,5 +1,7 @@
 import { WorkspaceNavbar } from '../../components/workspace-navbar';
 
+const githubRepositoryUrl = 'https://github.com/juanxjk/object-atlas';
+
 const productNotes = [
   'ObjectAtlas is being built as a web experience for documenting physical objects and connecting them to public pages.',
   'The project is intentionally transparent about being developed with AI-assisted code generation under human guidance.',
@@ -55,6 +57,29 @@ export default function AboutPage() {
               ))}
             </ul>
           </aside>
+        </section>
+
+        <section className="rounded-soft border border-black/5 bg-[#fff7f1] px-5 py-6 sm:px-8 sm:py-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
+            Contribute
+          </p>
+          <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl text-ink">
+            Follow the project and help shape it in public.
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-ink/75">
+            The GitHub repository is the best place to follow progress, open issues, suggest
+            improvements, and contribute code or product feedback as ObjectAtlas evolves.
+          </p>
+          <div className="mt-5">
+            <a
+              href={githubRepositoryUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white"
+            >
+              Visit the GitHub project
+            </a>
+          </div>
         </section>
       </div>
     </main>

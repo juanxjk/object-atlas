@@ -58,3 +58,4 @@ Important rule:
 - Uploaded binaries now compute a content hash so duplicate files can reuse the same stored file record
 - Database string columns and object validation now use explicit length limits instead of unbounded text fields
 - Create and edit forms now show text-length counters and upload-size guidance that match the backend limits
+- The About page now points to the GitHub repository with a clearer call for public contribution
