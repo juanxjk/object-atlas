@@ -33,6 +33,7 @@ After the MVP, the implementation can evolve toward:
 - Modal-based object creation flow
 - Object-card edit action opening a dedicated edit modal
 - Object detail screen focused on reading, attachments, and QR access
+- Object detail header includes a direct button to open the public page URL
 - QR code surface opened from a quick action instead of always rendering inline
 - Object listing cards can show a thumbnail when the record already has an image attachment
 - Attachments can mark one image as the main image for object listings

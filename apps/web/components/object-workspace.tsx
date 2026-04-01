@@ -1,6 +1,6 @@
 'use client';
 
-import { ImageIcon, Pencil, Plus, QrCode, Search, Star, Upload, X } from 'lucide-react';
+import { ExternalLink, ImageIcon, Pencil, Plus, QrCode, Search, Star, Upload, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { ObjectMediaRecord, ObjectRecord } from '@object-atlas/types';
 
@@ -20,6 +20,7 @@ const emptyFormState: ObjectFormState = {
 };
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+const publicAppUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
 async function requestObject<T>(
   path: string,
@@ -54,6 +55,10 @@ function getThumbnailUrl(thumbnailPath: string | null): string | null {
   }
 
   return `${apiBaseUrl}/uploads/${thumbnailPath}`;
+}
+
+function getPublicObjectUrl(publicId: string): string {
+  return `${publicAppUrl}/objects/${publicId}`;
 }
 
 export function ObjectWorkspace({
@@ -414,6 +419,16 @@ export function ObjectWorkspace({
                   </div>
 
                   <div className="flex flex-col gap-3 sm:flex-row">
+                    <a
+                      href={getPublicObjectUrl(selectedObject.publicId)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full border border-sand bg-white px-5 py-3 text-sm font-semibold text-ink"
+                    >
+                      <ExternalLink size={16} strokeWidth={2.1} />
+                      Open public page
+                    </a>
+
                     <button
                       type="button"
                       onClick={() => setIsQrModalOpen(true)}
