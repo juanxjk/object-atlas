@@ -54,6 +54,7 @@ The primary user creates an object from a phone or desktop browser, fills in ess
 - The management workspace should always show a visible navbar
 - Primary mobile navigation should live behind a hamburger menu
 - The hamburger menu should include an object listing option
+- Creating a new object should happen in a modal instead of inside the inline editor
 - The create flow should be short and segmented, not one large form
 - The public object page should be designed mobile-first and optimized for vertical reading
 - Internal object detail should prioritize quick edits and media management

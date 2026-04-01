@@ -5,15 +5,15 @@
 1. The user opens the management interface
 2. The user opens the hamburger menu
 3. The user chooses the object listing option
-4. The user starts the create object flow
-5. The system shows a short mobile-first form with essential fields
+4. The user taps the new object action
+5. The system opens a create-object modal with essential fields
 6. The user enters the object title, short description, story, and basic metadata
-7. The user uploads one or more media files
-8. The system validates the input and uploaded files
-9. The system stores the object in PostgreSQL
-10. The system stores media files through the storage abstraction backed by the local filesystem
-11. The system generates a public identifier and QR code for the object
-12. The system returns the saved object detail view
+7. The system validates the input
+8. The system stores the object in PostgreSQL
+9. The system closes the modal and opens the saved object detail view
+10. The user uploads one or more media files from the object detail page
+11. The system stores media files through the storage abstraction backed by the local filesystem
+12. The system generates a public identifier and QR code for the object
 13. The user sees the object detail page with the QR code and public page link
 
 ## Flow 2: View Public Object Page from QR Code

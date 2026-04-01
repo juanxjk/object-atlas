@@ -14,6 +14,7 @@ Current scaffold includes:
 - QR code card generated from the public object URL
 - basic object listing and title search in the management interface
 - always-visible management navbar with a mobile hamburger menu
+- modal-based flow for creating new objects
 - lightweight automated coverage for search and public object helpers
 - shared object contracts imported from `packages/types`
 

@@ -7,10 +7,6 @@ const navigationItems = [
   {
     href: '#object-listing',
     label: 'Object listing'
-  },
-  {
-    href: '#object-editor',
-    label: 'Create object'
   }
 ];
 

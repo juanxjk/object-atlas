@@ -34,3 +34,4 @@ Important rule:
 - Keep post-MVP hardening separate from the first usable release
 - Runtime verification revealed a few required setup fixes: `pnpm-workspace.yaml`, local `workspace:*` package links, `@types/pg`, and explicit `ObjectsModule` imports for database and storage providers
 - The management workspace now uses an always-visible navbar, with a hamburger menu only at mobile widths
+- New object creation now uses a dedicated modal instead of the inline editor
