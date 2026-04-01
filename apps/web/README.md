@@ -1,6 +1,13 @@
 # Web App
 
-This directory will contain the Next.js and Tailwind CSS frontend for ObjectAtlas.
+This directory contains the Next.js and Tailwind CSS frontend for ObjectAtlas.
+
+Current scaffold includes:
+
+- Next.js App Router structure
+- Tailwind CSS configuration
+- mobile-first dashboard shell
+- shared global styling for the MVP workspace
 
 Planned responsibilities:
 
