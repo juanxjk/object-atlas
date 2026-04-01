@@ -41,3 +41,4 @@ Important rule:
 - User-facing copy now keeps product principles implicit instead of repeating them in the UI
 - Shared surfaces now rely more on borders and contrast than repeated card shadows
 - Each object card now exposes an explicit edit action that opens a modal with the core fields
+- The main detail pane now shows object information, attachments, and QR access without an inline edit form

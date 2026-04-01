@@ -31,8 +31,7 @@ After the MVP, the implementation can evolve toward:
 - Dedicated About page for implementation and project-context content
 - Modal-based object creation flow
 - Object-card edit action opening a dedicated edit modal
-- Object editing screen
-- Object detail management screen
+- Object detail screen focused on reading, attachments, and QR access
 - Public object page routed by public identifier
 - Basic search input by title
 - QR code display within the object detail screen
