@@ -1,6 +1,19 @@
 'use client';
 
-import { ExternalLink, ImageIcon, Pencil, Plus, QrCode, Search, Star, Trash2, Upload, X } from 'lucide-react';
+import {
+  ExternalLink,
+  ImageIcon,
+  Pencil,
+  Plus,
+  QrCode,
+  Search,
+  Star,
+  Trash2,
+  Upload,
+  X,
+  ZoomIn,
+  ZoomOut
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { ObjectMediaRecord, ObjectRecord } from '@object-atlas/types';
 
@@ -87,6 +100,8 @@ export function ObjectWorkspace({
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
   const [deletingMediaId, setDeletingMediaId] = useState<string | null>(null);
   const [mediaError, setMediaError] = useState<string | null>(null);
+  const [previewMedia, setPreviewMedia] = useState<ObjectMediaRecord | null>(null);
+  const [previewZoom, setPreviewZoom] = useState(1);
 
   const selectedObject = objects.find((object) => object.id === selectedId) ?? null;
   const editingObject = objects.find((object) => object.id === editingObjectId) ?? null;
@@ -299,6 +314,16 @@ export function ObjectWorkspace({
     } finally {
       setDeletingMediaId(null);
     }
+  };
+
+  const handleOpenPreview = (mediaItem: ObjectMediaRecord) => {
+    setPreviewMedia(mediaItem);
+    setPreviewZoom(1);
+  };
+
+  const handleClosePreview = () => {
+    setPreviewMedia(null);
+    setPreviewZoom(1);
   };
 
   return (
@@ -582,13 +607,17 @@ export function ObjectWorkspace({
                       className="rounded-2xl border border-sand bg-clay px-4 py-4 text-sm text-ink"
                     >
                       {mediaItem.mimeType.startsWith('image/') ? (
-                        <div className="mb-4 overflow-hidden rounded-2xl border border-black/5 bg-white">
+                        <button
+                          type="button"
+                          onClick={() => handleOpenPreview(mediaItem)}
+                          className="mb-4 block w-full overflow-hidden rounded-2xl border border-black/5 bg-white text-left"
+                        >
                           <img
                             src={getThumbnailUrl(mediaItem.storagePath) ?? ''}
                             alt={mediaItem.originalFilename}
-                            className="h-48 w-full object-cover sm:h-56"
+                            className="h-48 w-full object-cover transition hover:scale-[1.02] sm:h-56"
                           />
-                        </div>
+                        </button>
                       ) : null}
 
                       <div className="flex items-start justify-between gap-3">
@@ -783,6 +812,69 @@ export function ObjectWorkspace({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      ) : null}
+
+      {previewMedia ? (
+        <div
+          className="fixed inset-0 z-40 flex items-center justify-center bg-ink/70 px-4 py-6"
+          onClick={handleClosePreview}
+        >
+          <div
+            className="w-full max-w-5xl rounded-soft border border-black/5 bg-white p-5 sm:p-6"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
+                  Image preview
+                </p>
+                <h2 className="mt-1 font-[family-name:var(--font-display)] text-2xl text-ink">
+                  {previewMedia.originalFilename}
+                </h2>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPreviewZoom((current) => Math.max(1, current - 0.25))}
+                  className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
+                >
+                  <ZoomOut size={16} strokeWidth={2.1} />
+                  Zoom out
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPreviewZoom((current) => Math.min(3, current + 0.25))}
+                  className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
+                >
+                  <ZoomIn size={16} strokeWidth={2.1} />
+                  Zoom in
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleClosePreview}
+                  className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
+                >
+                  <X size={16} strokeWidth={2.1} />
+                  Close
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-6 overflow-auto rounded-3xl bg-clay px-4 py-4">
+              <div className="flex min-h-[40vh] items-center justify-center">
+                <img
+                  src={getThumbnailUrl(previewMedia.storagePath) ?? ''}
+                  alt={previewMedia.originalFilename}
+                  className="max-h-[70vh] w-auto max-w-full origin-center rounded-2xl bg-white transition-transform duration-200"
+                  style={{ transform: `scale(${previewZoom})` }}
+                />
+              </div>
+            </div>
           </div>
         </div>
       ) : null}

@@ -54,3 +54,4 @@ Important rule:
 - Attachments can now be removed from the object detail flow, with primary-image fallback and cleanup of unreferenced files
 - The current main image can also be removed directly from the attachment card without changing it first
 - Image attachments now show an inline preview inside the object detail cards
+- Clicking an attachment preview now opens a modal with full-image viewing and zoom controls
