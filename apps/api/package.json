@@ -13,7 +13,7 @@
     "@nestjs/common": "^11.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
-    "@object-atlas/types": "0.1.0",
+    "@object-atlas/types": "workspace:*",
     "pg": "^8.13.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
@@ -21,6 +21,7 @@
   "devDependencies": {
     "@nestjs/cli": "^11.0.0",
     "@types/node": "^22.10.2",
+    "@types/pg": "^8.15.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"
   }

@@ -10,7 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@object-atlas/types": "0.1.0",
+    "@object-atlas/types": "workspace:*",
     "next": "^15.0.0",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",

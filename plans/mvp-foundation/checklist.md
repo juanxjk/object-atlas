@@ -32,3 +32,4 @@ Important rule:
 - MVP steps should remain shippable on their own
 - If implementation reveals a large step, split it into smaller commits before coding
 - Keep post-MVP hardening separate from the first usable release
+- Runtime verification revealed a few required setup fixes: `pnpm-workspace.yaml`, local `workspace:*` package links, `@types/pg`, and explicit `ObjectsModule` imports for database and storage providers
