@@ -1,0 +1,11 @@
+{
+  "name": "@object-atlas/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo \"Next.js app scaffold pending\"",
+    "build": "echo \"Next.js build pending\"",
+    "lint": "echo \"Web lint pending\"",
+    "test": "echo \"Web tests pending\""
+  }
+}

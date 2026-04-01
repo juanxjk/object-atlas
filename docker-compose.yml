@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: object-atlas-postgres
+    environment:
+      POSTGRES_DB: object_atlas
+      POSTGRES_USER: object_atlas
+      POSTGRES_PASSWORD: object_atlas
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

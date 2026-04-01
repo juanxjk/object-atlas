@@ -1,0 +1,11 @@
+{
+  "name": "@object-atlas/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start:dev": "echo \"NestJS API scaffold pending\"",
+    "build": "echo \"API build pending\"",
+    "lint": "echo \"API lint pending\"",
+    "test": "echo \"API tests pending\""
+  }
+}
