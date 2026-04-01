@@ -7,7 +7,7 @@
     "start:dev": "nest start --watch",
     "build": "nest build",
     "lint": "tsc --noEmit",
-    "test": "echo \"API tests pending\""
+    "test": "vitest run"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",

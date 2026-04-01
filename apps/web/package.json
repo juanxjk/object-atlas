@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "tsc --noEmit",
-    "test": "echo \"Web tests pending\""
+    "test": "vitest run"
   },
   "dependencies": {
     "next": "^15.0.0",

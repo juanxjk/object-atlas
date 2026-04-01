@@ -13,6 +13,7 @@ Current scaffold includes:
 - public object page route backed by public object retrieval
 - QR code card generated from the public object URL
 - basic object listing and title search in the management interface
+- lightweight automated coverage for search and public object helpers
 
 Planned responsibilities:
 

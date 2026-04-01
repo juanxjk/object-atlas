@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { ObjectQrCard } from './object-qr-card';
 import type { ObjectMediaRecord, ObjectRecord } from '../lib/object-api';
+import { filterObjectsByTitle } from '../lib/object-search';
 
 type ObjectFormState = {
   title: string;
@@ -63,9 +64,7 @@ export function ObjectWorkspace({
   const [mediaError, setMediaError] = useState<string | null>(null);
 
   const selectedObject = objects.find((object) => object.id === selectedId) ?? null;
-  const filteredObjects = objects.filter((object) =>
-    object.title.toLowerCase().includes(searchQuery.trim().toLowerCase())
-  );
+  const filteredObjects = filterObjectsByTitle(objects, searchQuery);
 
   useEffect(() => {
     async function loadMedia(): Promise<void> {

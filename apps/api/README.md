@@ -13,6 +13,7 @@ Current scaffold includes:
 - object media upload and listing endpoints
 - public object retrieval by public identifier
 - title-based object listing and search
+- lightweight automated coverage for validation and mappers
 
 Planned responsibilities:
 

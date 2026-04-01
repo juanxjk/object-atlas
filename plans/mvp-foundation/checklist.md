@@ -22,7 +22,7 @@ Important rule:
 - [x] `feat:` Implement public object page and public object retrieval endpoint
 - [x] `feat:` Generate and display QR code linked to the public object page
 - [x] `feat:` Add basic object listing and title search in the management interface
-- [ ] `test:` Add automated coverage for core object, media, and public page flows
+- [x] `test:` Add automated coverage for core object, media, and public page flows
 - [ ] `chore:` Final MVP cleanup, docs, and validation pass
 - [ ] `refactor:` Optional post-MVP extraction of shared contracts and UI primitives
 - [ ] `chore:` Optional post-MVP hardening for auth, upload restrictions, and operational polish
