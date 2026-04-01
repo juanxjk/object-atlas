@@ -1,14 +1,25 @@
 import { randomUUID } from 'node:crypto';
 
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 
 import { DatabaseService } from '../database/database.service';
+import { STORAGE_SERVICE } from '../storage/storage.constants';
+import { StorageService } from '../storage/storage.types';
+import { mapObjectMediaRow } from './object-media.mapper';
 import { mapObjectRow } from './object.mapper';
-import { CreateObjectInput, ObjectRecord, UpdateObjectInput } from './object.types';
+import {
+  CreateObjectInput,
+  ObjectMediaRecord,
+  ObjectRecord,
+  UpdateObjectInput
+} from './object.types';
 
 @Injectable()
 export class ObjectsService implements OnModuleInit {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    @Inject(STORAGE_SERVICE) private readonly storageService: StorageService
+  ) {}
 
   async onModuleInit(): Promise<void> {
     await this.databaseService.getPool().query(`
@@ -21,6 +32,18 @@ export class ObjectsService implements OnModuleInit {
         metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      )
+    `);
+
+    await this.databaseService.getPool().query(`
+      CREATE TABLE IF NOT EXISTS object_media (
+        id UUID PRIMARY KEY,
+        object_id UUID NOT NULL REFERENCES objects(id) ON DELETE CASCADE,
+        original_filename TEXT NOT NULL,
+        storage_path TEXT NOT NULL,
+        mime_type TEXT NOT NULL,
+        size INTEGER NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `);
   }
@@ -110,5 +133,66 @@ export class ObjectsService implements OnModuleInit {
     );
 
     return mapObjectRow(rows[0]);
+  }
+
+  async addMedia(
+    objectId: string,
+    file: {
+      originalname: string;
+      mimetype: string;
+      size: number;
+      buffer: Buffer;
+    }
+  ): Promise<ObjectMediaRecord> {
+    await this.getById(objectId);
+
+    const storedFile = await this.storageService.store({
+      objectId,
+      originalFilename: file.originalname,
+      mimeType: file.mimetype,
+      buffer: file.buffer
+    });
+
+    const mediaId = randomUUID();
+    const { rows } = await this.databaseService.getPool().query(
+      `
+        INSERT INTO object_media (
+          id,
+          object_id,
+          original_filename,
+          storage_path,
+          mime_type,
+          size
+        )
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING *
+      `,
+      [
+        mediaId,
+        objectId,
+        file.originalname,
+        storedFile.relativePath,
+        file.mimetype,
+        file.size
+      ]
+    );
+
+    return mapObjectMediaRow(rows[0]);
+  }
+
+  async listMedia(objectId: string): Promise<ObjectMediaRecord[]> {
+    await this.getById(objectId);
+
+    const { rows } = await this.databaseService.getPool().query(
+      `
+        SELECT *
+        FROM object_media
+        WHERE object_id = $1
+        ORDER BY created_at DESC
+      `,
+      [objectId]
+    );
+
+    return rows.map(mapObjectMediaRow);
   }
 }

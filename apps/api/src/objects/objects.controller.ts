@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UploadedFile,
+  UseInterceptors
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { validateCreateObject, validateUpdateObject } from './object.validation';
 import { ObjectsService } from './objects.service';
@@ -30,5 +41,37 @@ export class ObjectsController {
   @Patch(':id')
   updateObject(@Param('id') id: string, @Body() body: unknown) {
     return this.objectsService.update(id, validateUpdateObject(body));
+  }
+
+  @Post(':id/media')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadMedia(
+    @Param('id') id: string,
+    @UploadedFile()
+    file?: {
+      originalname: string;
+      mimetype: string;
+      size: number;
+      buffer: Buffer;
+    }
+  ) {
+    if (!file) {
+      throw new BadRequestException('file is required');
+    }
+
+    if (!['image/jpeg', 'image/png', 'image/webp', 'application/pdf'].includes(file.mimetype)) {
+      throw new BadRequestException('unsupported file type');
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      throw new BadRequestException('file is too large');
+    }
+
+    return this.objectsService.addMedia(id, file);
+  }
+
+  @Get(':id/media')
+  listMedia(@Param('id') id: string) {
+    return this.objectsService.listMedia(id);
   }
 }

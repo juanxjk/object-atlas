@@ -9,6 +9,8 @@ Current scaffold includes:
 - health endpoint
 - base object module structure
 - object creation, listing, retrieval, and update endpoints
+- filesystem-backed media storage abstraction
+- object media upload and listing endpoints
 
 Planned responsibilities:
 

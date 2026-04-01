@@ -9,6 +9,16 @@ export type ObjectRecord = {
   updatedAt: string;
 };
 
+export type ObjectMediaRecord = {
+  id: string;
+  objectId: string;
+  originalFilename: string;
+  storagePath: string;
+  mimeType: string;
+  size: number;
+  createdAt: string;
+};
+
 export type CreateObjectInput = {
   title: string;
   description: string | null;
