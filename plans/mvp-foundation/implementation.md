@@ -37,6 +37,7 @@ After the MVP, the implementation can evolve toward:
 - Object listing cards can show a thumbnail when the record already has an image attachment
 - Attachments can mark one image as the main image for object listings
 - Public object page routed by public identifier
+- Public object page includes an image carousel when image media is available
 - Basic search input by title
 - QR code display within the object detail screen
 

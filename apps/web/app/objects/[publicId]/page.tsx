@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { PublicObjectRecord } from '@object-atlas/types';
 
+import { PublicMediaCarousel } from '../../../components/public-media-carousel';
 import { getPublicObject } from '../../../lib/object-api';
 
 function formatDate(value: string): string {
@@ -10,17 +11,19 @@ function formatDate(value: string): string {
 }
 
 function MediaList({ media }: { media: PublicObjectRecord['media'] }) {
-  if (media.length === 0) {
+  const documentMedia = media.filter((item) => !item.mimeType.startsWith('image/'));
+
+  if (documentMedia.length === 0) {
     return (
       <div className="rounded-2xl bg-white/70 px-4 py-4 text-sm text-ink/70">
-        No media has been attached to this object yet.
+        No documents have been attached to this object yet.
       </div>
     );
   }
 
   return (
     <div className="space-y-3">
-      {media.map((item) => (
+      {documentMedia.map((item) => (
         <div
           key={item.id}
           className="rounded-2xl border border-sand bg-white/85 px-4 py-4 text-sm text-ink"
@@ -95,6 +98,14 @@ export default async function PublicObjectPage({
         <section className="rounded-soft border border-black/5 bg-white/85 p-6 sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">Media</p>
           <div className="mt-4">
+            <PublicMediaCarousel media={object.media} />
+          </div>
+          <div className="mt-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ink/45">
+              Documents and other files
+            </p>
+          </div>
+          <div className="mt-3">
             <MediaList media={object.media} />
           </div>
         </section>

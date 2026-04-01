@@ -48,3 +48,4 @@ Important rule:
 - Create, edit, and QR modals now close when the user clicks the backdrop
 - Files are now stored in a reusable file table, and objects point to a chosen primary file for thumbnails
 - The API database layer now uses Drizzle schema definitions and a typed Drizzle provider
+- Public object pages now present image attachments through a carousel instead of only a file list
