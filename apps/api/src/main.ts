@@ -16,7 +16,7 @@ async function bootstrap(): Promise<void> {
   app.setGlobalPrefix('api');
   app.enableCors({
     origin: publicAppUrl,
-    methods: ['GET', 'POST', 'PATCH'],
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type']
   });
   app.useStaticAssets(storageRoot, {

@@ -382,6 +382,80 @@ export class ObjectsService implements OnModuleInit {
     return mapObjectRow(updated.rows[0]);
   }
 
+  async deleteMedia(objectId: string, mediaId: string): Promise<ObjectRecord> {
+    const db = this.databaseService.getDb();
+    await this.getById(objectId);
+
+    const mediaResult = await db.execute<{
+      file_id: string;
+      storage_path: string;
+      is_primary: boolean;
+    }>(sql`
+      SELECT
+        object_files.file_id,
+        files.storage_path,
+        (objects.primary_file_id = object_files.file_id) AS is_primary
+      FROM object_files
+      INNER JOIN files ON files.id = object_files.file_id
+      INNER JOIN objects ON objects.id = object_files.object_id
+      WHERE object_files.id = ${mediaId}
+        AND object_files.object_id = ${objectId}
+    `);
+
+    const media = mediaResult.rows[0];
+
+    if (!media) {
+      throw new NotFoundException(`media ${mediaId} was not found for object ${objectId}`);
+    }
+
+    await db.execute(sql`
+      DELETE FROM object_files
+      WHERE id = ${mediaId}
+    `);
+
+    const remainingReferences = await db.execute<{ reference_count: number }>(sql`
+      SELECT COUNT(*)::int AS reference_count
+      FROM object_files
+      WHERE file_id = ${media.file_id}
+    `);
+
+    if (remainingReferences.rows[0]?.reference_count === 0) {
+      await db.execute(sql`
+        DELETE FROM files
+        WHERE id = ${media.file_id}
+      `);
+
+      await this.storageService.delete(media.storage_path);
+    }
+
+    if (media.is_primary) {
+      const nextPrimary = await db.execute<{ file_id: string | null }>(sql`
+        SELECT object_files.file_id
+        FROM object_files
+        INNER JOIN files ON files.id = object_files.file_id
+        WHERE object_files.object_id = ${objectId}
+          AND files.mime_type LIKE 'image/%'
+        ORDER BY object_files.created_at ASC
+        LIMIT 1
+      `);
+
+      await db.execute(sql`
+        UPDATE objects
+        SET primary_file_id = ${nextPrimary.rows[0]?.file_id ?? null},
+            updated_at = NOW()
+        WHERE id = ${objectId}
+      `);
+    } else {
+      await db.execute(sql`
+        UPDATE objects
+        SET updated_at = NOW()
+        WHERE id = ${objectId}
+      `);
+    }
+
+    return this.getById(objectId);
+  }
+
   async getByPublicId(publicId: string): Promise<ObjectRecord> {
     const db = this.databaseService.getDb();
     const result = await db.execute<DatabaseObjectRow>(sql`

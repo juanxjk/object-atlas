@@ -51,3 +51,4 @@ Important rule:
 - Public object pages now present image attachments through a carousel instead of only a file list
 - Object detail now includes a direct action to open the public page URL without opening the QR modal
 - Filesystem uploads and `/uploads` static serving now resolve from the API package root instead of depending on the launch cwd
+- Attachments can now be removed from the object detail flow, with primary-image fallback and cleanup of unreferenced files

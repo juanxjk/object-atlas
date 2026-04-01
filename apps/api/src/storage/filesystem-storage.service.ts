@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { basename, extname, join } from 'node:path';
 
 import { Injectable } from '@nestjs/common';
@@ -31,5 +31,9 @@ export class FilesystemStorageService implements StorageService {
       mimeType: input.mimeType,
       size: input.buffer.length
     };
+  }
+
+  async delete(relativePath: string): Promise<void> {
+    await rm(join(this.rootDirectory, relativePath), { force: true });
   }
 }

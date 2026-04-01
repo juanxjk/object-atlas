@@ -15,11 +15,13 @@
 11. The system stores media files through the storage abstraction backed by the local filesystem
 12. The user marks one image as the main image for the object
 13. The system stores the selected primary file reference on the object record
-14. The system generates a public identifier and QR code for the object
-15. The user can open the public page directly from the object detail header
-16. The system opens the public object page in a new browser tab
-17. The user opens the QR quick action from the object detail page
-18. The system shows the QR code and public page link on demand
+14. The user can remove an attachment from the object detail page when it is no longer needed
+15. The system removes the object-file relation, updates the primary image if needed, and cleans up unreferenced files
+16. The system generates a public identifier and QR code for the object
+17. The user can open the public page directly from the object detail header
+18. The system opens the public object page in a new browser tab
+19. The user opens the QR quick action from the object detail page
+20. The system shows the QR code and public page link on demand
 
 ## Flow 2: View Public Object Page from QR Code
 

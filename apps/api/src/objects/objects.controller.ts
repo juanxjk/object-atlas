@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -97,5 +98,10 @@ export class ObjectsController {
   @Get(':id/media')
   listMedia(@Param('id') id: string) {
     return this.objectsService.listMedia(id);
+  }
+
+  @Delete(':id/media/:mediaId')
+  deleteMedia(@Param('id') id: string, @Param('mediaId') mediaId: string) {
+    return this.objectsService.deleteMedia(id, mediaId);
   }
 }

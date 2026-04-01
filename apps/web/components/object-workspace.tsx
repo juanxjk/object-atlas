@@ -1,6 +1,6 @@
 'use client';
 
-import { ExternalLink, ImageIcon, Pencil, Plus, QrCode, Search, Star, Upload, X } from 'lucide-react';
+import { ExternalLink, ImageIcon, Pencil, Plus, QrCode, Search, Star, Trash2, Upload, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { ObjectMediaRecord, ObjectRecord } from '@object-atlas/types';
 
@@ -85,6 +85,7 @@ export function ObjectWorkspace({
   const [mediaItems, setMediaItems] = useState<ObjectMediaRecord[]>([]);
   const [isLoadingMedia, setIsLoadingMedia] = useState(false);
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+  const [deletingMediaId, setDeletingMediaId] = useState<string | null>(null);
   const [mediaError, setMediaError] = useState<string | null>(null);
 
   const selectedObject = objects.find((object) => object.id === selectedId) ?? null;
@@ -268,6 +269,35 @@ export function ObjectWorkspace({
       setMediaError(
         requestError instanceof Error ? requestError.message : 'Unable to set main image'
       );
+    }
+  };
+
+  const handleDeleteMedia = async (mediaItem: ObjectMediaRecord) => {
+    if (!selectedId) {
+      return;
+    }
+
+    setDeletingMediaId(mediaItem.id);
+    setMediaError(null);
+
+    try {
+      const updated = await requestObject<ObjectRecord>(
+        `/api/objects/${selectedId}/media/${mediaItem.id}`,
+        {
+          method: 'DELETE'
+        }
+      );
+
+      setObjects((current) =>
+        current.map((object) => (object.id === updated.id ? updated : object))
+      );
+      setMediaItems((current) => current.filter((item) => item.id !== mediaItem.id));
+    } catch (requestError) {
+      setMediaError(
+        requestError instanceof Error ? requestError.message : 'Unable to remove attachment'
+      );
+    } finally {
+      setDeletingMediaId(null);
     }
   };
 
@@ -578,17 +608,41 @@ export function ObjectWorkspace({
                               This image is currently used as the main thumbnail.
                             </p>
                           ) : (
-                            <button
-                              type="button"
-                              onClick={() => handleSetPrimaryImage(mediaItem)}
-                              className="inline-flex items-center gap-2 rounded-full border border-sand bg-white px-4 py-2 text-sm font-semibold text-ink"
-                            >
-                              <Star size={16} strokeWidth={2.1} />
-                              Set as main image
-                            </button>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleSetPrimaryImage(mediaItem)}
+                                className="inline-flex items-center gap-2 rounded-full border border-sand bg-white px-4 py-2 text-sm font-semibold text-ink"
+                              >
+                                <Star size={16} strokeWidth={2.1} />
+                                Set as main image
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteMedia(mediaItem)}
+                                disabled={deletingMediaId === mediaItem.id}
+                                className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 disabled:opacity-60"
+                              >
+                                <Trash2 size={16} strokeWidth={2.1} />
+                                {deletingMediaId === mediaItem.id ? 'Removing...' : 'Remove'}
+                              </button>
+                            </div>
                           )}
                         </div>
-                      ) : null}
+                      ) : (
+                        <div className="mt-3 border-t border-black/5 pt-3">
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteMedia(mediaItem)}
+                            disabled={deletingMediaId === mediaItem.id}
+                            className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 disabled:opacity-60"
+                          >
+                            <Trash2 size={16} strokeWidth={2.1} />
+                            {deletingMediaId === mediaItem.id ? 'Removing...' : 'Remove file'}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))
                 )}

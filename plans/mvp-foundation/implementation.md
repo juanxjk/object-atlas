@@ -37,6 +37,7 @@ After the MVP, the implementation can evolve toward:
 - QR code surface opened from a quick action instead of always rendering inline
 - Object listing cards can show a thumbnail when the record already has an image attachment
 - Attachments can mark one image as the main image for object listings
+- Attachments can be removed from the object detail flow
 - Public object page routed by public identifier
 - Public object page includes an image carousel when image media is available
 - Basic search input by title
@@ -46,6 +47,7 @@ After the MVP, the implementation can evolve toward:
 
 - CRUD endpoints for objects
 - Media upload endpoint tied to an object
+- Media delete endpoint tied to an object
 - Endpoint or service for generating QR target URLs
 - Public endpoint for resolving an object by public identifier
 - Basic listing and title search endpoint
@@ -78,6 +80,7 @@ Validation should remain practical and focused on obvious bad input for the MVP.
 - Use a storage service interface in the API
 - Provide a filesystem implementation first
 - Store media metadata in PostgreSQL
+- Remove object-file relations and delete the underlying file only when no objects still reference it
 - Keep public URLs or file-serving behavior simple
 - Resolve the filesystem storage root relative to the API package so uploads do not depend on the shell cwd
 - Restrict accepted file types and size with lightweight validation
