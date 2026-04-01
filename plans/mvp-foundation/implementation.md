@@ -25,6 +25,7 @@ After the MVP, the implementation can evolve toward:
 ## Frontend Scope
 
 - Landing management page or dashboard with basic object listing
+- Always-visible management navbar
 - Hamburger menu for primary mobile navigation
 - Object listing option inside the hamburger menu
 - Object creation and editing screens

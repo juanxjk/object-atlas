@@ -26,6 +26,7 @@ ObjectAtlas needs a first implementation that proves the core product promise wi
 The MVP should include:
 
 - a mobile-first web interface
+- an always-visible management navbar
 - a hamburger menu for primary mobile navigation
 - object create and edit flow
 - object detail page for internal management
@@ -50,6 +51,7 @@ The primary user creates an object from a phone or desktop browser, fills in ess
 
 ## UX Notes
 
+- The management workspace should always show a visible navbar
 - Primary mobile navigation should live behind a hamburger menu
 - The hamburger menu should include an object listing option
 - The create flow should be short and segmented, not one large form

@@ -13,7 +13,7 @@ Current scaffold includes:
 - public object page route backed by public object retrieval
 - QR code card generated from the public object URL
 - basic object listing and title search in the management interface
-- mobile hamburger menu with an object listing option
+- always-visible management navbar with a mobile hamburger menu
 - lightweight automated coverage for search and public object helpers
 - shared object contracts imported from `packages/types`
 

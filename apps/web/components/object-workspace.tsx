@@ -184,29 +184,55 @@ export function ObjectWorkspace({
 
   return (
     <section className="space-y-4">
-      <div className="rounded-soft border border-black/5 bg-white/85 p-4 shadow-card lg:hidden">
+      <nav className="rounded-soft border border-black/5 bg-white/85 p-4 shadow-card">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-moss">
-              Mobile navigation
+              Workspace navigation
             </p>
             <p className="mt-1 text-sm text-ink/70">
-              Open the menu to switch between object listing and editing.
+              Switch between object listing and editing from a single persistent navbar.
             </p>
           </div>
 
           <button
             type="button"
             onClick={() => setIsMenuOpen((current) => !current)}
-            className="inline-flex items-center gap-2 rounded-full border border-sand bg-clay px-4 py-2 text-sm font-semibold text-ink"
+            className="inline-flex items-center gap-2 rounded-full border border-sand bg-clay px-4 py-2 text-sm font-semibold text-ink lg:hidden"
           >
             <span className="text-base leading-none">≡</span>
             Menu
           </button>
+
+          <div className="hidden items-center gap-2 lg:flex">
+            <button
+              type="button"
+              onClick={() => setMobileView('list')}
+              className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                mobileView === 'list'
+                  ? 'bg-ink text-white'
+                  : 'border border-sand bg-clay text-ink'
+              }`}
+            >
+              Object listing
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMobileView('editor')}
+              className={`rounded-full px-4 py-2 text-sm font-semibold ${
+                mobileView === 'editor'
+                  ? 'bg-ink text-white'
+                  : 'border border-sand bg-clay text-ink'
+              }`}
+            >
+              {selectedObject ? 'Current object' : 'Create object'}
+            </button>
+          </div>
         </div>
 
         {isMenuOpen ? (
-          <div className="mt-4 space-y-2 rounded-3xl border border-sand bg-clay p-3">
+          <div className="mt-4 space-y-2 rounded-3xl border border-sand bg-clay p-3 lg:hidden">
             <button
               type="button"
               onClick={() => {
@@ -234,7 +260,7 @@ export function ObjectWorkspace({
             </button>
           </div>
         ) : null}
-      </div>
+      </nav>
 
       <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
         <article
