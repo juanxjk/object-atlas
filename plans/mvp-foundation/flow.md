@@ -14,7 +14,8 @@
 10. The user uploads one or more media files from the object detail page
 11. The system stores media files through the storage abstraction backed by the local filesystem
 12. The system generates a public identifier and QR code for the object
-13. The user sees the object detail page with the QR code and public page link
+13. The user opens the QR quick action from the object detail page
+14. The system shows the QR code and public page link on demand
 
 ## Flow 2: View Public Object Page from QR Code
 

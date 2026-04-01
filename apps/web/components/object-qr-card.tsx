@@ -1,15 +1,17 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import QRCode from 'qrcode';
 
 export function ObjectQrCard({
   publicId,
-  title
+  title,
+  actionSlot
 }: {
   publicId: string;
   title: string;
+  actionSlot?: ReactNode;
 }) {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [qrError, setQrError] = useState<string | null>(null);
@@ -40,13 +42,21 @@ export function ObjectQrCard({
 
   return (
     <div className="rounded-soft border border-black/5 bg-white/85 p-5 sm:p-6">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">QR access</p>
-      <h3 className="mt-2 font-[family-name:var(--font-display)] text-2xl text-ink">
-        Public object link
-      </h3>
-      <p className="mt-2 text-sm leading-6 text-ink/70">
-        Use this QR code on the physical object so visitors can open the public page directly.
-      </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
+            QR access
+          </p>
+          <h3 className="mt-2 font-[family-name:var(--font-display)] text-2xl text-ink">
+            Public object link
+          </h3>
+          <p className="mt-2 text-sm leading-6 text-ink/70">
+            Use this QR code on the physical object so visitors can open the public page directly.
+          </p>
+        </div>
+
+        {actionSlot ? <div className="shrink-0">{actionSlot}</div> : null}
+      </div>
 
       <div className="mt-5 flex flex-col items-center gap-4 rounded-3xl bg-clay px-4 py-5">
         {qrDataUrl ? (

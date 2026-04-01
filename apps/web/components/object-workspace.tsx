@@ -66,6 +66,7 @@ export function ObjectWorkspace({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditingFromModal, setIsEditingFromModal] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [mediaItems, setMediaItems] = useState<ObjectMediaRecord[]>([]);
   const [isLoadingMedia, setIsLoadingMedia] = useState(false);
@@ -334,13 +335,23 @@ export function ObjectWorkspace({
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => handleEditMode(selectedObject)}
-                    className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white"
-                  >
-                    Edit object
-                  </button>
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <button
+                      type="button"
+                      onClick={() => setIsQrModalOpen(true)}
+                      className="rounded-full border border-sand bg-white px-5 py-3 text-sm font-semibold text-ink"
+                    >
+                      Show QR code
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleEditMode(selectedObject)}
+                      className="rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white"
+                    >
+                      Edit object
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mt-6 grid gap-4">
@@ -462,9 +473,6 @@ export function ObjectWorkspace({
             </div>
           </article>
 
-          {selectedObject ? (
-            <ObjectQrCard publicId={selectedObject.publicId} title={selectedObject.title} />
-          ) : null}
         </div>
       </div>
 
@@ -676,6 +684,26 @@ export function ObjectWorkspace({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      ) : null}
+
+      {isQrModalOpen && selectedObject ? (
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-ink/35 px-4 py-6">
+          <div className="w-full max-w-xl">
+            <ObjectQrCard
+              publicId={selectedObject.publicId}
+              title={selectedObject.title}
+              actionSlot={
+                <button
+                  type="button"
+                  onClick={() => setIsQrModalOpen(false)}
+                  className="rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
+                >
+                  Close
+                </button>
+              }
+            />
           </div>
         </div>
       ) : null}

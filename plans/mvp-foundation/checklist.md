@@ -42,3 +42,4 @@ Important rule:
 - Shared surfaces now rely more on borders and contrast than repeated card shadows
 - Each object card now exposes an explicit edit action that opens a modal with the core fields
 - The main detail pane now shows object information, attachments, and QR access without an inline edit form
+- The QR code surface now opens from a quick action instead of staying expanded in the main pane
