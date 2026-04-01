@@ -34,6 +34,7 @@ The MVP should include:
 - QR code generation linked to the public object page
 - filesystem-based media uploads
 - basic search by object title
+- object tags with tag-based filtering
 
 ## Ideal Scenario
 

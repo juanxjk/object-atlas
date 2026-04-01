@@ -1,5 +1,5 @@
 import { relations, sql } from 'drizzle-orm';
-import { integer, jsonb, pgTable, timestamp, unique, uuid, varchar } from 'drizzle-orm/pg-core';
+import { integer, jsonb, pgTable, text, timestamp, unique, uuid, varchar } from 'drizzle-orm/pg-core';
 
 import { FILES_LIMITS, OBJECTS_LIMITS } from './schema-limits';
 
@@ -19,6 +19,7 @@ export const objectsTable = pgTable('objects', {
   title: varchar('title', { length: OBJECTS_LIMITS.title }).notNull(),
   description: varchar('description', { length: OBJECTS_LIMITS.description }),
   story: varchar('story', { length: OBJECTS_LIMITS.story }),
+  tags: varchar('tags', { length: OBJECTS_LIMITS.tag }).array().notNull().default(sql`ARRAY[]::varchar[]`),
   primaryFileId: uuid('primary_file_id').references(() => filesTable.id, { onDelete: 'set null' }),
   metadata: jsonb('metadata').$type<Record<string, unknown>>().notNull().default(sql`'{}'::jsonb`),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

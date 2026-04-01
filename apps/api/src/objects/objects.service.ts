@@ -24,6 +24,7 @@ type DatabaseObjectRow = {
   title: string;
   description: string | null;
   story: string | null;
+  tags: string[] | null;
   primary_file_id: string | null;
   thumbnail_path?: string | null;
   metadata: Record<string, unknown> | null;
@@ -70,6 +71,7 @@ export class ObjectsService implements OnModuleInit {
         title VARCHAR(${sql.raw(String(OBJECTS_LIMITS.title))}) NOT NULL,
         description VARCHAR(${sql.raw(String(OBJECTS_LIMITS.description))}),
         story VARCHAR(${sql.raw(String(OBJECTS_LIMITS.story))}),
+        tags VARCHAR(${sql.raw(String(OBJECTS_LIMITS.tag))})[] NOT NULL DEFAULT ARRAY[]::VARCHAR[],
         metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -113,6 +115,11 @@ export class ObjectsService implements OnModuleInit {
     await db.execute(sql`
       ALTER TABLE objects
       ADD COLUMN IF NOT EXISTS primary_file_id UUID REFERENCES files(id) ON DELETE SET NULL
+    `);
+
+    await db.execute(sql`
+      ALTER TABLE objects
+      ADD COLUMN IF NOT EXISTS tags VARCHAR(${sql.raw(String(OBJECTS_LIMITS.tag))})[] NOT NULL DEFAULT ARRAY[]::VARCHAR[]
     `);
 
     await db.execute(sql`
@@ -241,6 +248,7 @@ export class ObjectsService implements OnModuleInit {
         title,
         description,
         story,
+        tags,
         metadata
       )
       VALUES (
@@ -249,6 +257,7 @@ export class ObjectsService implements OnModuleInit {
         ${input.title},
         ${input.description},
         ${input.story},
+        ${input.tags},
         ${JSON.stringify(input.metadata)}::jsonb
       )
       RETURNING *, NULL::text AS thumbnail_path
@@ -299,6 +308,7 @@ export class ObjectsService implements OnModuleInit {
       title: input.title ?? current.title,
       description: input.description ?? current.description,
       story: input.story ?? current.story,
+      tags: input.tags ?? current.tags,
       metadata: input.metadata ?? current.metadata
     };
 
@@ -308,6 +318,7 @@ export class ObjectsService implements OnModuleInit {
         title = ${next.title},
         description = ${next.description},
         story = ${next.story},
+        tags = ${next.tags},
         metadata = ${JSON.stringify(next.metadata)}::jsonb,
         updated_at = NOW()
       WHERE id = ${id}
@@ -592,6 +603,7 @@ export class ObjectsService implements OnModuleInit {
       title: object.title,
       description: object.description,
       story: object.story,
+      tags: object.tags,
       createdAt: object.createdAt,
       updatedAt: object.updatedAt,
       media

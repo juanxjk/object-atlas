@@ -7,7 +7,7 @@
 3. The user chooses the object listing option
 4. The user taps the new object action
 5. The system opens a create-object modal with essential fields
-6. The user enters the object title, short description, story, and basic metadata
+6. The user enters the object title, short description, story, tags, and basic metadata
 7. The system validates the input
 8. The system stores the object in PostgreSQL
 9. The system closes the modal and opens the saved object detail view
@@ -37,7 +37,7 @@
 2. The user opens the hamburger menu
 3. The user chooses the object listing option
 4. The system shows the list of available object records
-5. The user searches or selects an object from the list
+5. The user searches, filters by tag, or selects an object from the list
 6. The system opens the selected object detail page
 
 ## Flow 4: Edit Existing Object
@@ -50,7 +50,7 @@
 6. The system returns matching results
 7. The user taps the edit action on an object card
 8. The system opens an edit modal with the core fields already filled
-9. The user updates object information and saves
+9. The user updates object information, including tags, and saves
 10. The system validates and persists the changes
 11. The system closes the modal and returns the user to the object detail view
 12. The updated public object page reflects the new data

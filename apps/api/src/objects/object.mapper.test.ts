@@ -10,6 +10,7 @@ describe('mapObjectRow', () => {
       title: 'Archive box',
       description: 'Storage box',
       story: 'Used in the first office',
+      tags: ['archive', 'office'],
       metadata: {
         shelf: 'A-2'
       },
@@ -23,6 +24,7 @@ describe('mapObjectRow', () => {
       title: 'Archive box',
       description: 'Storage box',
       story: 'Used in the first office',
+      tags: ['archive', 'office'],
       primaryFileId: null,
       thumbnailPath: null,
       metadata: {

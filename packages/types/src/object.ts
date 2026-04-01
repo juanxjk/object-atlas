@@ -4,6 +4,7 @@ export type ObjectRecord = {
   title: string;
   description: string | null;
   story: string | null;
+  tags: string[];
   primaryFileId: string | null;
   thumbnailPath: string | null;
   metadata: Record<string, unknown>;
@@ -25,7 +26,7 @@ export type ObjectMediaRecord = {
 
 export type PublicObjectRecord = Pick<
   ObjectRecord,
-  'id' | 'publicId' | 'title' | 'description' | 'story' | 'createdAt' | 'updatedAt'
+  'id' | 'publicId' | 'title' | 'description' | 'story' | 'tags' | 'createdAt' | 'updatedAt'
 > & {
   media: ObjectMediaRecord[];
 };

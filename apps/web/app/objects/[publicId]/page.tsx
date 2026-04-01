@@ -86,6 +86,22 @@ export default async function PublicObjectPage({
               <p className="mt-2">{formatDate(object.updatedAt)}</p>
             </div>
           </div>
+
+          {object.tags.length > 0 ? (
+            <div className="mt-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-moss">Tags</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {object.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-clay px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </section>
 
         <section className="rounded-soft border border-black/5 bg-white/85 p-6 sm:p-8">

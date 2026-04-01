@@ -6,6 +6,7 @@ type DatabaseObjectRow = {
   title: string;
   description: string | null;
   story: string | null;
+  tags?: string[] | null;
   primary_file_id?: string | null;
   thumbnail_path?: string | null;
   metadata: Record<string, unknown> | null;
@@ -20,6 +21,7 @@ export function mapObjectRow(row: DatabaseObjectRow): ObjectRecord {
     title: row.title,
     description: row.description,
     story: row.story,
+    tags: row.tags ?? [],
     primaryFileId: row.primary_file_id ?? null,
     thumbnailPath: row.thumbnail_path ?? null,
     metadata: row.metadata ?? {},

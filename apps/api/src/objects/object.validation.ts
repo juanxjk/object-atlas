@@ -39,6 +39,47 @@ function asOptionalString(value: unknown, fieldName: string): string | null {
   return normalized;
 }
 
+function asTags(value: unknown): string[] {
+  if (value === undefined || value === null) {
+    return [];
+  }
+
+  if (!Array.isArray(value)) {
+    throw new BadRequestException('tags must be an array');
+  }
+
+  const normalizedTags = value.map((item) => {
+    if (typeof item !== 'string') {
+      throw new BadRequestException('tags must contain only strings');
+    }
+
+    const normalized = item.trim();
+
+    if (!normalized) {
+      throw new BadRequestException('tags cannot be empty');
+    }
+
+    if (normalized.length > OBJECTS_LIMITS.tag) {
+      throw new BadRequestException(`each tag must be at most ${OBJECTS_LIMITS.tag} characters`);
+    }
+
+    return normalized;
+  });
+
+  const deduped = normalizedTags.filter(
+    (tag, index, collection) =>
+      collection.findIndex((candidate) => candidate.toLowerCase() === tag.toLowerCase()) === index
+  );
+
+  if (deduped.length > OBJECTS_LIMITS.tagsPerObject) {
+    throw new BadRequestException(
+      `tags must contain at most ${OBJECTS_LIMITS.tagsPerObject} items`
+    );
+  }
+
+  return deduped;
+}
+
 function asRequiredTitle(value: unknown): string {
   if (typeof value !== 'string') {
     throw new BadRequestException('title is required');
@@ -68,6 +109,7 @@ export function validateCreateObject(body: unknown): CreateObjectInput {
     title: asRequiredTitle(payload.title),
     description: asOptionalString(payload.description, 'description'),
     story: asOptionalString(payload.story, 'story'),
+    tags: asTags(payload.tags),
     metadata: asRecord(payload.metadata)
   };
 }
@@ -90,6 +132,10 @@ export function validateUpdateObject(body: unknown): UpdateObjectInput {
 
   if ('story' in payload) {
     update.story = asOptionalString(payload.story, 'story');
+  }
+
+  if ('tags' in payload) {
+    update.tags = asTags(payload.tags);
   }
 
   if ('metadata' in payload) {

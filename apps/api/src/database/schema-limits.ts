@@ -9,5 +9,7 @@ export const OBJECTS_LIMITS = {
   publicId: 64,
   title: 160,
   description: 500,
-  story: 10000
+  story: 10000,
+  tag: 40,
+  tagsPerObject: 12
 } as const;

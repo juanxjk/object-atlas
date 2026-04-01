@@ -8,6 +8,7 @@ export type CreateObjectInput = {
   title: string;
   description: string | null;
   story: string | null;
+  tags: string[];
   metadata: Record<string, unknown>;
 };
 

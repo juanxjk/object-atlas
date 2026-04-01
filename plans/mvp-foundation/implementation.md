@@ -34,6 +34,7 @@ After the MVP, the implementation can evolve toward:
 - Modal-based object creation flow
 - Object-card edit action opening a dedicated edit modal
 - Create and edit forms surface the current text-length limits in the UI
+- Create and edit forms support comma-separated tags
 - Object detail screen focused on reading, attachments, and QR access
 - Object detail header includes a direct button to open the public page URL
 - QR code surface opened from a quick action instead of always rendering inline
@@ -45,11 +46,13 @@ After the MVP, the implementation can evolve toward:
 - Public object page routed by public identifier
 - Public object page includes an image carousel when image media is available
 - Basic search input by title
+- Object listing can be filtered by tags
 - QR code display within the object detail screen
 
 ## Backend Scope
 
 - CRUD endpoints for objects
+- Objects persist a tag list for filtering and display
 - Media upload endpoint tied to an object
 - Media delete endpoint tied to an object
 - Endpoint or service for generating QR target URLs

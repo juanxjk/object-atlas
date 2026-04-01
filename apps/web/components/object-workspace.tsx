@@ -24,18 +24,22 @@ type ObjectFormState = {
   title: string;
   description: string;
   story: string;
+  tags: string;
 };
 
 const emptyFormState: ObjectFormState = {
   title: '',
   description: '',
-  story: ''
+  story: '',
+  tags: ''
 };
 
 const fieldLimits = {
   title: 160,
   description: 500,
   story: 10000,
+  tag: 40,
+  tagsPerObject: 12,
   uploadSizeMb: 10
 } as const;
 
@@ -65,7 +69,8 @@ function toFormState(object: ObjectRecord): ObjectFormState {
   return {
     title: object.title,
     description: object.description ?? '',
-    story: object.story ?? ''
+    story: object.story ?? '',
+    tags: object.tags.join(', ')
   };
 }
 
@@ -79,6 +84,19 @@ function getThumbnailUrl(thumbnailPath: string | null): string | null {
 
 function getPublicObjectUrl(publicId: string): string {
   return `${publicAppUrl}/objects/${publicId}`;
+}
+
+function parseTagsInput(value: string): string[] {
+  const parsed = value
+    .split(',')
+    .map((tag) => tag.trim())
+    .filter(Boolean)
+    .filter(
+      (tag, index, collection) =>
+        collection.findIndex((candidate) => candidate.toLowerCase() === tag.toLowerCase()) === index
+    );
+
+  return parsed.slice(0, fieldLimits.tagsPerObject);
 }
 
 export function ObjectWorkspace({
@@ -102,6 +120,7 @@ export function ObjectWorkspace({
   const [editError, setEditError] = useState<string | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
   const [mediaItems, setMediaItems] = useState<ObjectMediaRecord[]>([]);
   const [isLoadingMedia, setIsLoadingMedia] = useState(false);
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
@@ -112,7 +131,12 @@ export function ObjectWorkspace({
 
   const selectedObject = objects.find((object) => object.id === selectedId) ?? null;
   const editingObject = objects.find((object) => object.id === editingObjectId) ?? null;
-  const filteredObjects = filterObjectsByTitle(objects, searchQuery);
+  const filteredObjects = filterObjectsByTitle(objects, searchQuery, selectedTagFilter);
+  const availableTags = Array.from(
+    new Set(
+      objects.flatMap((object) => object.tags).sort((left, right) => left.localeCompare(right))
+    )
+  );
 
   useEffect(() => {
     async function loadMedia(): Promise<void> {
@@ -166,7 +190,10 @@ export function ObjectWorkspace({
     try {
       const created = await requestObject<ObjectRecord>('/api/objects', {
         method: 'POST',
-        body: JSON.stringify(createFormState)
+        body: JSON.stringify({
+          ...createFormState,
+          tags: parseTagsInput(createFormState.tags)
+        })
       });
 
       setObjects((current) => [created, ...current]);
@@ -248,7 +275,10 @@ export function ObjectWorkspace({
     try {
       const updated = await requestObject<ObjectRecord>(`/api/objects/${editingObjectId}`, {
         method: 'PATCH',
-        body: JSON.stringify(editFormState)
+        body: JSON.stringify({
+          ...editFormState,
+          tags: parseTagsInput(editFormState.tags)
+        })
       });
 
       setObjects((current) =>
@@ -377,6 +407,37 @@ export function ObjectWorkspace({
             </div>
           </label>
 
+          {availableTags.length > 0 ? (
+            <div className="mt-4">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-ink/55">
+                Filter by tag
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedTagFilter(null)}
+                  className={`rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                    !selectedTagFilter ? 'bg-ink text-white' : 'bg-clay text-ink/70'
+                  }`}
+                >
+                  All tags
+                </button>
+                {availableTags.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => setSelectedTagFilter(tag)}
+                    className={`rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
+                      selectedTagFilter === tag ? 'bg-ember text-white' : 'bg-clay text-ink/70'
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           <div className="mt-5 space-y-3">
             {objects.length === 0 ? (
               <div className="rounded-2xl bg-clay px-4 py-4 text-sm text-ink/70">
@@ -425,6 +486,18 @@ export function ObjectWorkspace({
                               <p className="mt-1 text-sm text-ink/65">
                                 {object.description ?? 'No description yet'}
                               </p>
+                              {object.tags.length > 0 ? (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                  {object.tags.map((tag) => (
+                                    <span
+                                      key={tag}
+                                      className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-moss"
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : null}
                             </div>
                             <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
                               {isSelected ? 'Open' : 'View'}
@@ -528,6 +601,26 @@ export function ObjectWorkspace({
                     <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-ink/80">
                       {selectedObject.story ?? 'No story has been added yet.'}
                     </p>
+                  </div>
+
+                  <div className="rounded-2xl bg-clay px-4 py-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+                      Tags
+                    </p>
+                    {selectedObject.tags.length > 0 ? (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {selectedObject.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded-full bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="mt-2 text-sm leading-6 text-ink/70">No tags yet.</p>
+                    )}
                   </div>
                 </div>
               </>
@@ -772,6 +865,30 @@ export function ObjectWorkspace({
 
               <label className="block">
                 <div className="mb-2 flex items-center justify-between gap-3">
+                  <span className="block text-sm font-semibold text-ink">Tags</span>
+                  <span className="text-xs font-medium text-ink/55">
+                    {parseTagsInput(createFormState.tags).length}/{fieldLimits.tagsPerObject}
+                  </span>
+                </div>
+                <input
+                  value={createFormState.tags}
+                  onChange={(event) =>
+                    setCreateFormState((current) => ({
+                      ...current,
+                      tags: event.target.value
+                    }))
+                  }
+                  className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
+                  placeholder="archive, bronze, restoration"
+                />
+                <p className="mt-2 text-xs text-ink/55">
+                  Comma-separated tags, up to {fieldLimits.tagsPerObject} tags and {fieldLimits.tag}{' '}
+                  characters each.
+                </p>
+              </label>
+
+              <label className="block">
+                <div className="mb-2 flex items-center justify-between gap-3">
                   <span className="block text-sm font-semibold text-ink">Description</span>
                   <span className="text-xs font-medium text-ink/55">
                     {createFormState.description.length}/{fieldLimits.description}
@@ -792,6 +909,30 @@ export function ObjectWorkspace({
                 />
                 <p className="mt-2 text-xs text-ink/55">
                   Up to {fieldLimits.description} characters.
+                </p>
+              </label>
+
+              <label className="block">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <span className="block text-sm font-semibold text-ink">Tags</span>
+                  <span className="text-xs font-medium text-ink/55">
+                    {parseTagsInput(editFormState.tags).length}/{fieldLimits.tagsPerObject}
+                  </span>
+                </div>
+                <input
+                  value={editFormState.tags}
+                  onChange={(event) =>
+                    setEditFormState((current) => ({
+                      ...current,
+                      tags: event.target.value
+                    }))
+                  }
+                  className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
+                  placeholder="archive, bronze, restoration"
+                />
+                <p className="mt-2 text-xs text-ink/55">
+                  Comma-separated tags, up to {fieldLimits.tagsPerObject} tags and {fieldLimits.tag}{' '}
+                  characters each.
                 </p>
               </label>
 

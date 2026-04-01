@@ -9,6 +9,7 @@ describe('object validation', () => {
       title: 'Bronze lamp',
       description: 'Desk lamp',
       story: 'Recovered from the old office',
+      tags: ['lighting', 'bronze'],
       metadata: {
         year: 1964
       }
@@ -18,6 +19,7 @@ describe('object validation', () => {
       title: 'Bronze lamp',
       description: 'Desk lamp',
       story: 'Recovered from the old office',
+      tags: ['lighting', 'bronze'],
       metadata: {
         year: 1964
       }
@@ -30,11 +32,13 @@ describe('object validation', () => {
 
   it('accepts partial update payloads', () => {
     const payload = validateUpdateObject({
-      story: 'Updated story'
+      story: 'Updated story',
+      tags: ['restored', 'office']
     });
 
     expect(payload).toEqual({
-      story: 'Updated story'
+      story: 'Updated story',
+      tags: ['restored', 'office']
     });
   });
 
@@ -64,5 +68,22 @@ describe('object validation', () => {
         story: 'a'.repeat(OBJECTS_LIMITS.story + 1)
       })
     ).toThrow(`story must be at most ${OBJECTS_LIMITS.story} characters`);
+  });
+
+  it('deduplicates tags case-insensitively', () => {
+    expect(
+      validateCreateObject({
+        title: 'Bronze lamp',
+        tags: ['Lighting', 'lighting', 'Bronze']
+      }).tags
+    ).toEqual(['Lighting', 'Bronze']);
+  });
+
+  it('rejects too many tags', () => {
+    expect(() =>
+      validateUpdateObject({
+        tags: Array.from({ length: OBJECTS_LIMITS.tagsPerObject + 1 }, (_, index) => `tag-${index}`)
+      })
+    ).toThrow(`tags must contain at most ${OBJECTS_LIMITS.tagsPerObject} items`);
   });
 });

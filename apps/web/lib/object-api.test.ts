@@ -17,10 +17,9 @@ describe('object api helpers', () => {
 
     await getObjects('lamp');
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      'http://localhost:3001/api/objects?q=lamp',
-      expect.objectContaining({ cache: 'no-store' })
-    );
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0]?.[0]?.toString()).toBe('http://localhost:3001/api/objects?q=lamp');
+    expect(fetchMock.mock.calls[0]?.[1]).toEqual({ cache: 'no-store' });
   });
 
   it('returns null when the public object endpoint is unavailable', async () => {

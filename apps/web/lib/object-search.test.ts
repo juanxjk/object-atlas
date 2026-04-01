@@ -9,6 +9,7 @@ const objects = [
     title: 'Bronze lamp',
     description: null,
     story: null,
+    tags: ['lighting', 'bronze'],
     primaryFileId: null,
     thumbnailPath: null,
     metadata: {},
@@ -21,6 +22,7 @@ const objects = [
     title: 'Wooden chair',
     description: null,
     story: null,
+    tags: ['furniture', 'wood'],
     primaryFileId: null,
     thumbnailPath: null,
     metadata: {},
@@ -37,5 +39,13 @@ describe('filterObjectsByTitle', () => {
   it('filters objects by a case-insensitive title match', () => {
     expect(filterObjectsByTitle(objects, 'lamp')).toEqual([objects[0]]);
     expect(filterObjectsByTitle(objects, 'CHAIR')).toEqual([objects[1]]);
+  });
+
+  it('filters objects by tag text match', () => {
+    expect(filterObjectsByTitle(objects, 'bronze')).toEqual([objects[0]]);
+  });
+
+  it('filters objects by selected tag', () => {
+    expect(filterObjectsByTitle(objects, '', 'furniture')).toEqual([objects[1]]);
   });
 });
