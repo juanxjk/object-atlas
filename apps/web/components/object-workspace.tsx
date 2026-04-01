@@ -55,7 +55,6 @@ export function ObjectWorkspace({
   const [mobileView, setMobileView] = useState<'list' | 'editor'>(
     initialObjects[0]?.id ? 'editor' : 'list'
   );
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [objects, setObjects] = useState<ObjectRecord[]>(initialObjects);
   const [formState, setFormState] = useState<ObjectFormState>(emptyFormState);
   const [selectedId, setSelectedId] = useState<string | null>(initialObjects[0]?.id ?? null);
@@ -101,7 +100,6 @@ export function ObjectWorkspace({
     setFormState(toFormState(object));
     setError(null);
     setMobileView('editor');
-    setIsMenuOpen(false);
   };
 
   const handleCreateMode = () => {
@@ -111,7 +109,6 @@ export function ObjectWorkspace({
     setMediaItems([]);
     setMediaError(null);
     setMobileView('editor');
-    setIsMenuOpen(false);
   };
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,86 +181,9 @@ export function ObjectWorkspace({
 
   return (
     <section className="space-y-4">
-      <nav className="rounded-soft border border-black/5 bg-white/85 p-4 shadow-card">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-moss">
-              Workspace navigation
-            </p>
-            <p className="mt-1 text-sm text-ink/70">
-              Switch between object listing and editing from a single persistent navbar.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setIsMenuOpen((current) => !current)}
-            className="inline-flex items-center gap-2 rounded-full border border-sand bg-clay px-4 py-2 text-sm font-semibold text-ink lg:hidden"
-          >
-            <span className="text-base leading-none">≡</span>
-            Menu
-          </button>
-
-          <div className="hidden items-center gap-2 lg:flex">
-            <button
-              type="button"
-              onClick={() => setMobileView('list')}
-              className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                mobileView === 'list'
-                  ? 'bg-ink text-white'
-                  : 'border border-sand bg-clay text-ink'
-              }`}
-            >
-              Object listing
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setMobileView('editor')}
-              className={`rounded-full px-4 py-2 text-sm font-semibold ${
-                mobileView === 'editor'
-                  ? 'bg-ink text-white'
-                  : 'border border-sand bg-clay text-ink'
-              }`}
-            >
-              {selectedObject ? 'Current object' : 'Create object'}
-            </button>
-          </div>
-        </div>
-
-        {isMenuOpen ? (
-          <div className="mt-4 space-y-2 rounded-3xl border border-sand bg-clay p-3 lg:hidden">
-            <button
-              type="button"
-              onClick={() => {
-                setMobileView('list');
-                setIsMenuOpen(false);
-              }}
-              className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold ${
-                mobileView === 'list' ? 'bg-white text-ink' : 'text-ink/70'
-              }`}
-            >
-              Object listing
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setMobileView('editor');
-                setIsMenuOpen(false);
-              }}
-              className={`w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold ${
-                mobileView === 'editor' ? 'bg-white text-ink' : 'text-ink/70'
-              }`}
-            >
-              {selectedObject ? 'Current object' : 'Create object'}
-            </button>
-          </div>
-        ) : null}
-      </nav>
-
       <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
         <article
+          id="object-listing"
           className={`rounded-soft border border-black/5 bg-white/85 p-5 shadow-card sm:p-6 ${
             mobileView === 'list' ? 'block' : 'hidden lg:block'
           }`}
@@ -341,22 +261,25 @@ export function ObjectWorkspace({
           </div>
         </article>
 
-      <div
-        className={`space-y-4 ${mobileView === 'editor' ? 'block' : 'hidden lg:block'}`}
-      >
-        <article className="rounded-soft border border-black/5 bg-white/90 p-5 shadow-card sm:p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
-            {selectedObject ? 'Edit object' : 'Create object'}
-          </p>
-          <h2 className="mt-1 font-[family-name:var(--font-display)] text-3xl text-ink">
-            {selectedObject ? selectedObject.title : 'Start a new object record'}
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-ink/70">
-            Keep the first version lightweight: title, short description, and story. Media and
-            public presentation will connect to this flow in the next steps.
-          </p>
+        <div
+          className={`space-y-4 ${mobileView === 'editor' ? 'block' : 'hidden lg:block'}`}
+        >
+          <article
+            id="object-editor"
+            className="rounded-soft border border-black/5 bg-white/90 p-5 shadow-card sm:p-6"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
+              {selectedObject ? 'Edit object' : 'Create object'}
+            </p>
+            <h2 className="mt-1 font-[family-name:var(--font-display)] text-3xl text-ink">
+              {selectedObject ? selectedObject.title : 'Start a new object record'}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-ink/70">
+              Keep the first version lightweight: title, short description, and story. Media and
+              public presentation will connect to this flow in the next steps.
+            </p>
 
-          <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+            <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
             <label className="block">
               <span className="mb-2 block text-sm font-semibold text-ink">Title</span>
               <input
@@ -434,9 +357,9 @@ export function ObjectWorkspace({
                 </button>
               ) : null}
             </div>
-          </form>
+            </form>
 
-          <div className="mt-8 border-t border-black/5 pt-6">
+            <div className="mt-8 border-t border-black/5 pt-6">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">
@@ -515,13 +438,13 @@ export function ObjectWorkspace({
                 ))
               )}
             </div>
-          </div>
-        </article>
+            </div>
+          </article>
 
-        {selectedObject ? (
-          <ObjectQrCard publicId={selectedObject.publicId} title={selectedObject.title} />
-        ) : null}
-      </div>
+          {selectedObject ? (
+            <ObjectQrCard publicId={selectedObject.publicId} title={selectedObject.title} />
+          ) : null}
+        </div>
       </div>
     </section>
   );

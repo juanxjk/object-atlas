@@ -1,4 +1,5 @@
 import { ObjectWorkspace } from '../components/object-workspace';
+import { WorkspaceNavbar } from '../components/workspace-navbar';
 import { getObjects } from '../lib/object-api';
 
 const priorities = [
@@ -13,6 +14,8 @@ export default async function HomePage() {
   return (
     <main className="min-h-screen px-4 py-6 sm:px-6">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+        <WorkspaceNavbar />
+
         <section className="overflow-hidden rounded-soft border border-black/5 bg-white/90 shadow-card">
           <div className="flex flex-col gap-6 px-5 py-6 sm:px-8 sm:py-8">
             <div className="inline-flex w-fit items-center gap-2 rounded-full bg-ink px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white">
