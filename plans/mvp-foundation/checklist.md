@@ -15,7 +15,7 @@ Important rule:
 - [x] `chore:` Bootstrap monorepo structure with web, api, shared packages, and Docker Compose
 - [x] `feat:` Scaffold NestJS API with PostgreSQL connectivity and base object module
 - [x] `feat:` Scaffold Next.js app with Tailwind CSS and mobile-first base layout
-- [ ] `feat:` Implement object creation and editing API endpoints
+- [x] `feat:` Implement object creation and editing API endpoints
 - [ ] `feat:` Implement object create and edit flow in the web app
 - [ ] `feat:` Add filesystem-backed media storage abstraction and upload endpoint
 - [ ] `feat:` Add media upload UI to the object detail flow

@@ -8,6 +8,7 @@ Current scaffold includes:
 - PostgreSQL pool provider using `DATABASE_URL`
 - health endpoint
 - base object module structure
+- object creation, listing, retrieval, and update endpoints
 
 Planned responsibilities:
 
