@@ -52,6 +52,11 @@ export class ObjectsController {
     return this.objectsService.update(id, validateUpdateObject(body));
   }
 
+  @Delete(':id')
+  deleteObject(@Param('id') id: string) {
+    return this.objectsService.delete(id);
+  }
+
   @Patch(':id/primary-media/:mediaId')
   setPrimaryMedia(@Param('id') id: string, @Param('mediaId') mediaId: string) {
     return this.objectsService.setPrimaryMedia(id, mediaId);

@@ -117,6 +117,7 @@ export function ObjectWorkspace({
   const [editingObjectId, setEditingObjectId] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isEditingFromModal, setIsEditingFromModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -292,6 +293,29 @@ export function ObjectWorkspace({
       setEditError(requestError instanceof Error ? requestError.message : 'Unable to save object');
     } finally {
       setIsEditingFromModal(false);
+    }
+  };
+
+  const handleDeleteObject = async (objectId: string) => {
+    if (!window.confirm('Are you sure you want to delete this object? This cannot be undone.')) {
+      return;
+    }
+    
+    setIsDeleting(true);
+    setEditError(null);
+    try {
+      await requestObject(`/api/objects/${objectId}`, { method: 'DELETE' });
+      setObjects((current) => current.filter((o) => o.id !== objectId));
+      if (selectedId === objectId) {
+        setSelectedId(null);
+        setMobileView('list');
+      }
+      setIsEditModalOpen(false);
+      setEditingObjectId(null);
+    } catch (requestError) {
+      setEditError(requestError instanceof Error ? requestError.message : 'Unable to delete object');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -514,14 +538,26 @@ export function ObjectWorkspace({
                         </p>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => handleEditMode(object)}
-                        className="inline-flex items-center gap-2 rounded-full border border-sand bg-white/80 px-4 py-2 text-sm font-semibold text-ink"
-                      >
-                        <Pencil size={16} strokeWidth={2.1} />
-                        Edit
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleEditMode(object)}
+                          className="inline-flex items-center gap-2 rounded-full border border-sand bg-white/80 px-4 py-2 text-sm font-semibold text-ink"
+                        >
+                          <Pencil size={16} strokeWidth={2.1} />
+                          Edit
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteObject(object.id)}
+                          disabled={isDeleting}
+                          className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white/80 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60"
+                        >
+                          <Trash2 size={16} strokeWidth={2.1} />
+                          Remove
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -1152,26 +1188,38 @@ export function ObjectWorkspace({
                 </div>
               ) : null}
 
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <button
-                  type="submit"
-                  disabled={isEditingFromModal}
-                  className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:opacity-70"
-                >
-                  <Pencil size={16} strokeWidth={2.1} />
-                  {isEditingFromModal ? 'Saving...' : 'Save changes'}
-                </button>
+              <div className="flex flex-col sm:flex-row justify-between gap-3 pt-2">
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <button
+                    type="submit"
+                    disabled={isEditingFromModal || isDeleting}
+                    className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:opacity-70"
+                  >
+                    <Pencil size={16} strokeWidth={2.1} />
+                    {isEditingFromModal ? 'Saving...' : 'Save changes'}
+                  </button>
 
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditModalOpen(false);
+                      setEditingObjectId(null);
+                    }}
+                    className="inline-flex items-center gap-2 rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
+                  >
+                    <X size={16} strokeWidth={2.1} />
+                    Cancel
+                  </button>
+                </div>
+                
                 <button
                   type="button"
-                  onClick={() => {
-                    setIsEditModalOpen(false);
-                    setEditingObjectId(null);
-                  }}
-                  className="inline-flex items-center gap-2 rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
+                  onClick={() => handleDeleteObject(editingObjectId!)}
+                  disabled={isEditingFromModal || isDeleting}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-red-200 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-70"
                 >
-                  <X size={16} strokeWidth={2.1} />
-                  Cancel
+                  <Trash2 size={16} strokeWidth={2.1} />
+                  {isDeleting ? 'Deleting...' : 'Delete object'}
                 </button>
               </div>
             </form>

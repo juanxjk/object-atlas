@@ -337,6 +337,21 @@ export class ObjectsService implements OnModuleInit {
     return mapObjectRow(result.rows[0]);
   }
 
+  async delete(id: string): Promise<void> {
+    const db = this.databaseService.getDb();
+    await this.getById(id);
+
+    const media = await this.listMedia(id);
+    for (const item of media) {
+      await this.deleteMedia(id, item.id);
+    }
+
+    await db.execute(sql`
+      DELETE FROM objects
+      WHERE id = ${id}
+    `);
+  }
+
   async addMedia(
     objectId: string,
     file: {
