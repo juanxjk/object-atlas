@@ -810,10 +810,10 @@ export function ObjectWorkspace({
           onClick={() => setIsCreateModalOpen(false)}
         >
           <div
-            className="w-full max-w-xl rounded-soft border border-black/5 bg-white p-5 sm:p-6"
+            className="w-full max-w-xl max-h-full flex flex-col rounded-soft border border-black/5 bg-white p-5 sm:p-6"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex shrink-0 items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
                   Create object
@@ -837,7 +837,7 @@ export function ObjectWorkspace({
               </button>
             </div>
 
-            <form className="mt-6 space-y-4" onSubmit={handleCreateSubmit}>
+            <form className="mt-6 min-h-0 space-y-4 overflow-y-auto pr-2" onSubmit={handleCreateSubmit}>
               <label className="block">
                 <div className="mb-2 flex items-center justify-between gap-3">
                   <span className="block text-sm font-semibold text-ink">Title</span>
@@ -912,29 +912,6 @@ export function ObjectWorkspace({
                 </p>
               </label>
 
-              <label className="block">
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <span className="block text-sm font-semibold text-ink">Tags</span>
-                  <span className="text-xs font-medium text-ink/55">
-                    {parseTagsInput(editFormState.tags).length}/{fieldLimits.tagsPerObject}
-                  </span>
-                </div>
-                <input
-                  value={editFormState.tags}
-                  onChange={(event) =>
-                    setEditFormState((current) => ({
-                      ...current,
-                      tags: event.target.value
-                    }))
-                  }
-                  className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
-                  placeholder="archive, bronze, restoration"
-                />
-                <p className="mt-2 text-xs text-ink/55">
-                  Comma-separated tags, up to {fieldLimits.tagsPerObject} tags and {fieldLimits.tag}{' '}
-                  characters each.
-                </p>
-              </label>
 
               <label className="block">
                 <div className="mb-2 flex items-center justify-between gap-3">
@@ -1063,10 +1040,10 @@ export function ObjectWorkspace({
           }}
         >
           <div
-            className="w-full max-w-xl rounded-soft border border-black/5 bg-white p-5 sm:p-6"
+            className="w-full max-w-xl max-h-full flex flex-col rounded-soft border border-black/5 bg-white p-5 sm:p-6"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex shrink-0 items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
                   Edit object
@@ -1093,7 +1070,7 @@ export function ObjectWorkspace({
               </button>
             </div>
 
-            <form className="mt-6 space-y-4" onSubmit={handleEditSubmit}>
+            <form className="mt-6 min-h-0 space-y-4 overflow-y-auto pr-2" onSubmit={handleEditSubmit}>
               <label className="block">
                 <div className="mb-2 flex items-center justify-between gap-3">
                   <span className="block text-sm font-semibold text-ink">Title</span>
