@@ -241,6 +241,11 @@ export class ObjectsService implements OnModuleInit {
     const db = this.databaseService.getDb();
     const id = randomUUID();
     const publicId = randomUUID();
+    
+    const tagsSql = input.tags && input.tags.length > 0
+      ? sql`ARRAY[${sql.join(input.tags.map(t => sql`${t}`), sql`, `)}]::VARCHAR[]`
+      : sql`ARRAY[]::VARCHAR[]`;
+
     const result = await db.execute<DatabaseObjectRow>(sql`
       INSERT INTO objects (
         id,
@@ -257,8 +262,8 @@ export class ObjectsService implements OnModuleInit {
         ${input.title},
         ${input.description},
         ${input.story},
-        ${input.tags},
-        ${JSON.stringify(input.metadata)}::jsonb
+        ${tagsSql},
+        ${JSON.stringify(input.metadata ?? {})}::jsonb
       )
       RETURNING *, NULL::text AS thumbnail_path
     `);
@@ -312,14 +317,18 @@ export class ObjectsService implements OnModuleInit {
       metadata: input.metadata ?? current.metadata
     };
 
+    const tagsSql = next.tags && next.tags.length > 0
+      ? sql`ARRAY[${sql.join(next.tags.map(t => sql`${t}`), sql`, `)}]::VARCHAR[]`
+      : sql`ARRAY[]::VARCHAR[]`;
+
     const result = await db.execute<DatabaseObjectRow>(sql`
       UPDATE objects
       SET
         title = ${next.title},
         description = ${next.description},
         story = ${next.story},
-        tags = ${next.tags},
-        metadata = ${JSON.stringify(next.metadata)}::jsonb,
+        tags = ${tagsSql},
+        metadata = ${JSON.stringify(next.metadata ?? {})}::jsonb,
         updated_at = NOW()
       WHERE id = ${id}
       RETURNING *, ${current.thumbnailPath}::text AS thumbnail_path
