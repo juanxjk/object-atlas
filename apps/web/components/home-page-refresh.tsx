@@ -3,8 +3,7 @@
 import {
   ArrowUpRight,
   LayoutDashboard,
-  Package2,
-  Sparkles
+  Package2
 } from 'lucide-react';
 import type { ObjectRecord } from '@object-atlas/types';
 
@@ -97,7 +96,7 @@ export function HomePageRefresh({
                   style={{ color: activeTheme.cardMetaText }}
                 >
                   Manage records, attach media, choose a main image, and publish QR-linked object
-                  pages from a layout that feels more intentional than the original MVP shell.
+                  pages from a layout that feels more intentional and easier to use.
                 </p>
 
                 <div className="mt-6 flex flex-wrap gap-3">
@@ -157,15 +156,10 @@ export function HomePageRefresh({
                   The real object management flow, inside the new shell.
                 </h2>
                 <p className="mt-2 text-sm leading-6" style={{ color: activeTheme.cardMetaText }}>
-                  This keeps the working MVP behavior in place while the top-level visual direction
-                  moves toward the refreshed layout.
+                  Create and update records, manage media, and move through the collection from a
+                  calmer, more structured workspace.
                 </p>
               </div>
-
-              <Button variant="soft">
-                <Sparkles size={16} strokeWidth={2.1} />
-                Current MVP
-              </Button>
             </div>
 
             <div className="mt-5">
