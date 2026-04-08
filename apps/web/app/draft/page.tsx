@@ -208,6 +208,76 @@ export default function DraftPage() {
                 </div>
               </div>
             </div>
+
+            <div className="mt-4 rounded-[1.5rem] bg-white px-4 py-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#4d6c57]">
+                    Media example
+                  </p>
+                  <h3 className="mt-2 font-[family-name:var(--font-display)] text-2xl text-[#17181d]">
+                    Object with multiple attached images
+                  </h3>
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-black/62">
+                    A draft detail surface for an item with several attached images: one lead image,
+                    a compact gallery strip, and quick actions grouped without looking crowded.
+                  </p>
+                </div>
+
+                <Button variant="secondary" className="bg-[#f4ede3]">
+                  View all media
+                </Button>
+              </div>
+
+              <div className="mt-5 grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
+                <div className="overflow-hidden rounded-[1.4rem] border border-black/6 bg-[#efe2cf]">
+                  <div className="aspect-[4/3] bg-[linear-gradient(135deg,#b36a41,#f0dcc0_48%,#d8b48d)]" />
+                  <div className="flex items-center justify-between gap-3 border-t border-black/6 bg-[#fffaf3] px-4 py-3">
+                    <div>
+                      <p className="text-sm font-semibold text-[#17181d]">Main attached image</p>
+                      <p className="mt-1 text-xs uppercase tracking-[0.14em] text-black/46">
+                        Hero photo for public page and listing
+                      </p>
+                    </div>
+                    <Button variant="ghost" className="bg-white">
+                      Set as main
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {[1, 2, 3, 4].map((item) => (
+                    <div
+                      key={item}
+                      className="overflow-hidden rounded-[1.25rem] border border-black/6 bg-[#f5eee3]"
+                    >
+                      <div
+                        className={`aspect-square ${
+                          item === 1
+                            ? 'bg-[linear-gradient(140deg,#d1a377,#f2dfc9)]'
+                            : item === 2
+                              ? 'bg-[linear-gradient(140deg,#6f7d6a,#dce3d7)]'
+                              : item === 3
+                                ? 'bg-[linear-gradient(140deg,#9d6b54,#ead3c3)]'
+                                : 'bg-[linear-gradient(140deg,#8c8f9a,#dadde4)]'
+                        }`}
+                      />
+                      <div className="flex items-center justify-between gap-2 px-3 py-3">
+                        <div>
+                          <p className="text-sm font-semibold text-[#17181d]">Image {item}</p>
+                          <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-black/42">
+                            Attached
+                          </p>
+                        </div>
+                        <Button variant="ghost" size="sm" className="bg-white">
+                          Open
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </article>
 
           <aside className="rounded-[2rem] border border-black/6 bg-white p-4 sm:p-5">

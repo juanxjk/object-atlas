@@ -28,3 +28,4 @@ Important rule:
 - Keep existing object-management behavior intact during the first redesign pass
 - If the redesign becomes too large, split shell/layout changes from workspace-surface changes into separate commits
 - The first concrete deliverable after planning is a visual draft page with non-functional controls so layout direction can be reviewed before behavior is wired
+- The draft page should be rich enough to evaluate layout treatment for both simple object cards and multi-image object detail states
