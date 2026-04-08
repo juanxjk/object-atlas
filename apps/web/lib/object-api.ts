@@ -1,5 +1,7 @@
 import type { ObjectRecord, PublicObjectRecord } from '@object-atlas/types';
 
+import { readJsonResponse } from './http-response';
+
 const apiBaseUrl = process.env.API_URL ?? 'http://localhost:3001';
 
 export async function getObjects(searchQuery?: string): Promise<ObjectRecord[]> {
@@ -17,7 +19,11 @@ export async function getObjects(searchQuery?: string): Promise<ObjectRecord[]> 
     return [];
   }
 
-  return (await response.json()) as ObjectRecord[];
+  try {
+    return await readJsonResponse<ObjectRecord[]>(response);
+  } catch {
+    return [];
+  }
 }
 
 export async function getPublicObject(publicId: string): Promise<PublicObjectRecord | null> {
@@ -29,5 +35,9 @@ export async function getPublicObject(publicId: string): Promise<PublicObjectRec
     return null;
   }
 
-  return (await response.json()) as PublicObjectRecord;
+  try {
+    return await readJsonResponse<PublicObjectRecord>(response);
+  } catch {
+    return null;
+  }
 }

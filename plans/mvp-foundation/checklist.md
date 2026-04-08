@@ -61,3 +61,4 @@ Important rule:
 - The About page now points to the GitHub repository with a clearer call for public contribution
 - Objects now support tags for display and filtering in the management listing
 - Workspace dialogs and delete confirmation now run on Base UI primitives instead of custom modal wiring
+- Web fetch helpers now guard against HTML error pages so unexpected non-JSON responses fail gracefully

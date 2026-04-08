@@ -20,6 +20,7 @@ import { Dialog } from '@base-ui/react/dialog';
 import type { ObjectMediaRecord, ObjectRecord } from '@object-atlas/types';
 
 import { ObjectQrCard } from './object-qr-card';
+import { readErrorMessage, readJsonResponse } from '../lib/http-response';
 import { filterObjectsByTitle } from '../lib/object-search';
 
 type ObjectFormState = {
@@ -60,11 +61,10 @@ async function requestObject<T>(
   });
 
   if (!response.ok) {
-    const payload = (await response.json().catch(() => null)) as { message?: string } | null;
-    throw new Error(payload?.message ?? 'Request failed');
+    throw new Error(await readErrorMessage(response));
   }
 
-  return (await response.json()) as T;
+  return await readJsonResponse<T>(response);
 }
 
 function toFormState(object: ObjectRecord): ObjectFormState {
@@ -236,11 +236,10 @@ export function ObjectWorkspace({
       });
 
       if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as { message?: string } | null;
-        throw new Error(payload?.message ?? 'Unable to upload media');
+        throw new Error(await readErrorMessage(response));
       }
 
-      const uploaded = (await response.json()) as ObjectMediaRecord;
+      const uploaded = await readJsonResponse<ObjectMediaRecord>(response);
       setMediaItems((current) => [uploaded, ...current]);
       if (uploaded.mimeType.startsWith('image/')) {
         setObjects((current) =>
