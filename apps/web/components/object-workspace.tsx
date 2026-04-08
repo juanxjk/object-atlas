@@ -426,13 +426,13 @@ export function ObjectWorkspace({
             <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-ink/55">
               Search by title
             </span>
-            <div className="flex items-center gap-3 rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink">
-              <Search size={16} strokeWidth={2.1} className="shrink-0 text-ink/55" />
+            <div className="flex items-center gap-2.5 rounded-2xl border border-sand bg-clay px-3 py-2 text-sm text-ink">
+              <Search size={14} strokeWidth={2.1} className="shrink-0 text-ink/55" />
               <Input
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search object titles"
-                className="border-0 bg-transparent px-0 py-0"
+                placeholder="Search titles"
+                className="border-0 bg-transparent px-0 py-0 text-sm"
               />
             </div>
           </label>
