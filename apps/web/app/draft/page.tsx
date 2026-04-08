@@ -199,7 +199,7 @@ export default function DraftPage() {
                     </div>
                     <Button
                       variant="ghost"
-                      className="border-[#d9b48a]/20 bg-[#d9b48a]/12 text-[#f3d5b4] hover:bg-[#d9b48a]/18"
+                      className="border-[#e5c49f] bg-[#ecd1ad] text-[#53321d] hover:bg-[#f1d8b7]"
                     >
                       <QrCode size={16} strokeWidth={2.1} />
                       Open
