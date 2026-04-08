@@ -3,6 +3,7 @@
 import { BookOpen, Menu, Package2, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
+import { ThemeModeToggle } from './theme-mode-toggle';
 import { ThemeNavSelect } from './theme-nav-select';
 import { Button } from './ui/button';
 
@@ -51,6 +52,7 @@ export function WorkspaceNavbar() {
           </Button>
 
           <div className="hidden items-center gap-2 lg:flex">
+            <ThemeModeToggle />
             <ThemeNavSelect />
             {navigationItems.map((item) => (
               <Button
@@ -67,7 +69,8 @@ export function WorkspaceNavbar() {
 
         {isMenuOpen ? (
           <div className="mt-4 space-y-2 rounded-3xl border border-sand bg-clay p-3 lg:hidden">
-            <div className="rounded-2xl bg-white/70 p-2">
+            <div className="flex items-center gap-2 rounded-2xl bg-white/70 p-2">
+              <ThemeModeToggle />
               <ThemeNavSelect />
             </div>
             {navigationItems.map((item) => (
