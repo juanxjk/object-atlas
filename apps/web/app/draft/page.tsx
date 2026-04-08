@@ -47,6 +47,7 @@ const draftThemeClasses: Record<
     badgeBg: string;
     badgeText: string;
     cardBorder: string;
+    cardMetaText: string;
     cardMuted: string;
     cardPrimary: string;
     heroPanel: string;
@@ -77,6 +78,7 @@ const draftThemeClasses: Record<
     badgeBg: '#ffffff',
     badgeText: '#4d6c57',
     cardBorder: '#d4b08c',
+    cardMetaText: '#5c5145',
     cardMuted: '#f7f1e9',
     cardPrimary: '#fff8ef',
     heroPanel: '#0f1218',
@@ -106,6 +108,7 @@ const draftThemeClasses: Record<
     badgeBg: '#f8fbf7',
     badgeText: '#466751',
     cardBorder: '#a8c2ac',
+    cardMetaText: '#415647',
     cardMuted: '#edf3ec',
     cardPrimary: '#f4faf4',
     heroPanel: '#102019',
@@ -135,6 +138,7 @@ const draftThemeClasses: Record<
     badgeBg: '#f7f8fd',
     badgeText: '#4c5d96',
     cardBorder: '#bcc7ec',
+    cardMetaText: '#4e5878',
     cardMuted: '#eef1fa',
     cardPrimary: '#f7f8fd',
     heroPanel: '#111421',
@@ -164,6 +168,7 @@ const draftThemeClasses: Record<
     badgeBg: '#fff7fb',
     badgeText: '#8e5d82',
     cardBorder: '#ffc8dd',
+    cardMetaText: '#7e5873',
     cardMuted: '#ffeaf3',
     cardPrimary: '#fff4fa',
     heroPanel: '#6e5a84',
@@ -351,7 +356,8 @@ export default function DraftPage() {
                     <Input
                       readOnly
                       value="Search titles, tags, and materials"
-                      className="border-0 bg-transparent px-0 py-0 text-sm text-black/58"
+                      className="border-0 bg-transparent px-0 py-0 text-sm"
+                      style={{ color: activeTheme.cardMetaText }}
                     />
                   </div>
                 </div>
@@ -416,7 +422,10 @@ export default function DraftPage() {
                   <h3 className="mt-2 font-[family-name:var(--font-display)] text-2xl text-[#17181d]">
                     Object with multiple attached images
                   </h3>
-                  <p className="mt-2 max-w-2xl text-sm leading-6 text-black/62">
+                  <p
+                    className="mt-2 max-w-2xl text-sm leading-6"
+                    style={{ color: activeTheme.cardMetaText }}
+                  >
                     A draft detail surface for an item with several attached images: one lead image,
                     a compact gallery strip, and quick actions grouped without looking crowded.
                   </p>
@@ -444,7 +453,10 @@ export default function DraftPage() {
                   >
                     <div>
                       <p className="text-sm font-semibold text-[#17181d]">Main attached image</p>
-                      <p className="mt-1 text-xs uppercase tracking-[0.14em] text-black/46">
+                      <p
+                        className="mt-1 text-xs uppercase tracking-[0.14em]"
+                        style={{ color: activeTheme.cardMetaText }}
+                      >
                         Hero photo for public page and listing
                       </p>
                     </div>
@@ -470,7 +482,10 @@ export default function DraftPage() {
                       <div className="flex flex-col items-start gap-3 px-3 py-3">
                         <div>
                           <p className="text-sm font-semibold text-[#17181d]">Image {item}</p>
-                          <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-black/42">
+                          <p
+                            className="mt-1 text-[11px] uppercase tracking-[0.14em]"
+                            style={{ color: activeTheme.cardMetaText }}
+                          >
                             Attached
                           </p>
                         </div>
@@ -532,7 +547,9 @@ export default function DraftPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="font-semibold text-[#17181d]">{card.title}</p>
-                          <p className="mt-1 text-sm text-black/58">{card.meta}</p>
+                          <p className="mt-1 text-sm" style={{ color: activeTheme.cardMetaText }}>
+                            {card.meta}
+                          </p>
                         </div>
                         <span
                           className="rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]"
