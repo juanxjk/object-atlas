@@ -10,6 +10,7 @@ describe('object validation', () => {
       description: 'Desk lamp',
       story: 'Recovered from the old office',
       tags: ['lighting', 'bronze'],
+      collectionId: 'collection-1',
       metadata: {
         year: 1964
       }
@@ -20,6 +21,7 @@ describe('object validation', () => {
       description: 'Desk lamp',
       story: 'Recovered from the old office',
       tags: ['lighting', 'bronze'],
+      collectionId: 'collection-1',
       metadata: {
         year: 1964
       }
@@ -33,12 +35,14 @@ describe('object validation', () => {
   it('accepts partial update payloads', () => {
     const payload = validateUpdateObject({
       story: 'Updated story',
-      tags: ['restored', 'office']
+      tags: ['restored', 'office'],
+      collectionId: null
     });
 
     expect(payload).toEqual({
       story: 'Updated story',
-      tags: ['restored', 'office']
+      tags: ['restored', 'office'],
+      collectionId: null
     });
   });
 

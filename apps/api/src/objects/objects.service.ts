@@ -5,6 +5,8 @@ import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/com
 import { sql } from 'drizzle-orm';
 import { PublicObjectRecord } from '@object-atlas/types';
 
+import { CollectionsService } from '../collections/collections.service';
+import { ensureCollectionsSchema } from '../collections/collections.schema';
 import { FILES_LIMITS, OBJECTS_LIMITS } from '../database/schema-limits';
 import { DatabaseService } from '../database/database.service';
 import { STORAGE_SERVICE } from '../storage/storage.constants';
@@ -25,6 +27,11 @@ type DatabaseObjectRow = {
   description: string | null;
   story: string | null;
   tags: string[] | null;
+  collection_id?: string | null;
+  collection_public_id?: string | null;
+  collection_title?: string | null;
+  collection_description?: string | null;
+  collection_visibility?: 'private' | 'unlisted' | 'public' | null;
   primary_file_id: string | null;
   thumbnail_path?: string | null;
   metadata: Record<string, unknown> | null;
@@ -58,11 +65,14 @@ type DatabaseFileRow = {
 export class ObjectsService implements OnModuleInit {
   constructor(
     private readonly databaseService: DatabaseService,
+    private readonly collectionsService: CollectionsService,
     @Inject(STORAGE_SERVICE) private readonly storageService: StorageService
   ) {}
 
   async onModuleInit(): Promise<void> {
     const db = this.databaseService.getDb();
+
+    await ensureCollectionsSchema(db);
 
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS objects (
@@ -115,6 +125,11 @@ export class ObjectsService implements OnModuleInit {
     await db.execute(sql`
       ALTER TABLE objects
       ADD COLUMN IF NOT EXISTS primary_file_id UUID REFERENCES files(id) ON DELETE SET NULL
+    `);
+
+    await db.execute(sql`
+      ALTER TABLE objects
+      ADD COLUMN IF NOT EXISTS collection_id UUID REFERENCES collections(id) ON DELETE SET NULL
     `);
 
     await db.execute(sql`
@@ -215,6 +230,11 @@ export class ObjectsService implements OnModuleInit {
     return sql`
       SELECT
         objects.*,
+        collections.id AS collection_id,
+        collections.public_id AS collection_public_id,
+        collections.title AS collection_title,
+        collections.description AS collection_description,
+        collections.visibility AS collection_visibility,
         COALESCE(
           primary_file.storage_path,
           (
@@ -241,12 +261,16 @@ export class ObjectsService implements OnModuleInit {
     const db = this.databaseService.getDb();
     const id = randomUUID();
     const publicId = randomUUID();
+
+    if (input.collectionId) {
+      await this.collectionsService.ensureCollectionExists(input.collectionId);
+    }
     
     const tagsSql = input.tags && input.tags.length > 0
       ? sql`ARRAY[${sql.join(input.tags.map(t => sql`${t}`), sql`, `)}]::VARCHAR[]`
       : sql`ARRAY[]::VARCHAR[]`;
 
-    const result = await db.execute<DatabaseObjectRow>(sql`
+    await db.execute<DatabaseObjectRow>(sql`
       INSERT INTO objects (
         id,
         public_id,
@@ -254,6 +278,7 @@ export class ObjectsService implements OnModuleInit {
         description,
         story,
         tags,
+        collection_id,
         metadata
       )
       VALUES (
@@ -263,26 +288,38 @@ export class ObjectsService implements OnModuleInit {
         ${input.description},
         ${input.story},
         ${tagsSql},
+        ${input.collectionId},
         ${JSON.stringify(input.metadata ?? {})}::jsonb
       )
       RETURNING *, NULL::text AS thumbnail_path
     `);
 
-    return mapObjectRow(result.rows[0]);
+    return this.getById(id);
   }
 
-  async list(searchQuery?: string): Promise<ObjectRecord[]> {
+  async list(searchQuery?: string, collectionId?: string): Promise<ObjectRecord[]> {
     const db = this.databaseService.getDb();
     const normalizedQuery = searchQuery?.trim();
     const hasQuery = Boolean(normalizedQuery);
+    const normalizedCollectionId = collectionId?.trim();
+    const hasCollectionId = Boolean(normalizedCollectionId);
+
+    if (normalizedCollectionId) {
+      await this.collectionsService.ensureCollectionExists(normalizedCollectionId);
+    }
+
     const result = await db.execute<DatabaseObjectRow>(sql`
       ${this.objectSelectSql()}
       FROM objects
       LEFT JOIN files AS primary_file ON primary_file.id = objects.primary_file_id
-      WHERE (${hasQuery ? normalizedQuery : null}::text IS NULL OR title ILIKE '%' || ${
+      LEFT JOIN collections ON collections.id = objects.collection_id
+      WHERE (${hasQuery ? normalizedQuery : null}::text IS NULL OR objects.title ILIKE '%' || ${
         hasQuery ? normalizedQuery : null
       } || '%')
-      ORDER BY updated_at DESC
+        AND (${hasCollectionId ? normalizedCollectionId : null}::uuid IS NULL OR objects.collection_id = ${
+          hasCollectionId ? normalizedCollectionId : null
+        }::uuid)
+      ORDER BY objects.updated_at DESC
     `);
 
     return result.rows.map(mapObjectRow);
@@ -294,6 +331,7 @@ export class ObjectsService implements OnModuleInit {
       ${this.objectSelectSql()}
       FROM objects
       LEFT JOIN files AS primary_file ON primary_file.id = objects.primary_file_id
+      LEFT JOIN collections ON collections.id = objects.collection_id
       WHERE objects.id = ${id}
     `);
 
@@ -314,27 +352,33 @@ export class ObjectsService implements OnModuleInit {
       description: input.description ?? current.description,
       story: input.story ?? current.story,
       tags: input.tags ?? current.tags,
+      collectionId: input.collectionId === undefined ? current.collection?.id ?? null : input.collectionId,
       metadata: input.metadata ?? current.metadata
     };
+
+    if (next.collectionId) {
+      await this.collectionsService.ensureCollectionExists(next.collectionId);
+    }
 
     const tagsSql = next.tags && next.tags.length > 0
       ? sql`ARRAY[${sql.join(next.tags.map(t => sql`${t}`), sql`, `)}]::VARCHAR[]`
       : sql`ARRAY[]::VARCHAR[]`;
 
-    const result = await db.execute<DatabaseObjectRow>(sql`
+    await db.execute<DatabaseObjectRow>(sql`
       UPDATE objects
       SET
         title = ${next.title},
         description = ${next.description},
         story = ${next.story},
         tags = ${tagsSql},
+        collection_id = ${next.collectionId},
         metadata = ${JSON.stringify(next.metadata ?? {})}::jsonb,
         updated_at = NOW()
       WHERE id = ${id}
       RETURNING *, ${current.thumbnailPath}::text AS thumbnail_path
     `);
 
-    return mapObjectRow(result.rows[0]);
+    return this.getById(id);
   }
 
   async delete(id: string): Promise<void> {
@@ -514,7 +558,7 @@ export class ObjectsService implements OnModuleInit {
       throw new NotFoundException(`media ${mediaId} is not an image`);
     }
 
-    const updated = await db.execute<DatabaseObjectRow>(sql`
+    await db.execute<DatabaseObjectRow>(sql`
       UPDATE objects
       SET primary_file_id = ${media.file_id},
           updated_at = NOW()
@@ -522,7 +566,7 @@ export class ObjectsService implements OnModuleInit {
       RETURNING *, ${media.storage_path}::text AS thumbnail_path
     `);
 
-    return mapObjectRow(updated.rows[0]);
+    return this.getById(objectId);
   }
 
   async deleteMedia(objectId: string, mediaId: string): Promise<ObjectRecord> {
@@ -605,6 +649,7 @@ export class ObjectsService implements OnModuleInit {
       ${this.objectSelectSql()}
       FROM objects
       LEFT JOIN files AS primary_file ON primary_file.id = objects.primary_file_id
+      LEFT JOIN collections ON collections.id = objects.collection_id
       WHERE objects.public_id = ${publicId}
     `);
 

@@ -80,6 +80,24 @@ function asTags(value: unknown): string[] {
   return deduped;
 }
 
+function asOptionalCollectionId(value: unknown): string | null {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+
+  if (typeof value !== 'string') {
+    throw new BadRequestException('collectionId must be a string');
+  }
+
+  const normalized = value.trim();
+
+  if (!normalized) {
+    return null;
+  }
+
+  return normalized;
+}
+
 function asRequiredTitle(value: unknown): string {
   if (typeof value !== 'string') {
     throw new BadRequestException('title is required');
@@ -110,6 +128,7 @@ export function validateCreateObject(body: unknown): CreateObjectInput {
     description: asOptionalString(payload.description, 'description'),
     story: asOptionalString(payload.story, 'story'),
     tags: asTags(payload.tags),
+    collectionId: asOptionalCollectionId(payload.collectionId),
     metadata: asRecord(payload.metadata)
   };
 }
@@ -136,6 +155,10 @@ export function validateUpdateObject(body: unknown): UpdateObjectInput {
 
   if ('tags' in payload) {
     update.tags = asTags(payload.tags);
+  }
+
+  if ('collectionId' in payload) {
+    update.collectionId = asOptionalCollectionId(payload.collectionId);
   }
 
   if ('metadata' in payload) {
