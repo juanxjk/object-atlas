@@ -11,7 +11,6 @@ import {
 import type { ObjectRecord } from '@object-atlas/types';
 
 import { ObjectWorkspace } from './object-workspace';
-import { ThemeSelector } from './theme-selector';
 import { themeStyles } from './theme-styles';
 import { useTheme } from './theme-provider';
 import { WorkspaceNavbar } from './workspace-navbar';
@@ -80,8 +79,6 @@ export function HomePageRefresh({
                 </Button>
               </div>
             </div>
-
-            <ThemeSelector compact />
 
             <div className="grid gap-3 lg:grid-cols-[1.35fr_0.85fr]">
               <div

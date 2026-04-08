@@ -3,6 +3,7 @@
 import { BookOpen, LayoutDashboard, Menu, Package2, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
+import { ThemeNavSelect } from './theme-nav-select';
 import { Button } from './ui/button';
 
 const navigationItems = [
@@ -55,6 +56,7 @@ export function WorkspaceNavbar() {
           </Button>
 
           <div className="hidden items-center gap-2 lg:flex">
+            <ThemeNavSelect />
             {navigationItems.map((item) => (
               <Button
                 key={item.href}
@@ -70,6 +72,9 @@ export function WorkspaceNavbar() {
 
         {isMenuOpen ? (
           <div className="mt-4 space-y-2 rounded-3xl border border-sand bg-clay p-3 lg:hidden">
+            <div className="rounded-2xl bg-white/70 p-2">
+              <ThemeNavSelect />
+            </div>
             {navigationItems.map((item) => (
               <Button
                 key={item.href}

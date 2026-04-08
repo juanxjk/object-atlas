@@ -15,7 +15,7 @@ Important rule:
 - [x] `feat:` Add a draft page to explore the new layout direction before wiring behavior
 - [x] `feat:` Add theme tokens and client-side light/dark theme state
 - [x] `feat:` Add a config page for theme exploration and selection
-- [ ] `feat:` Add a Base UI-backed theme toggle in the shared navigation
+- [x] `feat:` Add a Base UI-backed theme selector in the shared navigation
 - [x] `refactor:` Redesign the home page and shared shell with a bento-style layout
 - [ ] `refactor:` Align shared surfaces and navigation styling with the new color system
 - [ ] `test:` Add or update automated coverage for theme behavior and shell rendering
@@ -35,3 +35,4 @@ Important rule:
 - Theme exploration now has a dedicated config page so the selector can live outside the draft surface while shared-navigation controls are still being designed
 - The theme-family system should stay open to curated palettes, including externally provided palettes that need both light and dark variants
 - The draft theme style map is now shared with the real home page so the redesign can move from exploration into the live shell without duplicating palette logic
+- The home page now keeps only a compact theme-family dropdown in the navbar, while the full selector stays on the config page
