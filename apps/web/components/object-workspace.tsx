@@ -20,6 +20,8 @@ import { Dialog } from '@base-ui/react/dialog';
 import type { ObjectMediaRecord, ObjectRecord } from '@object-atlas/types';
 
 import { ObjectQrCard } from './object-qr-card';
+import { themeStyles } from './theme-styles';
+import { useTheme } from './theme-provider';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
@@ -109,6 +111,9 @@ export function ObjectWorkspace({
 }: {
   initialObjects: ObjectRecord[];
 }) {
+  const { mode, themeKey } = useTheme();
+  const activeTheme = themeStyles[themeKey];
+  const isDark = mode === 'dark';
   const [mobileView, setMobileView] = useState<'list' | 'editor'>(
     initialObjects[0]?.id ? 'editor' : 'list'
   );
@@ -144,6 +149,14 @@ export function ObjectWorkspace({
       objects.flatMap((object) => object.tags).sort((left, right) => left.localeCompare(right))
     )
   );
+  const workspacePanelBg = isDark ? activeTheme.heroPanel : activeTheme.badgeBg;
+  const workspacePanelBorder = activeTheme.cardBorder;
+  const workspaceSectionBg = isDark ? activeTheme.secondaryPanel : activeTheme.cardMuted;
+  const workspaceCardBg = isDark ? activeTheme.metricsPanel : activeTheme.cardPrimary;
+  const workspaceSelectedCardBg = isDark ? activeTheme.previewPanel : activeTheme.heroSurface;
+  const workspacePrimaryText = isDark ? '#f7f3ee' : '#17181d';
+  const workspaceMutedText = isDark ? 'rgba(255,255,255,0.72)' : activeTheme.cardMetaText;
+  const workspaceSoftText = isDark ? 'rgba(255,255,255,0.58)' : activeTheme.badgeText;
 
   useEffect(() => {
     async function loadMedia(): Promise<void> {
@@ -402,16 +415,26 @@ export function ObjectWorkspace({
       <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
         <article
           id="object-listing"
-          className={`rounded-soft border border-black/5 bg-white/85 p-5 sm:p-6 ${
+          className={`rounded-soft border p-5 sm:p-6 ${
             mobileView === 'list' ? 'block' : 'hidden lg:block'
           }`}
+          style={{
+            backgroundColor: workspacePanelBg,
+            borderColor: workspacePanelBorder
+          }}
         >
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">
+              <p
+                className="text-xs font-semibold uppercase tracking-[0.2em]"
+                style={{ color: activeTheme.badgeText }}
+              >
                 Object records
               </p>
-              <h2 className="mt-1 font-[family-name:var(--font-display)] text-2xl text-ink">
+              <h2
+                className="mt-1 font-[family-name:var(--font-display)] text-2xl"
+                style={{ color: workspacePrimaryText }}
+              >
                 Manage the first collection slice
               </h2>
             </div>
@@ -423,23 +446,42 @@ export function ObjectWorkspace({
           </div>
 
           <label className="mt-5 block">
-            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-ink/55">
+            <span
+              className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em]"
+              style={{ color: workspaceSoftText }}
+            >
               Search by title
             </span>
-            <div className="flex items-center gap-2.5 rounded-2xl border border-sand bg-clay px-3 py-2 text-sm text-ink">
-              <Search size={14} strokeWidth={2.1} className="shrink-0 text-ink/55" />
+            <div
+              className="flex items-center gap-2.5 rounded-2xl border px-3 py-2 text-sm"
+              style={{
+                backgroundColor: workspaceSectionBg,
+                borderColor: workspacePanelBorder,
+                color: workspacePrimaryText
+              }}
+            >
+              <Search
+                size={14}
+                strokeWidth={2.1}
+                className="shrink-0"
+                style={{ color: workspaceSoftText }}
+              />
               <Input
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Search titles"
                 className="border-0 bg-transparent px-0 py-0 text-sm"
+                style={{ color: workspacePrimaryText }}
               />
             </div>
           </label>
 
           {availableTags.length > 0 ? (
             <div className="mt-4">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-ink/55">
+              <p
+                className="mb-2 text-xs font-semibold uppercase tracking-[0.16em]"
+                style={{ color: workspaceSoftText }}
+              >
                 Filter by tag
               </p>
               <div className="flex flex-wrap gap-2">
@@ -470,11 +512,17 @@ export function ObjectWorkspace({
 
           <div className="mt-5 space-y-3">
             {objects.length === 0 ? (
-              <div className="rounded-2xl bg-clay px-4 py-4 text-sm text-ink/70">
+              <div
+                className="rounded-2xl px-4 py-4 text-sm"
+                style={{ backgroundColor: workspaceSectionBg, color: workspaceMutedText }}
+              >
                 No object records yet. Start by creating the first one.
               </div>
             ) : filteredObjects.length === 0 ? (
-              <div className="rounded-2xl bg-clay px-4 py-4 text-sm text-ink/70">
+              <div
+                className="rounded-2xl px-4 py-4 text-sm"
+                style={{ backgroundColor: workspaceSectionBg, color: workspaceMutedText }}
+              >
                 No objects match that title search.
               </div>
             ) : (
@@ -484,9 +532,11 @@ export function ObjectWorkspace({
                 return (
                   <div
                     key={object.id}
-                    className={`w-full rounded-2xl border px-4 py-4 transition ${
-                      isSelected ? 'border-ember bg-[#fff7f1]' : 'border-sand bg-clay'
-                    }`}
+                    className="w-full rounded-2xl border px-4 py-4 transition"
+                    style={{
+                      borderColor: isSelected ? activeTheme.accent : workspacePanelBorder,
+                      backgroundColor: isSelected ? workspaceSelectedCardBg : workspaceCardBg
+                    }}
                   >
                     <Button
                       type="button"
@@ -496,7 +546,10 @@ export function ObjectWorkspace({
                     >
                       <div className="flex items-start gap-3">
                         {object.thumbnailPath ? (
-                          <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-black/5 bg-white">
+                          <div
+                            className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl border"
+                            style={{ borderColor: workspacePanelBorder, backgroundColor: activeTheme.badgeBg }}
+                          >
                             <img
                               src={getThumbnailUrl(object.thumbnailPath) ?? ''}
                               alt={`Thumbnail for ${object.title}`}
@@ -504,7 +557,14 @@ export function ObjectWorkspace({
                             />
                           </div>
                         ) : (
-                          <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-2xl border border-dashed border-sand bg-white/70 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink/40">
+                          <div
+                            className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-2xl border border-dashed text-[10px] font-semibold uppercase tracking-[0.12em]"
+                            style={{
+                              borderColor: workspacePanelBorder,
+                              backgroundColor: activeTheme.badgeBg,
+                              color: workspaceSoftText
+                            }}
+                          >
                             <ImageIcon size={16} strokeWidth={2} />
                             <span className="mt-1">No image</span>
                           </div>
@@ -513,8 +573,8 @@ export function ObjectWorkspace({
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
-                              <p className="truncate font-semibold text-ink">{object.title}</p>
-                              <p className="mt-1 text-sm text-ink/65">
+                              <p className="truncate font-semibold" style={{ color: workspacePrimaryText }}>{object.title}</p>
+                              <p className="mt-1 text-sm" style={{ color: workspaceMutedText }}>
                                 {object.description ?? 'No description yet'}
                               </p>
                               {object.tags.length > 0 ? (
@@ -522,7 +582,11 @@ export function ObjectWorkspace({
                                   {object.tags.map((tag) => (
                                     <span
                                       key={tag}
-                                      className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-moss"
+                                      className="rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em]"
+                                      style={{
+                                        backgroundColor: activeTheme.badgeBg,
+                                        color: activeTheme.badgeText
+                                      }}
                                     >
                                       {tag}
                                     </span>
@@ -530,7 +594,13 @@ export function ObjectWorkspace({
                                 </div>
                               ) : null}
                             </div>
-                            <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+                            <span
+                              className="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]"
+                              style={{
+                                backgroundColor: activeTheme.badgeBg,
+                                color: activeTheme.badgeText
+                              }}
+                            >
                               {isSelected ? 'Open' : 'View'}
                             </span>
                           </div>
@@ -538,9 +608,15 @@ export function ObjectWorkspace({
                       </div>
                     </Button>
 
-                    <div className="mt-4 flex items-center justify-between gap-3 border-t border-black/5 pt-3">
+                    <div
+                      className="mt-4 flex items-center justify-between gap-3 border-t pt-3"
+                      style={{ borderColor: workspacePanelBorder }}
+                    >
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ink/45">
+                        <p
+                          className="text-xs font-semibold uppercase tracking-[0.16em]"
+                          style={{ color: workspaceSoftText }}
+                        >
                           Quick actions
                         </p>
                       </div>
@@ -580,19 +656,26 @@ export function ObjectWorkspace({
         >
           <article
             id="object-editor"
-            className="rounded-soft border border-black/5 bg-white/90 p-5 sm:p-6"
+            className="rounded-soft border p-5 sm:p-6"
+            style={{ backgroundColor: workspacePanelBg, borderColor: workspacePanelBorder }}
           >
             {selectedObject ? (
               <>
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
+                    <p
+                      className="text-xs font-semibold uppercase tracking-[0.2em]"
+                      style={{ color: activeTheme.accent }}
+                    >
                       Object details
                     </p>
-                    <h2 className="mt-1 font-[family-name:var(--font-display)] text-3xl text-ink">
+                    <h2
+                      className="mt-1 font-[family-name:var(--font-display)] text-3xl"
+                      style={{ color: workspacePrimaryText }}
+                    >
                       {selectedObject.title}
                     </h2>
-                    <p className="mt-2 text-sm leading-6 text-ink/70">
+                    <p className="mt-2 text-sm leading-6" style={{ color: workspaceMutedText }}>
                       Review the object summary here, then use edit when you want to change the
                       core fields.
                     </p>
@@ -633,26 +716,35 @@ export function ObjectWorkspace({
                 </div>
 
                 <div className="mt-6 grid gap-4">
-                  <div className="rounded-2xl bg-clay px-4 py-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+                  <div className="rounded-2xl px-4 py-4" style={{ backgroundColor: workspaceSectionBg }}>
+                    <p
+                      className="text-xs font-semibold uppercase tracking-[0.16em]"
+                      style={{ color: activeTheme.badgeText }}
+                    >
                       Description
                     </p>
-                    <p className="mt-2 text-sm leading-6 text-ink/80">
+                    <p className="mt-2 text-sm leading-6" style={{ color: workspaceMutedText }}>
                       {selectedObject.description ?? 'No description yet.'}
                     </p>
                   </div>
 
-                  <div className="rounded-2xl bg-clay px-4 py-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+                  <div className="rounded-2xl px-4 py-4" style={{ backgroundColor: workspaceSectionBg }}>
+                    <p
+                      className="text-xs font-semibold uppercase tracking-[0.16em]"
+                      style={{ color: activeTheme.badgeText }}
+                    >
                       Story
                     </p>
-                    <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-ink/80">
+                    <p className="mt-2 whitespace-pre-wrap text-sm leading-7" style={{ color: workspaceMutedText }}>
                       {selectedObject.story ?? 'No story has been added yet.'}
                     </p>
                   </div>
 
-                  <div className="rounded-2xl bg-clay px-4 py-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-moss">
+                  <div className="rounded-2xl px-4 py-4" style={{ backgroundColor: workspaceSectionBg }}>
+                    <p
+                      className="text-xs font-semibold uppercase tracking-[0.16em]"
+                      style={{ color: activeTheme.badgeText }}
+                    >
                       Tags
                     </p>
                     {selectedObject.tags.length > 0 ? (
@@ -660,14 +752,15 @@ export function ObjectWorkspace({
                         {selectedObject.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="rounded-full bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-ink"
+                            className="rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
+                            style={{ backgroundColor: activeTheme.badgeBg, color: workspacePrimaryText }}
                           >
                             {tag}
                           </span>
                         ))}
                       </div>
                     ) : (
-                      <p className="mt-2 text-sm leading-6 text-ink/70">No tags yet.</p>
+                      <p className="mt-2 text-sm leading-6" style={{ color: workspaceMutedText }}>No tags yet.</p>
                     )}
                   </div>
                 </div>
@@ -676,26 +769,32 @@ export function ObjectWorkspace({
 
             {!selectedObject ? (
               <>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
+                <p
+                  className="text-xs font-semibold uppercase tracking-[0.2em]"
+                  style={{ color: activeTheme.accent }}
+                >
                   Object details
                 </p>
-                <h2 className="mt-1 font-[family-name:var(--font-display)] text-3xl text-ink">
+                <h2 className="mt-1 font-[family-name:var(--font-display)] text-3xl" style={{ color: workspacePrimaryText }}>
                   Select an object from the listing
                 </h2>
-                <p className="mt-2 text-sm leading-6 text-ink/70">
+                <p className="mt-2 text-sm leading-6" style={{ color: workspaceMutedText }}>
                   Use the object listing to open an existing record, or create a new one from the
                   listing panel.
                 </p>
               </>
             ) : null}
 
-            <div className="mt-8 border-t border-black/5 pt-6">
+            <div className="mt-8 border-t pt-6" style={{ borderColor: workspacePanelBorder }}>
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">
+                  <p
+                    className="text-xs font-semibold uppercase tracking-[0.2em]"
+                    style={{ color: activeTheme.badgeText }}
+                  >
                     Attachments
                   </p>
-                  <p className="mt-1 text-sm text-ink/65">
+                  <p className="mt-1 text-sm" style={{ color: workspaceMutedText }}>
                     {selectedObject
                       ? `Upload images or PDFs for this object record. Files up to ${fieldLimits.uploadSizeMb} MB.`
                       : 'Create an object first, then attach media.'}
@@ -723,7 +822,7 @@ export function ObjectWorkspace({
 
               <div className="mt-4 space-y-3">
                 {isLoadingMedia ? (
-                  <div className="rounded-2xl bg-clay px-4 py-3 text-sm text-ink/70">
+                  <div className="rounded-2xl px-4 py-3 text-sm" style={{ backgroundColor: workspaceSectionBg, color: workspaceMutedText }}>
                     Loading attachments...
                   </div>
                 ) : null}
@@ -741,18 +840,23 @@ export function ObjectWorkspace({
                 ) : null}
 
                 {!selectedObject ? (
-                  <div className="rounded-2xl bg-clay px-4 py-3 text-sm text-ink/70">
+                  <div className="rounded-2xl px-4 py-3 text-sm" style={{ backgroundColor: workspaceSectionBg, color: workspaceMutedText }}>
                     Select or create an object to manage attachments.
                   </div>
                 ) : mediaItems.length === 0 && !isLoadingMedia ? (
-                  <div className="rounded-2xl bg-clay px-4 py-3 text-sm text-ink/70">
+                  <div className="rounded-2xl px-4 py-3 text-sm" style={{ backgroundColor: workspaceSectionBg, color: workspaceMutedText }}>
                     No attachments yet. Upload the first image or document.
                   </div>
                 ) : (
                   mediaItems.map((mediaItem) => (
                     <div
                       key={mediaItem.id}
-                      className="rounded-2xl border border-sand bg-clay px-4 py-4 text-sm text-ink"
+                      className="rounded-2xl border px-4 py-4 text-sm"
+                      style={{
+                        borderColor: workspacePanelBorder,
+                        backgroundColor: workspaceSectionBg,
+                        color: workspacePrimaryText
+                      }}
                     >
                       {mediaItem.mimeType.startsWith('image/') ? (
                         <Button
