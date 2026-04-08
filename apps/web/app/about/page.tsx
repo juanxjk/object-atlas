@@ -1,4 +1,5 @@
 import { WorkspaceNavbar } from '../../components/workspace-navbar';
+import { Button } from '../../components/ui/button';
 
 const githubRepositoryUrl = 'https://github.com/juanxjk/object-atlas';
 
@@ -71,14 +72,15 @@ export default function AboutPage() {
             improvements, and contribute code or product feedback as ObjectAtlas evolves.
           </p>
           <div className="mt-5">
-            <a
+            <Button
               href={githubRepositoryUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white"
+              variant="primary"
+              size="lg"
             >
               Visit the GitHub project
-            </a>
+            </Button>
           </div>
         </section>
       </div>

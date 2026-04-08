@@ -62,3 +62,4 @@ Important rule:
 - Objects now support tags for display and filtering in the management listing
 - Workspace dialogs and delete confirmation now run on Base UI primitives instead of custom modal wiring
 - Web fetch helpers now guard against HTML error pages so unexpected non-JSON responses fail gracefully
+- Shared workspace and chrome controls now run through Base UI-backed button and input primitives instead of raw native elements

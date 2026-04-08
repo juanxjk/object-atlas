@@ -36,6 +36,7 @@ After the MVP, the implementation can evolve toward:
 - Create and edit forms surface the current text-length limits in the UI
 - Create and edit forms support comma-separated tags
 - Interactive dialogs and destructive confirmations use Base UI primitives instead of custom overlay wiring
+- Shared interactive controls such as buttons and inputs use Base UI-backed wrappers instead of raw native elements
 - Object detail screen focused on reading, attachments, and QR access
 - Object detail header includes a direct button to open the public page URL
 - QR code surface opened from a quick action instead of always rendering inline

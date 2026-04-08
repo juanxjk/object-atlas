@@ -1,5 +1,6 @@
 import { FolderGit2, Home, Info } from 'lucide-react';
-import Link from 'next/link';
+
+import { Button } from './ui/button';
 
 const footerLinks = [
   {
@@ -28,27 +29,29 @@ export function SiteFooter() {
             <p className="mt-2 max-w-2xl text-sm leading-6 text-ink/68">
               A calm home for object records, public stories, and QR-linked pages.
             </p>
-            <a
+            <Button
               href={githubRepositoryUrl}
               target="_blank"
               rel="noreferrer"
-              className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-ember underline-offset-4 transition hover:underline"
+              variant="link"
+              className="mt-3 px-0 py-0 font-medium"
             >
               <FolderGit2 size={16} strokeWidth={2.1} />
               View the GitHub repository
-            </a>
+            </Button>
           </div>
 
           <nav className="flex flex-wrap items-center gap-3 text-sm text-ink/72">
             {footerLinks.map((link) => (
-              <Link
+              <Button
                 key={link.href}
                 href={link.href}
-                className="inline-flex items-center gap-2 rounded-full border border-sand bg-white/70 px-4 py-2 font-medium transition hover:bg-white"
+                variant="secondary"
+                className="bg-white/70 font-medium hover:bg-white"
               >
                 <link.icon size={16} strokeWidth={2.1} />
                 {link.label}
-              </Link>
+              </Button>
             ))}
           </nav>
         </div>

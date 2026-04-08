@@ -4,6 +4,8 @@ import { ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { ObjectMediaRecord } from '@object-atlas/types';
 
+import { Button } from './ui/button';
+
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 function toMediaUrl(storagePath: string): string {
@@ -62,22 +64,14 @@ export function PublicMediaCarousel({
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handlePrevious}
-              className="inline-flex items-center gap-2 rounded-full border border-sand bg-white px-4 py-2 text-sm font-semibold text-ink"
-            >
+            <Button type="button" onClick={handlePrevious} variant="secondary">
               <ChevronLeft size={16} strokeWidth={2.1} />
               Prev
-            </button>
-            <button
-              type="button"
-              onClick={handleNext}
-              className="inline-flex items-center gap-2 rounded-full border border-sand bg-white px-4 py-2 text-sm font-semibold text-ink"
-            >
+            </Button>
+            <Button type="button" onClick={handleNext} variant="secondary">
               Next
               <ChevronRight size={16} strokeWidth={2.1} />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -88,11 +82,12 @@ export function PublicMediaCarousel({
             const isActive = index === currentIndex;
 
             return (
-              <button
+              <Button
                 key={item.id}
                 type="button"
                 onClick={() => setCurrentIndex(index)}
-                className={`overflow-hidden rounded-2xl border ${
+                variant="secondary"
+                className={`overflow-hidden rounded-2xl border p-0 ${
                   isActive ? 'border-ember' : 'border-black/5'
                 }`}
               >
@@ -101,7 +96,7 @@ export function PublicMediaCarousel({
                   alt={item.originalFilename}
                   className="aspect-square h-full w-full object-cover"
                 />
-              </button>
+              </Button>
             );
           })}
         </div>

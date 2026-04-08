@@ -20,6 +20,9 @@ import { Dialog } from '@base-ui/react/dialog';
 import type { ObjectMediaRecord, ObjectRecord } from '@object-atlas/types';
 
 import { ObjectQrCard } from './object-qr-card';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
 import { readErrorMessage, readJsonResponse } from '../lib/http-response';
 import { filterObjectsByTitle } from '../lib/object-search';
 
@@ -413,14 +416,10 @@ export function ObjectWorkspace({
               </h2>
             </div>
 
-            <button
-              type="button"
-              onClick={handleCreateMode}
-              className="inline-flex items-center gap-2 rounded-full bg-ember px-4 py-2 text-sm font-semibold text-white"
-            >
+            <Button type="button" onClick={handleCreateMode} variant="soft">
               <Plus size={16} strokeWidth={2.2} />
               New object
-            </button>
+            </Button>
           </div>
 
           <label className="mt-5 block">
@@ -429,11 +428,11 @@ export function ObjectWorkspace({
             </span>
             <div className="flex items-center gap-3 rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink">
               <Search size={16} strokeWidth={2.1} className="shrink-0 text-ink/55" />
-              <input
+              <Input
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Search object titles"
-                className="w-full bg-transparent text-sm text-ink outline-none ring-0 placeholder:text-ink/45"
+                className="border-0 bg-transparent px-0 py-0"
               />
             </div>
           </label>
@@ -444,26 +443,26 @@ export function ObjectWorkspace({
                 Filter by tag
               </p>
               <div className="flex flex-wrap gap-2">
-                <button
+                <Button
                   type="button"
                   onClick={() => setSelectedTagFilter(null)}
-                  className={`rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
-                    !selectedTagFilter ? 'bg-ink text-white' : 'bg-clay text-ink/70'
-                  }`}
+                  variant={!selectedTagFilter ? 'chip-active' : 'chip'}
+                  size="sm"
+                  className="text-xs uppercase tracking-[0.12em]"
                 >
                   All tags
-                </button>
+                </Button>
                 {availableTags.map((tag) => (
-                  <button
+                  <Button
                     key={tag}
                     type="button"
                     onClick={() => setSelectedTagFilter(tag)}
-                    className={`rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] ${
-                      selectedTagFilter === tag ? 'bg-ember text-white' : 'bg-clay text-ink/70'
-                    }`}
+                    variant={selectedTagFilter === tag ? 'chip-active' : 'chip'}
+                    size="sm"
+                    className="text-xs uppercase tracking-[0.12em]"
                   >
                     {tag}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -489,10 +488,11 @@ export function ObjectWorkspace({
                       isSelected ? 'border-ember bg-[#fff7f1]' : 'border-sand bg-clay'
                     }`}
                   >
-                    <button
+                    <Button
                       type="button"
                       onClick={() => handleSelect(object)}
-                      className="w-full text-left"
+                      variant="secondary"
+                      className="w-full justify-start rounded-none border-0 bg-transparent p-0 text-left"
                     >
                       <div className="flex items-start gap-3">
                         {object.thumbnailPath ? (
@@ -536,7 +536,7 @@ export function ObjectWorkspace({
                           </div>
                         </div>
                       </div>
-                    </button>
+                    </Button>
 
                     <div className="mt-4 flex items-center justify-between gap-3 border-t border-black/5 pt-3">
                       <div>
@@ -546,24 +546,26 @@ export function ObjectWorkspace({
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <button
+                        <Button
                           type="button"
                           onClick={() => handleEditMode(object)}
-                          className="inline-flex items-center gap-2 rounded-full border border-sand bg-white/80 px-4 py-2 text-sm font-semibold text-ink"
+                          variant="secondary"
+                          className="bg-white/80"
                         >
                           <Pencil size={16} strokeWidth={2.1} />
                           Edit
-                        </button>
+                        </Button>
 
-                        <button
+                        <Button
                           type="button"
                           onClick={() => handleDeleteObject(object.id)}
                           disabled={isDeleting}
-                          className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white/80 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-60"
+                          variant="danger"
+                          className="bg-white/80"
                         >
                           <Trash2 size={16} strokeWidth={2.1} />
                           Remove
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -597,33 +599,36 @@ export function ObjectWorkspace({
                   </div>
 
                   <div className="flex flex-col gap-3 sm:flex-row">
-                    <a
+                    <Button
                       href={getPublicObjectUrl(selectedObject.publicId)}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-2 rounded-full border border-sand bg-white px-5 py-3 text-sm font-semibold text-ink"
+                      variant="secondary"
+                      size="lg"
                     >
                       <ExternalLink size={16} strokeWidth={2.1} />
                       Open public page
-                    </a>
+                    </Button>
 
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setIsQrModalOpen(true)}
-                      className="inline-flex items-center gap-2 rounded-full border border-sand bg-white px-5 py-3 text-sm font-semibold text-ink"
+                      variant="secondary"
+                      size="lg"
                     >
                       <QrCode size={16} strokeWidth={2.1} />
                       Show QR code
-                    </button>
+                    </Button>
 
-                    <button
+                    <Button
                       type="button"
                       onClick={() => handleEditMode(selectedObject)}
-                      className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white"
+                      variant="primary"
+                      size="lg"
                     >
                       <Pencil size={16} strokeWidth={2.1} />
                       Edit object
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
@@ -706,7 +711,7 @@ export function ObjectWorkspace({
                 >
                   <Upload size={16} strokeWidth={2.1} />
                   Add file
-                  <input
+                  <Input
                     type="file"
                     accept="image/png,image/jpeg,image/webp,application/pdf"
                     disabled={!selectedObject || isUploadingMedia}
@@ -750,17 +755,18 @@ export function ObjectWorkspace({
                       className="rounded-2xl border border-sand bg-clay px-4 py-4 text-sm text-ink"
                     >
                       {mediaItem.mimeType.startsWith('image/') ? (
-                        <button
+                        <Button
                           type="button"
                           onClick={() => handleOpenPreview(mediaItem)}
-                          className="mb-4 block w-full overflow-hidden rounded-2xl border border-black/5 bg-white text-left"
+                          variant="secondary"
+                          className="mb-4 block w-full overflow-hidden rounded-2xl border border-black/5 bg-white p-0 text-left"
                         >
                           <img
                             src={getThumbnailUrl(mediaItem.storagePath) ?? ''}
                             alt={mediaItem.originalFilename}
                             className="h-48 w-full object-cover transition hover:scale-[1.02] sm:h-56"
                           />
-                        </button>
+                        </Button>
                       ) : null}
 
                       <div className="flex items-start justify-between gap-3">
@@ -791,50 +797,50 @@ export function ObjectWorkspace({
                                 This image is currently used as the main thumbnail.
                               </p>
 
-                              <button
+                              <Button
                                 type="button"
                                 onClick={() => handleDeleteMedia(mediaItem)}
                                 disabled={deletingMediaId === mediaItem.id}
-                                className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 disabled:opacity-60"
+                                variant="danger"
                               >
                                 <Trash2 size={16} strokeWidth={2.1} />
                                 {deletingMediaId === mediaItem.id ? 'Removing...' : 'Remove'}
-                              </button>
+                              </Button>
                             </div>
                           ) : (
                             <div className="flex flex-wrap items-center gap-2">
-                              <button
+                              <Button
                                 type="button"
                                 onClick={() => handleSetPrimaryImage(mediaItem)}
-                                className="inline-flex items-center gap-2 rounded-full border border-sand bg-white px-4 py-2 text-sm font-semibold text-ink"
+                                variant="secondary"
                               >
                                 <Star size={16} strokeWidth={2.1} />
                                 Set as main image
-                              </button>
+                              </Button>
 
-                              <button
+                              <Button
                                 type="button"
                                 onClick={() => handleDeleteMedia(mediaItem)}
                                 disabled={deletingMediaId === mediaItem.id}
-                                className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 disabled:opacity-60"
+                                variant="danger"
                               >
                                 <Trash2 size={16} strokeWidth={2.1} />
                                 {deletingMediaId === mediaItem.id ? 'Removing...' : 'Remove'}
-                              </button>
+                              </Button>
                             </div>
                           )}
                         </div>
                       ) : (
                         <div className="mt-3 border-t border-black/5 pt-3">
-                          <button
+                          <Button
                             type="button"
                             onClick={() => handleDeleteMedia(mediaItem)}
                             disabled={deletingMediaId === mediaItem.id}
-                            className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-700 disabled:opacity-60"
+                            variant="danger"
                           >
                             <Trash2 size={16} strokeWidth={2.1} />
                             {deletingMediaId === mediaItem.id ? 'Removing...' : 'Remove file'}
-                          </button>
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -887,7 +893,7 @@ export function ObjectWorkspace({
                     {createFormState.title.length}/{fieldLimits.title}
                   </span>
                 </div>
-                <input
+                <Input
                   required
                   maxLength={fieldLimits.title}
                   value={createFormState.title}
@@ -897,7 +903,6 @@ export function ObjectWorkspace({
                       title: event.target.value
                     }))
                   }
-                  className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
                   placeholder="Object title"
                 />
                 <p className="mt-2 text-xs text-ink/55">
@@ -912,7 +917,7 @@ export function ObjectWorkspace({
                     {parseTagsInput(createFormState.tags).length}/{fieldLimits.tagsPerObject}
                   </span>
                 </div>
-                <input
+                <Input
                   value={createFormState.tags}
                   onChange={(event) =>
                     setCreateFormState((current) => ({
@@ -920,7 +925,6 @@ export function ObjectWorkspace({
                       tags: event.target.value
                     }))
                   }
-                  className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
                   placeholder="archive, bronze, restoration"
                 />
                 <p className="mt-2 text-xs text-ink/55">
@@ -936,7 +940,7 @@ export function ObjectWorkspace({
                     {createFormState.description.length}/{fieldLimits.description}
                   </span>
                 </div>
-                <textarea
+                <Textarea
                   maxLength={fieldLimits.description}
                   value={createFormState.description}
                   onChange={(event) =>
@@ -946,7 +950,6 @@ export function ObjectWorkspace({
                     }))
                   }
                   rows={3}
-                  className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
                   placeholder="Short summary for management and public display"
                 />
                 <p className="mt-2 text-xs text-ink/55">
@@ -961,7 +964,7 @@ export function ObjectWorkspace({
                     {createFormState.story.length}/{fieldLimits.story}
                   </span>
                 </div>
-                <textarea
+                <Textarea
                   maxLength={fieldLimits.story}
                   value={createFormState.story}
                   onChange={(event) =>
@@ -971,7 +974,6 @@ export function ObjectWorkspace({
                     }))
                   }
                   rows={6}
-                  className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
                   placeholder="Historical context, significance, or narrative"
                 />
                 <p className="mt-2 text-xs text-ink/55">
@@ -986,14 +988,15 @@ export function ObjectWorkspace({
               ) : null}
 
               <div className="flex flex-col gap-3 sm:flex-row">
-                <button
+                <Button
                   type="submit"
                   disabled={isCreating}
-                  className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:opacity-70"
+                  variant="primary"
+                  size="lg"
                 >
                   <Plus size={16} strokeWidth={2.1} />
                   {isCreating ? 'Creating...' : 'Create object'}
-                </button>
+                </Button>
 
                 <Dialog.Close
                   className="inline-flex items-center gap-2 rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
@@ -1028,23 +1031,23 @@ export function ObjectWorkspace({
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setPreviewZoom((current) => Math.max(1, current - 0.25))}
-                      className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
+                      variant="secondary"
                     >
                       <ZoomOut size={16} strokeWidth={2.1} />
                       Zoom out
-                    </button>
+                    </Button>
 
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setPreviewZoom((current) => Math.min(3, current + 0.25))}
-                      className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
+                      variant="secondary"
                     >
                       <ZoomIn size={16} strokeWidth={2.1} />
                       Zoom in
-                    </button>
+                    </Button>
 
                     <Dialog.Close className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink">
                       <X size={16} strokeWidth={2.1} />
@@ -1110,7 +1113,7 @@ export function ObjectWorkspace({
                         {editFormState.title.length}/{fieldLimits.title}
                       </span>
                     </div>
-                    <input
+                    <Input
                       required
                       maxLength={fieldLimits.title}
                       value={editFormState.title}
@@ -1120,11 +1123,33 @@ export function ObjectWorkspace({
                           title: event.target.value
                         }))
                       }
-                      className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
                       placeholder="Object title"
                     />
                     <p className="mt-2 text-xs text-ink/55">
                       Up to {fieldLimits.title} characters.
+                    </p>
+                  </label>
+
+                  <label className="block">
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <span className="block text-sm font-semibold text-ink">Tags</span>
+                      <span className="text-xs font-medium text-ink/55">
+                        {parseTagsInput(editFormState.tags).length}/{fieldLimits.tagsPerObject}
+                      </span>
+                    </div>
+                    <Input
+                      value={editFormState.tags}
+                      onChange={(event) =>
+                        setEditFormState((current) => ({
+                          ...current,
+                          tags: event.target.value
+                        }))
+                      }
+                      placeholder="archive, bronze, restoration"
+                    />
+                    <p className="mt-2 text-xs text-ink/55">
+                      Comma-separated tags, up to {fieldLimits.tagsPerObject} tags and {fieldLimits.tag}{' '}
+                      characters each.
                     </p>
                   </label>
 
@@ -1135,7 +1160,7 @@ export function ObjectWorkspace({
                         {editFormState.description.length}/{fieldLimits.description}
                       </span>
                     </div>
-                    <textarea
+                    <Textarea
                       maxLength={fieldLimits.description}
                       value={editFormState.description}
                       onChange={(event) =>
@@ -1145,7 +1170,6 @@ export function ObjectWorkspace({
                         }))
                       }
                       rows={3}
-                      className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
                       placeholder="Short summary for management and public display"
                     />
                     <p className="mt-2 text-xs text-ink/55">
@@ -1160,7 +1184,7 @@ export function ObjectWorkspace({
                         {editFormState.story.length}/{fieldLimits.story}
                       </span>
                     </div>
-                    <textarea
+                    <Textarea
                       maxLength={fieldLimits.story}
                       value={editFormState.story}
                       onChange={(event) =>
@@ -1170,7 +1194,6 @@ export function ObjectWorkspace({
                         }))
                       }
                       rows={6}
-                      className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
                       placeholder="Historical context, significance, or narrative"
                     />
                     <p className="mt-2 text-xs text-ink/55">
@@ -1186,14 +1209,15 @@ export function ObjectWorkspace({
 
                   <div className="flex flex-col justify-between gap-3 pt-2 sm:flex-row">
                     <div className="flex flex-col gap-3 sm:flex-row">
-                      <button
+                      <Button
                         type="submit"
                         disabled={isEditingFromModal || isDeleting}
-                        className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:opacity-70"
+                        variant="primary"
+                        size="lg"
                       >
                         <Pencil size={16} strokeWidth={2.1} />
                         {isEditingFromModal ? 'Saving...' : 'Save changes'}
-                      </button>
+                      </Button>
 
                       <Dialog.Close
                         className="inline-flex items-center gap-2 rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
@@ -1203,15 +1227,16 @@ export function ObjectWorkspace({
                       </Dialog.Close>
                     </div>
 
-                    <button
+                    <Button
                       type="button"
                       onClick={() => handleDeleteObject(editingObjectId!)}
                       disabled={isEditingFromModal || isDeleting}
-                      className="inline-flex items-center justify-center gap-2 rounded-full border border-red-200 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-70"
+                      variant="danger"
+                      size="lg"
                     >
                       <Trash2 size={16} strokeWidth={2.1} />
                       {isDeleting ? 'Deleting...' : 'Delete object'}
-                    </button>
+                    </Button>
                   </div>
                 </form>
               </>
@@ -1261,15 +1286,16 @@ export function ObjectWorkspace({
               <AlertDialog.Close className="inline-flex items-center justify-center gap-2 rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink">
                 Cancel
               </AlertDialog.Close>
-              <button
+              <Button
                 type="button"
                 onClick={handleConfirmDelete}
                 disabled={isDeleting}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-70"
+                variant="danger"
+                className="border-red-600 bg-red-600 text-white hover:bg-red-700"
               >
                 <Trash2 size={16} strokeWidth={2.1} />
                 {isDeleting ? 'Deleting...' : 'Delete object'}
-              </button>
+              </Button>
             </div>
           </AlertDialog.Popup>
         </AlertDialog.Portal>

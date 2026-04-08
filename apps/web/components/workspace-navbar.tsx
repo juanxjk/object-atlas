@@ -1,8 +1,9 @@
 'use client';
 
 import { BookOpen, Menu, Package2 } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
+
+import { Button } from './ui/button';
 
 const navigationItems = [
   {
@@ -33,25 +34,26 @@ export function WorkspaceNavbar() {
             </p>
           </div>
 
-          <button
+          <Button
             type="button"
             onClick={() => setIsMenuOpen((current) => !current)}
-            className="inline-flex items-center gap-2 rounded-full border border-sand bg-clay px-4 py-2 text-sm font-semibold text-ink lg:hidden"
+            variant="ghost"
+            className="lg:hidden"
           >
             <Menu size={16} strokeWidth={2.2} />
             Menu
-          </button>
+          </Button>
 
           <div className="hidden items-center gap-2 lg:flex">
             {navigationItems.map((item) => (
-              <Link
+              <Button
                 key={item.href}
                 href={item.href}
-                className="inline-flex items-center gap-2 rounded-full border border-sand bg-clay px-4 py-2 text-sm font-semibold text-ink"
+                variant="ghost"
               >
                 <item.icon size={16} strokeWidth={2.1} />
                 {item.label}
-              </Link>
+              </Button>
             ))}
           </div>
         </div>
@@ -59,15 +61,16 @@ export function WorkspaceNavbar() {
         {isMenuOpen ? (
           <div className="mt-4 space-y-2 rounded-3xl border border-sand bg-clay p-3 lg:hidden">
             {navigationItems.map((item) => (
-              <Link
+              <Button
                 key={item.href}
                 href={item.href}
                 onClick={() => setIsMenuOpen(false)}
-                className="inline-flex w-full items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-ink"
+                variant="secondary"
+                className="w-full justify-start rounded-2xl"
               >
                 <item.icon size={16} strokeWidth={2.1} />
                 {item.label}
-              </Link>
+              </Button>
             ))}
           </div>
         ) : null}
