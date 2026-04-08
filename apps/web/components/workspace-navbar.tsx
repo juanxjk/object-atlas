@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, LayoutDashboard, Menu, Package2 } from 'lucide-react';
+import { BookOpen, LayoutDashboard, Menu, Package2, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from './ui/button';
@@ -20,6 +20,11 @@ const navigationItems = [
     href: '/draft',
     label: 'Draft UI',
     icon: LayoutDashboard
+  },
+  {
+    href: '/config',
+    label: 'Config',
+    icon: Settings2
   }
 ];
 

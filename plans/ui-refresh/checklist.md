@@ -14,6 +14,7 @@ Important rule:
 - [x] `docs:` Define the UI refresh scope, redesign goals, and acceptance criteria
 - [x] `feat:` Add a draft page to explore the new layout direction before wiring behavior
 - [x] `feat:` Add theme tokens and client-side light/dark theme state
+- [x] `feat:` Add a config page for theme exploration and selection
 - [ ] `feat:` Add a Base UI-backed theme toggle in the shared navigation
 - [ ] `refactor:` Redesign the home page and shared shell with a bento-style layout
 - [ ] `refactor:` Align shared surfaces and navigation styling with the new color system
@@ -31,3 +32,4 @@ Important rule:
 - The draft page should be rich enough to evaluate layout treatment for both simple object cards and multi-image object detail states
 - The first working theme implementation can land on the draft page before the same toggle is moved into the shared navigation
 - Theme foundations now include both a light/dark mode and a persisted theme-family key so multiple visual directions can be tested without changing code
+- Theme exploration now has a dedicated config page so the selector can live outside the draft surface while shared-navigation controls are still being designed

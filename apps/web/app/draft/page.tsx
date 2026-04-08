@@ -3,21 +3,15 @@
 import {
   ArrowUpRight,
   LayoutDashboard,
-  Moon,
   Package2,
-  Palette,
   QrCode,
   Search,
   Sparkles,
-  SunMedium
 } from 'lucide-react';
 
 import { Button } from '../../components/ui/button';
-import {
-  themeOptions,
-  type ThemeKey,
-  useTheme
-} from '../../components/theme-provider';
+import { ThemeSelector } from '../../components/theme-selector';
+import { type ThemeKey, useTheme } from '../../components/theme-provider';
 import { Input } from '../../components/ui/input';
 
 const collectionCards = [
@@ -136,7 +130,7 @@ const draftThemeClasses: Record<
 };
 
 export default function DraftPage() {
-  const { mode, setMode, setThemeKey, themeKey } = useTheme();
+  const { mode, themeKey } = useTheme();
   const isDark = mode === 'dark';
   const activeTheme = draftThemeClasses[themeKey];
 
@@ -175,96 +169,10 @@ export default function DraftPage() {
                   <Package2 size={16} strokeWidth={2.1} />
                   Objects
                 </Button>
-                <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 p-1">
-                  <Button
-                    type="button"
-                    onClick={() => setMode('light')}
-                    variant="ghost"
-                    size="sm"
-                    className={`border-0 ${
-                      !isDark
-                        ? 'bg-white text-[#17181d] hover:bg-white'
-                        : 'bg-transparent text-white hover:bg-white/8'
-                    }`}
-                  >
-                    <SunMedium size={15} strokeWidth={2.1} />
-                    Light
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => setMode('dark')}
-                    variant="ghost"
-                    size="sm"
-                    className={`border-0 ${
-                      isDark
-                        ? 'bg-white text-[#17181d] hover:bg-white'
-                        : 'bg-transparent text-white hover:bg-white/8'
-                    }`}
-                  >
-                    <Moon size={15} strokeWidth={2.1} />
-                    Dark
-                  </Button>
-                </div>
               </div>
             </div>
 
-            <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
-              <div className="flex items-start gap-3">
-                <div className="rounded-full border border-white/10 bg-white/6 p-2 text-white">
-                  <Palette size={16} strokeWidth={2.1} />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/58">
-                    Theme selector
-                  </p>
-                  <p className="mt-2 text-sm text-white/74">
-                    Choose a theme family. Each one includes both a light and dark presentation,
-                    and the selected theme key is saved locally.
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-4 grid gap-3 md:grid-cols-3">
-                {themeOptions.map((option) => {
-                  const isSelected = option.key === themeKey;
-                  const optionTheme = draftThemeClasses[option.key];
-
-                  return (
-                    <Button
-                      key={option.key}
-                      type="button"
-                      onClick={() => setThemeKey(option.key)}
-                      variant="ghost"
-                      className={`h-auto flex-col items-start rounded-[1.25rem] border p-4 text-left ${
-                        isSelected
-                          ? 'border-white/18 bg-white/12 text-white'
-                          : 'border-white/10 bg-white/5 text-white/76 hover:bg-white/8'
-                      }`}
-                    >
-                      <div className="flex w-full items-center justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-semibold">{option.label}</p>
-                          <p className="mt-1 text-xs uppercase tracking-[0.14em] text-white/52">
-                            {option.description}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-1.5">
-                          <span
-                            className="h-4 w-4 rounded-full border border-white/15"
-                            style={{ backgroundColor: optionTheme.heroSurface }}
-                          />
-                          <span
-                            className="h-4 w-4 rounded-full border border-white/15"
-                            style={{ backgroundColor: optionTheme.heroPanel }}
-                          />
-                        </div>
-                      </div>
-                    </Button>
-                  );
-                })}
-              </div>
-            </div>
+            <ThemeSelector compact />
 
             <div className="grid gap-3 lg:grid-cols-[1.4fr_0.85fr]">
               <div
