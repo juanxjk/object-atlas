@@ -5,7 +5,7 @@ Copy this folder to create a new feature plan.
 Recommended format:
 
 ```text
-/plans
+/docs/plans
   /public-object-page
     concept.md
     implementation.md

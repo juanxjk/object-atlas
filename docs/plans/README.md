@@ -2,7 +2,7 @@
 
 This folder stores feature plans that should be written before implementation begins.
 
-Each plan should start from the folder template at [plans/_template/README.md](/Users/juanxjk/git-projects/drafts/object-atlas/plans/_template/README.md).
+Each plan should start from the folder template at [docs/plans/_template/README.md](/Users/juanxjk/git-projects/drafts/object-atlas/docs/plans/_template/README.md).
 
 Create one folder per feature plan.
 
