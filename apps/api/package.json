@@ -1,0 +1,36 @@
+{
+  "name": "@object-atlas/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "node dist/main.js",
+    "start:dev": "nest start -b swc -w",
+    "build": "nest build",
+    "db:generate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
+    "lint": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.3",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "@object-atlas/types": "workspace:*",
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.2",
+    "pg": "^8.13.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "@swc/cli": "^0.8.1",
+    "@swc/core": "^1.15.21",
+    "@types/node": "^22.10.2",
+    "@types/pg": "^8.15.5",
+    "ts-loader": "^9.5.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}
