@@ -49,7 +49,7 @@ export function WorkspaceNavbar() {
         }}
       >
         <div className="flex items-center justify-between gap-4">
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p
               className="text-xs font-semibold uppercase tracking-[0.18em]"
               style={{ color: activeTheme.badgeText }}
@@ -62,6 +62,24 @@ export function WorkspaceNavbar() {
             >
               Browse records and learn more about the project.
             </p>
+          </div>
+
+          <div className="hidden items-center gap-2 lg:flex">
+            {navigationItems.map((item) => (
+              <Button
+                key={item.href}
+                href={item.href}
+                variant="ghost"
+                style={{
+                  color: isDark ? '#f7f3ee' : '#17181d',
+                  borderColor: activeTheme.cardBorder,
+                  backgroundColor: 'transparent'
+                }}
+              >
+                <item.icon size={16} strokeWidth={2.1} />
+                {item.label}
+              </Button>
+            ))}
           </div>
 
           <Button
@@ -78,21 +96,6 @@ export function WorkspaceNavbar() {
           <div className="hidden items-center gap-2 lg:flex">
             <ThemeModeToggle />
             <ThemeNavSelect />
-            {navigationItems.map((item) => (
-              <Button
-                key={item.href}
-                href={item.href}
-                variant="ghost"
-                style={{
-                  color: isDark ? '#f7f3ee' : '#17181d',
-                  borderColor: activeTheme.cardBorder,
-                  backgroundColor: 'transparent'
-                }}
-              >
-                <item.icon size={16} strokeWidth={2.1} />
-                {item.label}
-              </Button>
-            ))}
           </div>
         </div>
 
