@@ -3,6 +3,8 @@
 import { BookOpen, Home, Menu, Package2, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
+import { themeStyles } from './theme-styles';
+import { useTheme } from './theme-provider';
 import { ThemeModeToggle } from './theme-mode-toggle';
 import { ThemeNavSelect } from './theme-nav-select';
 import { Button } from './ui/button';
@@ -32,16 +34,32 @@ const navigationItems = [
 
 export function WorkspaceNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { mode, themeKey } = useTheme();
+  const activeTheme = themeStyles[themeKey];
+  const isDark = mode === 'dark';
 
   return (
     <header className="sticky top-4 z-20">
-      <nav className="rounded-soft border border-black/5 bg-white/90 px-4 py-3 backdrop-blur sm:px-6">
+      <nav
+        className="rounded-soft border px-4 py-3 backdrop-blur sm:px-6"
+        style={{
+          backgroundColor: isDark ? activeTheme.metricsPanel : activeTheme.cardPrimary,
+          borderColor: activeTheme.cardBorder,
+          color: isDark ? '#f7f3ee' : '#17181d'
+        }}
+      >
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-moss">
+            <p
+              className="text-xs font-semibold uppercase tracking-[0.18em]"
+              style={{ color: activeTheme.badgeText }}
+            >
               ObjectAtlas
             </p>
-            <p className="mt-1 truncate text-sm text-ink/70">
+            <p
+              className="mt-1 truncate text-sm"
+              style={{ color: isDark ? 'rgba(255,255,255,0.72)' : activeTheme.cardMetaText }}
+            >
               Browse records and learn more about the project.
             </p>
           </div>
@@ -51,6 +69,7 @@ export function WorkspaceNavbar() {
             onClick={() => setIsMenuOpen((current) => !current)}
             variant="ghost"
             className="lg:hidden"
+            style={{ color: isDark ? '#f7f3ee' : '#17181d' }}
           >
             <Menu size={16} strokeWidth={2.2} />
             Menu
@@ -64,6 +83,11 @@ export function WorkspaceNavbar() {
                 key={item.href}
                 href={item.href}
                 variant="ghost"
+                style={{
+                  color: isDark ? '#f7f3ee' : '#17181d',
+                  borderColor: activeTheme.cardBorder,
+                  backgroundColor: 'transparent'
+                }}
               >
                 <item.icon size={16} strokeWidth={2.1} />
                 {item.label}
@@ -73,8 +97,19 @@ export function WorkspaceNavbar() {
         </div>
 
         {isMenuOpen ? (
-          <div className="mt-4 space-y-2 rounded-3xl border border-sand bg-clay p-3 lg:hidden">
-            <div className="flex items-center gap-2 rounded-2xl bg-white/70 p-2">
+          <div
+            className="mt-4 space-y-2 rounded-3xl border p-3 lg:hidden"
+            style={{
+              backgroundColor: isDark ? activeTheme.secondaryPanel : activeTheme.cardMuted,
+              borderColor: activeTheme.cardBorder
+            }}
+          >
+            <div
+              className="flex items-center gap-2 rounded-2xl p-2"
+              style={{
+                backgroundColor: isDark ? activeTheme.heroPanel : activeTheme.badgeBg
+              }}
+            >
               <ThemeModeToggle />
               <ThemeNavSelect />
             </div>
@@ -85,6 +120,11 @@ export function WorkspaceNavbar() {
                 onClick={() => setIsMenuOpen(false)}
                 variant="secondary"
                 className="w-full justify-start rounded-2xl"
+                style={{
+                  backgroundColor: isDark ? activeTheme.metricsPanel : activeTheme.cardPrimary,
+                  borderColor: activeTheme.cardBorder,
+                  color: isDark ? '#f7f3ee' : '#17181d'
+                }}
               >
                 <item.icon size={16} strokeWidth={2.1} />
                 {item.label}

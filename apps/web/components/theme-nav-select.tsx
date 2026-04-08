@@ -3,10 +3,13 @@
 import { ChevronDown, Palette } from 'lucide-react';
 import { Select } from '@base-ui/react/select';
 
+import { themeStyles } from './theme-styles';
 import { themeOptions, useTheme } from './theme-provider';
 
 export function ThemeNavSelect() {
-  const { setThemeKey, themeKey } = useTheme();
+  const { mode, setThemeKey, themeKey } = useTheme();
+  const activeTheme = themeStyles[themeKey];
+  const isDark = mode === 'dark';
 
   return (
     <Select.Root
@@ -17,7 +20,14 @@ export function ThemeNavSelect() {
         }
       }}
     >
-      <Select.Trigger className="inline-flex items-center gap-2 rounded-full border border-sand bg-white/92 px-3 py-2 text-sm font-semibold text-ink transition hover:bg-white">
+      <Select.Trigger
+        className="inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition"
+        style={{
+          backgroundColor: isDark ? activeTheme.secondaryPanel : activeTheme.cardPrimary,
+          borderColor: activeTheme.cardBorder,
+          color: isDark ? '#f7f3ee' : '#17181d'
+        }}
+      >
         <Palette size={15} strokeWidth={2.1} />
         <Select.Value />
         <Select.Icon>
@@ -27,21 +37,47 @@ export function ThemeNavSelect() {
 
       <Select.Portal>
         <Select.Positioner sideOffset={8}>
-          <Select.Popup className="z-50 min-w-[14rem] overflow-hidden rounded-[1.25rem] border border-black/8 bg-white p-2 text-ink shadow-lg">
+          <Select.Popup
+            className="z-50 min-w-[14rem] overflow-hidden rounded-[1.25rem] border p-2 shadow-lg"
+            style={{
+              backgroundColor: isDark ? activeTheme.metricsPanel : activeTheme.cardPrimary,
+              borderColor: activeTheme.cardBorder,
+              color: isDark ? '#f7f3ee' : '#17181d'
+            }}
+          >
             <Select.List className="space-y-1">
               {themeOptions.map((option) => (
                 <Select.Item
                   key={option.key}
                   value={option.key}
-                  className="flex cursor-default items-center justify-between rounded-[1rem] px-3 py-2.5 outline-none transition data-[highlighted]:bg-clay data-[selected]:bg-[#f4ede3]"
+                  className="flex cursor-default items-center justify-between rounded-[1rem] px-3 py-2.5 outline-none transition"
+                  style={{
+                    backgroundColor:
+                      option.key === themeKey
+                        ? activeTheme.heroSurface
+                        : 'transparent'
+                  }}
                 >
                   <div>
                     <p className="text-sm font-semibold">{option.label}</p>
-                    <p className="mt-0.5 text-xs uppercase tracking-[0.12em] text-ink/48">
+                    <p
+                      className="mt-0.5 text-xs uppercase tracking-[0.12em]"
+                      style={{
+                        color:
+                          option.key === themeKey
+                            ? activeTheme.cardMetaText
+                            : isDark
+                              ? 'rgba(255,255,255,0.56)'
+                              : 'rgba(23,24,29,0.48)'
+                      }}
+                    >
                       {option.description}
                     </p>
                   </div>
-                  <Select.ItemIndicator className="text-xs font-semibold uppercase tracking-[0.14em] text-ember">
+                  <Select.ItemIndicator
+                    className="text-xs font-semibold uppercase tracking-[0.14em]"
+                    style={{ color: activeTheme.accent }}
+                  >
                     On
                   </Select.ItemIndicator>
                 </Select.Item>
