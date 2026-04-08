@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Menu, Package2, Settings2 } from 'lucide-react';
+import { BookOpen, Home, Menu, Package2, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { ThemeModeToggle } from './theme-mode-toggle';
@@ -8,6 +8,11 @@ import { ThemeNavSelect } from './theme-nav-select';
 import { Button } from './ui/button';
 
 const navigationItems = [
+  {
+    href: '/',
+    label: 'Home',
+    icon: Home
+  },
   {
     href: '/#object-listing',
     label: 'Object listing',
