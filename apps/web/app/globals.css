@@ -4,6 +4,18 @@
 
 :root {
   color-scheme: light;
+  --app-background:
+    radial-gradient(circle at top, rgba(190, 90, 56, 0.14), transparent 32%),
+    linear-gradient(180deg, #f8f2ea 0%, #f3ede3 100%);
+  --app-foreground: #101523;
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --app-background:
+    radial-gradient(circle at top, rgba(217, 180, 138, 0.08), transparent 28%),
+    linear-gradient(180deg, #171b22 0%, #12151b 100%);
+  --app-foreground: #f6efe7;
 }
 
 html,
@@ -14,10 +26,8 @@ body {
 body {
   margin: 0;
   position: relative;
-  background:
-    radial-gradient(circle at top, rgba(190, 90, 56, 0.14), transparent 32%),
-    linear-gradient(180deg, #f8f2ea 0%, #f3ede3 100%);
-  color: #101523;
+  background: var(--app-background);
+  color: var(--app-foreground);
 }
 
 a {
