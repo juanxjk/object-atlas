@@ -1403,7 +1403,10 @@ export function ObjectWorkspace({
                 publicId={selectedObject.publicId}
                 title={selectedObject.title}
                 actionSlot={
-                  <Dialog.Close className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink">
+                  <Dialog.Close
+                    className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold"
+                    style={{ borderColor: workspacePanelBorder, color: modalFieldText }}
+                  >
                     <X size={16} strokeWidth={2.1} />
                     Close
                   </Dialog.Close>

@@ -48,3 +48,4 @@ Important rule:
 - User-facing shell copy should avoid internal labels like "MVP" when the same message can be expressed in product language
 - The object listing and detail workspace should inherit the active theme family too, rather than keeping the earlier hardcoded clay and sand surfaces
 - Modal forms like create-object should inherit the active theme family as well, rather than falling back to fixed white and sand inputs
+- QR and sharing dialogs should inherit the active theme family too, so auxiliary object actions feel part of the same interface
