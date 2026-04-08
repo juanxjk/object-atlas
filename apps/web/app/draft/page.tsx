@@ -262,14 +262,18 @@ export default function DraftPage() {
                                 : 'bg-[linear-gradient(140deg,#8c8f9a,#dadde4)]'
                         }`}
                       />
-                      <div className="flex items-center justify-between gap-2 px-3 py-3">
+                      <div className="flex flex-col items-start gap-3 px-3 py-3">
                         <div>
                           <p className="text-sm font-semibold text-[#17181d]">Image {item}</p>
                           <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-black/42">
                             Attached
                           </p>
                         </div>
-                        <Button variant="ghost" size="sm" className="bg-white">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-center bg-white"
+                        >
                           Open
                         </Button>
                       </div>
