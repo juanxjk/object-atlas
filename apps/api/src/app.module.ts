@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CollectionsModule } from './collections/collections.module';
 import { DatabaseModule } from './database/database.module';
 import { ObjectsModule } from './objects/objects.module';
 import { StorageModule } from './storage/storage.module';
@@ -15,6 +16,7 @@ import { StorageModule } from './storage/storage.module';
     }),
     DatabaseModule,
     StorageModule,
+    CollectionsModule,
     ObjectsModule
   ],
   controllers: [AppController],

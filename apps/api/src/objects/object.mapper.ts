@@ -9,6 +9,11 @@ type DatabaseObjectRow = {
   tags?: string[] | null;
   primary_file_id?: string | null;
   thumbnail_path?: string | null;
+  collection_id?: string | null;
+  collection_public_id?: string | null;
+  collection_title?: string | null;
+  collection_description?: string | null;
+  collection_visibility?: 'private' | 'unlisted' | 'public' | null;
   metadata: Record<string, unknown> | null;
   created_at: Date | string;
   updated_at: Date | string;
@@ -24,6 +29,19 @@ export function mapObjectRow(row: DatabaseObjectRow): ObjectRecord {
     tags: row.tags ?? [],
     primaryFileId: row.primary_file_id ?? null,
     thumbnailPath: row.thumbnail_path ?? null,
+    collection:
+      row.collection_id &&
+      row.collection_public_id &&
+      row.collection_title &&
+      row.collection_visibility
+        ? {
+            id: row.collection_id,
+            publicId: row.collection_public_id,
+            title: row.collection_title,
+            description: row.collection_description ?? null,
+            visibility: row.collection_visibility
+          }
+        : null,
     metadata: row.metadata ?? {},
     createdAt: new Date(row.created_at).toISOString(),
     updatedAt: new Date(row.updated_at).toISOString()

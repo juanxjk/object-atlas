@@ -1,7 +1,17 @@
 import { relations, sql } from 'drizzle-orm';
 import { integer, jsonb, pgTable, text, timestamp, unique, uuid, varchar } from 'drizzle-orm/pg-core';
 
-import { FILES_LIMITS, OBJECTS_LIMITS } from './schema-limits';
+import { COLLECTIONS_LIMITS, FILES_LIMITS, OBJECTS_LIMITS } from './schema-limits';
+
+export const collectionsTable = pgTable('collections', {
+  id: uuid('id').primaryKey(),
+  publicId: varchar('public_id', { length: COLLECTIONS_LIMITS.publicId }).notNull().unique(),
+  title: varchar('title', { length: COLLECTIONS_LIMITS.title }).notNull(),
+  description: varchar('description', { length: COLLECTIONS_LIMITS.description }),
+  visibility: varchar('visibility', { length: 16 }).notNull().default('private'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+});
 
 export const filesTable = pgTable('files', {
   id: uuid('id').primaryKey(),
@@ -20,11 +30,16 @@ export const objectsTable = pgTable('objects', {
   description: varchar('description', { length: OBJECTS_LIMITS.description }),
   story: varchar('story', { length: OBJECTS_LIMITS.story }),
   tags: varchar('tags', { length: OBJECTS_LIMITS.tag }).array().notNull().default(sql`ARRAY[]::varchar[]`),
+  collectionId: uuid('collection_id').references(() => collectionsTable.id, { onDelete: 'set null' }),
   primaryFileId: uuid('primary_file_id').references(() => filesTable.id, { onDelete: 'set null' }),
   metadata: jsonb('metadata').$type<Record<string, unknown>>().notNull().default(sql`'{}'::jsonb`),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
 });
+
+export const collectionsRelations = relations(collectionsTable, ({ many }) => ({
+  objects: many(objectsTable)
+}));
 
 export const objectFilesTable = pgTable(
   'object_files',
@@ -56,6 +71,10 @@ export const objectMediaLegacyTable = pgTable('object_media', {
 });
 
 export const objectsRelations = relations(objectsTable, ({ one, many }) => ({
+  collection: one(collectionsTable, {
+    fields: [objectsTable.collectionId],
+    references: [collectionsTable.id]
+  }),
   primaryFile: one(filesTable, {
     fields: [objectsTable.primaryFileId],
     references: [filesTable.id]
@@ -79,6 +98,7 @@ export const objectFilesRelations = relations(objectFilesTable, ({ one }) => ({
 }));
 
 export const schema = {
+  collectionsTable,
   filesTable,
   objectsTable,
   objectFilesTable,

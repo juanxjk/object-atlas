@@ -13,3 +13,9 @@ export const OBJECTS_LIMITS = {
   tag: 40,
   tagsPerObject: 12
 } as const;
+
+export const COLLECTIONS_LIMITS = {
+  publicId: 64,
+  title: 160,
+  description: 500
+} as const;
