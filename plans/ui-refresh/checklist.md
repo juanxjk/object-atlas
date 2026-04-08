@@ -47,3 +47,4 @@ Important rule:
 - The shared navbar should keep a clear Home action so secondary pages never trap the user away from the main object workspace
 - User-facing shell copy should avoid internal labels like "MVP" when the same message can be expressed in product language
 - The object listing and detail workspace should inherit the active theme family too, rather than keeping the earlier hardcoded clay and sand surfaces
+- Modal forms like create-object should inherit the active theme family as well, rather than falling back to fixed white and sand inputs

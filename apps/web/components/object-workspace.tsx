@@ -157,6 +157,10 @@ export function ObjectWorkspace({
   const workspacePrimaryText = isDark ? '#f7f3ee' : '#17181d';
   const workspaceMutedText = isDark ? 'rgba(255,255,255,0.72)' : activeTheme.cardMetaText;
   const workspaceSoftText = isDark ? 'rgba(255,255,255,0.58)' : activeTheme.badgeText;
+  const modalBg = isDark ? activeTheme.metricsPanel : activeTheme.badgeBg;
+  const modalFieldBg = isDark ? activeTheme.secondaryPanel : activeTheme.cardMuted;
+  const modalFieldText = isDark ? '#f7f3ee' : '#17181d';
+  const modalHelperText = isDark ? 'rgba(255,255,255,0.58)' : activeTheme.cardMetaText;
 
   useEffect(() => {
     async function loadMedia(): Promise<void> {
@@ -968,22 +972,41 @@ export function ObjectWorkspace({
       >
         <Dialog.Portal>
           <Dialog.Backdrop className="fixed inset-0 z-30 min-h-dvh bg-ink/35 transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 supports-[-webkit-touch-callout:none]:absolute" />
-          <Dialog.Popup className="fixed left-1/2 top-1/2 z-30 flex max-h-[calc(100dvh-3rem)] w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col rounded-soft border border-black/5 bg-white p-5 shadow-xl transition-all duration-150 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0 sm:p-6">
+          <Dialog.Popup
+            className="fixed left-1/2 top-1/2 z-30 flex max-h-[calc(100dvh-3rem)] w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col rounded-soft border p-5 shadow-xl transition-all duration-150 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0 sm:p-6"
+            style={{
+              backgroundColor: modalBg,
+              borderColor: workspacePanelBorder,
+              color: modalFieldText
+            }}
+          >
             <div className="flex shrink-0 items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
+                <p
+                  className="text-xs font-semibold uppercase tracking-[0.2em]"
+                  style={{ color: activeTheme.accent }}
+                >
                   Create object
                 </p>
-                <Dialog.Title className="mt-1 font-[family-name:var(--font-display)] text-3xl text-ink">
+                <Dialog.Title
+                  className="mt-1 font-[family-name:var(--font-display)] text-3xl"
+                  style={{ color: modalFieldText }}
+                >
                   New object record
                 </Dialog.Title>
-                <Dialog.Description className="mt-2 text-sm leading-6 text-ink/70">
+                <Dialog.Description
+                  className="mt-2 text-sm leading-6"
+                  style={{ color: workspaceMutedText }}
+                >
                   Start with the essentials. You can add attachments and a QR-linked public page
                   right after creation.
                 </Dialog.Description>
               </div>
 
-              <Dialog.Close className="inline-flex items-center gap-2 rounded-full border border-sand px-3 py-2 text-sm font-semibold text-ink">
+              <Dialog.Close
+                className="inline-flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold"
+                style={{ borderColor: workspacePanelBorder, color: modalFieldText }}
+              >
                 <X size={16} strokeWidth={2.1} />
                 Close
               </Dialog.Close>
@@ -992,8 +1015,8 @@ export function ObjectWorkspace({
             <form className="mt-6 min-h-0 space-y-4 overflow-y-auto pr-2" onSubmit={handleCreateSubmit}>
               <label className="block">
                 <div className="mb-2 flex items-center justify-between gap-3">
-                  <span className="block text-sm font-semibold text-ink">Title</span>
-                  <span className="text-xs font-medium text-ink/55">
+                  <span className="block text-sm font-semibold" style={{ color: modalFieldText }}>Title</span>
+                  <span className="text-xs font-medium" style={{ color: modalHelperText }}>
                     {createFormState.title.length}/{fieldLimits.title}
                   </span>
                 </div>
@@ -1008,16 +1031,21 @@ export function ObjectWorkspace({
                     }))
                   }
                   placeholder="Object title"
+                  style={{
+                    backgroundColor: modalFieldBg,
+                    borderColor: workspacePanelBorder,
+                    color: modalFieldText
+                  }}
                 />
-                <p className="mt-2 text-xs text-ink/55">
+                <p className="mt-2 text-xs" style={{ color: modalHelperText }}>
                   Up to {fieldLimits.title} characters.
                 </p>
               </label>
 
               <label className="block">
                 <div className="mb-2 flex items-center justify-between gap-3">
-                  <span className="block text-sm font-semibold text-ink">Tags</span>
-                  <span className="text-xs font-medium text-ink/55">
+                  <span className="block text-sm font-semibold" style={{ color: modalFieldText }}>Tags</span>
+                  <span className="text-xs font-medium" style={{ color: modalHelperText }}>
                     {parseTagsInput(createFormState.tags).length}/{fieldLimits.tagsPerObject}
                   </span>
                 </div>
@@ -1030,8 +1058,13 @@ export function ObjectWorkspace({
                     }))
                   }
                   placeholder="archive, bronze, restoration"
+                  style={{
+                    backgroundColor: modalFieldBg,
+                    borderColor: workspacePanelBorder,
+                    color: modalFieldText
+                  }}
                 />
-                <p className="mt-2 text-xs text-ink/55">
+                <p className="mt-2 text-xs" style={{ color: modalHelperText }}>
                   Comma-separated tags, up to {fieldLimits.tagsPerObject} tags and {fieldLimits.tag}{' '}
                   characters each.
                 </p>
@@ -1039,8 +1072,8 @@ export function ObjectWorkspace({
 
               <label className="block">
                 <div className="mb-2 flex items-center justify-between gap-3">
-                  <span className="block text-sm font-semibold text-ink">Description</span>
-                  <span className="text-xs font-medium text-ink/55">
+                  <span className="block text-sm font-semibold" style={{ color: modalFieldText }}>Description</span>
+                  <span className="text-xs font-medium" style={{ color: modalHelperText }}>
                     {createFormState.description.length}/{fieldLimits.description}
                   </span>
                 </div>
@@ -1055,16 +1088,21 @@ export function ObjectWorkspace({
                   }
                   rows={3}
                   placeholder="Short summary for management and public display"
+                  style={{
+                    backgroundColor: modalFieldBg,
+                    borderColor: workspacePanelBorder,
+                    color: modalFieldText
+                  }}
                 />
-                <p className="mt-2 text-xs text-ink/55">
+                <p className="mt-2 text-xs" style={{ color: modalHelperText }}>
                   Up to {fieldLimits.description} characters.
                 </p>
               </label>
 
               <label className="block">
                 <div className="mb-2 flex items-center justify-between gap-3">
-                  <span className="block text-sm font-semibold text-ink">Story</span>
-                  <span className="text-xs font-medium text-ink/55">
+                  <span className="block text-sm font-semibold" style={{ color: modalFieldText }}>Story</span>
+                  <span className="text-xs font-medium" style={{ color: modalHelperText }}>
                     {createFormState.story.length}/{fieldLimits.story}
                   </span>
                 </div>
@@ -1079,8 +1117,13 @@ export function ObjectWorkspace({
                   }
                   rows={6}
                   placeholder="Historical context, significance, or narrative"
+                  style={{
+                    backgroundColor: modalFieldBg,
+                    borderColor: workspacePanelBorder,
+                    color: modalFieldText
+                  }}
                 />
-                <p className="mt-2 text-xs text-ink/55">
+                <p className="mt-2 text-xs" style={{ color: modalHelperText }}>
                   Up to {fieldLimits.story} characters.
                 </p>
               </label>
@@ -1103,7 +1146,8 @@ export function ObjectWorkspace({
                 </Button>
 
                 <Dialog.Close
-                  className="inline-flex items-center gap-2 rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
+                  className="inline-flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-semibold"
+                  style={{ borderColor: workspacePanelBorder, color: modalFieldText }}
                 >
                   <X size={16} strokeWidth={2.1} />
                   Cancel
