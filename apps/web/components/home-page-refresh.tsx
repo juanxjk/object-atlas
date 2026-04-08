@@ -2,10 +2,8 @@
 
 import {
   ArrowUpRight,
-  BarChart3,
   LayoutDashboard,
   Package2,
-  QrCode,
   Sparkles
 } from 'lucide-react';
 import type { ObjectRecord } from '@object-atlas/types';
@@ -113,60 +111,25 @@ export function HomePageRefresh({
                 </div>
               </div>
 
-              <div className="grid gap-3">
-                <div
-                  className="rounded-[1.75rem] border border-white/10 px-5 py-5"
-                  style={{ backgroundColor: activeTheme.metricsPanel }}
+              <div
+                className="rounded-[1.75rem] border border-white/10 px-5 py-5"
+                style={{ backgroundColor: activeTheme.metricsPanel }}
+              >
+                <p
+                  className="text-xs font-semibold uppercase tracking-[0.2em]"
+                  style={{ color: activeTheme.accent }}
                 >
-                  <p
-                    className="text-xs font-semibold uppercase tracking-[0.2em]"
-                    style={{ color: activeTheme.accent }}
-                  >
-                    Workspace snapshot
-                  </p>
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    {overviewStats.map((item) => (
-                      <div key={item.label} className="rounded-[1.25rem] bg-white/6 px-3 py-4">
-                        <p className="text-xl font-semibold text-white">{item.value}</p>
-                        <p className="mt-1 text-xs uppercase tracking-[0.14em] text-white/56">
-                          {item.label}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div
-                  className="rounded-[1.75rem] border border-white/10 px-5 py-5 text-white"
-                  style={{ backgroundColor: activeTheme.previewPanel }}
-                >
-                  <div className="flex items-center gap-2">
-                    <BarChart3 size={16} strokeWidth={2.1} style={{ color: activeTheme.accent }} />
-                    <p
-                      className="text-xs font-semibold uppercase tracking-[0.2em]"
-                      style={{ color: activeTheme.accent }}
-                    >
-                      Public-facing flow
-                    </p>
-                  </div>
-                  <div className="mt-4 rounded-[1.25rem] bg-white/6 p-4">
-                    <div className="aspect-[4/3] rounded-[1rem] bg-[linear-gradient(135deg,#d9b48a,transparent),#2a313d]" />
-                    <div className="mt-4 flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold">QR-linked object page</p>
-                        <p className="mt-1 text-xs uppercase tracking-[0.14em] text-white/54">
-                          Story, images, and object context
-                        </p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        className="border-[#e5c49f] bg-[#ecd1ad] text-[#53321d] hover:bg-[#f1d8b7]"
-                      >
-                        <QrCode size={16} strokeWidth={2.1} />
-                        Open
-                      </Button>
+                  Workspace snapshot
+                </p>
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  {overviewStats.map((item) => (
+                    <div key={item.label} className="rounded-[1.25rem] bg-white/6 px-3 py-4">
+                      <p className="text-xl font-semibold text-white">{item.value}</p>
+                      <p className="mt-1 text-xs uppercase tracking-[0.14em] text-white/56">
+                        {item.label}
+                      </p>
                     </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
