@@ -44,8 +44,16 @@ const draftThemeClasses: Record<
   ThemeKey,
   {
     accent: string;
+    badgeBg: string;
+    badgeText: string;
+    cardBorder: string;
+    cardMuted: string;
+    cardPrimary: string;
     heroPanel: string;
     heroSurface: string;
+    imageDetailBg: string;
+    imageDetailPanel: string;
+    imageThumbs: string[];
     listingPanel: string;
     mainBg: {
       dark: string;
@@ -66,8 +74,16 @@ const draftThemeClasses: Record<
 > = {
   atlas: {
     accent: '#d9b48a',
+    badgeBg: '#ffffff',
+    badgeText: '#4d6c57',
+    cardBorder: '#d4b08c',
+    cardMuted: '#f7f1e9',
+    cardPrimary: '#fff8ef',
     heroPanel: '#0f1218',
     heroSurface: '#f0e5d6',
+    imageDetailBg: '#fffaf3',
+    imageDetailPanel: '#efe2cf',
+    imageThumbs: ['#d1a377', '#6f7d6a', '#9d6b54', '#8c8f9a'],
     listingPanel: '#f4ede3',
     mainBg: {
       light: 'bg-[#efe6d9] text-[#17181d]',
@@ -87,8 +103,16 @@ const draftThemeClasses: Record<
   },
   gallery: {
     accent: '#a8c2ac',
+    badgeBg: '#f8fbf7',
+    badgeText: '#466751',
+    cardBorder: '#a8c2ac',
+    cardMuted: '#edf3ec',
+    cardPrimary: '#f4faf4',
     heroPanel: '#102019',
     heroSurface: '#e6eee5',
+    imageDetailBg: '#f7fbf6',
+    imageDetailPanel: '#dbe7db',
+    imageThumbs: ['#95b198', '#7a8e7c', '#b8c9b6', '#8ea99a'],
     listingPanel: '#edf3ec',
     mainBg: {
       light: 'bg-[#e8efe7] text-[#172019]',
@@ -108,8 +132,16 @@ const draftThemeClasses: Record<
   },
   nocturne: {
     accent: '#9caee6',
+    badgeBg: '#f7f8fd',
+    badgeText: '#4c5d96',
+    cardBorder: '#bcc7ec',
+    cardMuted: '#eef1fa',
+    cardPrimary: '#f7f8fd',
     heroPanel: '#111421',
     heroSurface: '#e6e9f4',
+    imageDetailBg: '#fbfbff',
+    imageDetailPanel: '#dde3f4',
+    imageThumbs: ['#9caee6', '#7081ba', '#b9c4eb', '#818baf'],
     listingPanel: '#eceff8',
     mainBg: {
       light: 'bg-[#e8ebf5] text-[#171b27]',
@@ -129,8 +161,16 @@ const draftThemeClasses: Record<
   },
   dreamland: {
     accent: '#ffafcc',
+    badgeBg: '#fff7fb',
+    badgeText: '#8e5d82',
+    cardBorder: '#ffc8dd',
+    cardMuted: '#ffeaf3',
+    cardPrimary: '#fff4fa',
     heroPanel: '#6e5a84',
     heroSurface: '#ffc8dd',
+    imageDetailBg: '#fff7fb',
+    imageDetailPanel: '#ffdbe8',
+    imageThumbs: ['#cdb4db', '#ffc8dd', '#ffafcc', '#a2d2ff'],
     listingPanel: '#bde0fe',
     mainBg: {
       light: 'bg-[#fff3f8] text-[#352a45]',
@@ -281,11 +321,15 @@ export default function DraftPage() {
           >
             <div className="grid gap-4 md:grid-cols-[1fr_0.9fr]">
               <div
-                className="rounded-[1.5rem] bg-white px-4 py-4 text-[#17181d]"
+                className="rounded-[1.5rem] px-4 py-4 text-[#17181d]"
+                style={{ backgroundColor: activeTheme.listingPanel }}
               >
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#4d6c57]">
+                    <p
+                      className="text-xs font-semibold uppercase tracking-[0.2em]"
+                      style={{ color: activeTheme.badgeText }}
+                    >
                       Listing shell
                     </p>
                     <h2 className="mt-2 font-[family-name:var(--font-display)] text-2xl">
@@ -298,7 +342,10 @@ export default function DraftPage() {
                   </Button>
                 </div>
 
-                <div className="mt-4 rounded-[1.25rem] border border-black/6 bg-[#f4ede3] p-3">
+                <div
+                  className="mt-4 rounded-[1.25rem] border border-black/6 p-3"
+                  style={{ backgroundColor: activeTheme.heroSurface }}
+                >
                   <div className="flex items-center gap-2">
                     <Search size={15} strokeWidth={2.1} className="text-black/48" />
                     <Input
@@ -355,11 +402,15 @@ export default function DraftPage() {
             </div>
 
             <div
-              className="mt-4 rounded-[1.5rem] bg-white px-4 py-4 text-[#17181d]"
+              className="mt-4 rounded-[1.5rem] px-4 py-4 text-[#17181d]"
+              style={{ backgroundColor: activeTheme.listingPanel }}
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#4d6c57]">
+                  <p
+                    className="text-xs font-semibold uppercase tracking-[0.2em]"
+                    style={{ color: activeTheme.badgeText }}
+                  >
                     Media example
                   </p>
                   <h3 className="mt-2 font-[family-name:var(--font-display)] text-2xl text-[#17181d]">
@@ -371,22 +422,33 @@ export default function DraftPage() {
                   </p>
                 </div>
 
-                <Button variant="secondary" className="bg-[#f4ede3]">
+                <Button variant="secondary" className="bg-white/80">
                   View all media
                 </Button>
               </div>
 
               <div className="mt-5 grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
-                <div className="overflow-hidden rounded-[1.4rem] border border-black/6 bg-[#efe2cf]">
-                  <div className="aspect-[4/3] bg-[linear-gradient(135deg,#b36a41,#f0dcc0_48%,#d8b48d)]" />
-                  <div className="flex items-center justify-between gap-3 border-t border-black/6 bg-[#fffaf3] px-4 py-3">
+                <div
+                  className="overflow-hidden rounded-[1.4rem] border border-black/6"
+                  style={{ backgroundColor: activeTheme.imageDetailPanel }}
+                >
+                  <div
+                    className="aspect-[4/3]"
+                    style={{
+                      background: `linear-gradient(135deg, ${activeTheme.imageThumbs[0]}, ${activeTheme.heroSurface} 48%, ${activeTheme.accent})`
+                    }}
+                  />
+                  <div
+                    className="flex items-center justify-between gap-3 border-t border-black/6 px-4 py-3"
+                    style={{ backgroundColor: activeTheme.imageDetailBg }}
+                  >
                     <div>
                       <p className="text-sm font-semibold text-[#17181d]">Main attached image</p>
                       <p className="mt-1 text-xs uppercase tracking-[0.14em] text-black/46">
                         Hero photo for public page and listing
                       </p>
                     </div>
-                    <Button variant="ghost" className="bg-white">
+                    <Button variant="ghost" className="bg-white/85">
                       Set as main
                     </Button>
                   </div>
@@ -396,18 +458,14 @@ export default function DraftPage() {
                   {[1, 2, 3, 4].map((item) => (
                     <div
                       key={item}
-                      className="overflow-hidden rounded-[1.25rem] border border-black/6 bg-[#f5eee3]"
+                      className="overflow-hidden rounded-[1.25rem] border border-black/6"
+                      style={{ backgroundColor: activeTheme.imageDetailBg }}
                     >
                       <div
-                        className={`aspect-square ${
-                          item === 1
-                            ? 'bg-[linear-gradient(140deg,#d1a377,#f2dfc9)]'
-                            : item === 2
-                              ? 'bg-[linear-gradient(140deg,#6f7d6a,#dce3d7)]'
-                              : item === 3
-                                ? 'bg-[linear-gradient(140deg,#9d6b54,#ead3c3)]'
-                                : 'bg-[linear-gradient(140deg,#8c8f9a,#dadde4)]'
-                        }`}
+                        className="aspect-square"
+                        style={{
+                          background: `linear-gradient(140deg, ${activeTheme.imageThumbs[item - 1]}, ${activeTheme.heroSurface})`
+                        }}
                       />
                       <div className="flex flex-col items-start gap-3 px-3 py-3">
                         <div>
@@ -419,7 +477,7 @@ export default function DraftPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="w-full justify-center bg-white"
+                          className="w-full justify-center bg-white/85"
                         >
                           Open
                         </Button>
@@ -438,14 +496,17 @@ export default function DraftPage() {
           >
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#4d6c57]">
+                <p
+                  className="text-xs font-semibold uppercase tracking-[0.2em]"
+                  style={{ color: activeTheme.badgeText }}
+                >
                   Record cards
                 </p>
                 <h2 className="mt-2 font-[family-name:var(--font-display)] text-2xl text-[#17181d]">
                   A calmer object list
                 </h2>
               </div>
-              <Button variant="secondary" className="bg-[#f4ede3]">
+              <Button variant="secondary" className="bg-white/80">
                 Show all
               </Button>
             </div>
@@ -454,33 +515,49 @@ export default function DraftPage() {
               {collectionCards.map((card, index) => (
                 <div
                   key={card.title}
-                  className={`rounded-[1.5rem] border px-4 py-4 ${
-                    index === 0
-                      ? 'border-[#d4b08c] bg-[#fff8ef]'
-                      : 'border-black/6 bg-[#f7f1e9]'
-                  }`}
+                  className="rounded-[1.5rem] border px-4 py-4"
+                  style={{
+                    backgroundColor: index === 0 ? activeTheme.cardPrimary : activeTheme.cardMuted,
+                    borderColor: index === 0 ? activeTheme.cardBorder : `${activeTheme.cardBorder}66`
+                  }}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="h-14 w-14 rounded-[1.1rem] bg-[linear-gradient(140deg,#d2aa82,#ede1d1)]" />
+                    <div
+                      className="h-14 w-14 rounded-[1.1rem]"
+                      style={{
+                        background: `linear-gradient(140deg, ${activeTheme.imageThumbs[index]}, ${activeTheme.heroSurface})`
+                      }}
+                    />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="font-semibold text-[#17181d]">{card.title}</p>
                           <p className="mt-1 text-sm text-black/58">{card.meta}</p>
                         </div>
-                        <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#4d6c57]">
+                        <span
+                          className="rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]"
+                          style={{
+                            backgroundColor: activeTheme.badgeBg,
+                            color: activeTheme.badgeText
+                          }}
+                        >
                           {card.note}
                         </span>
                       </div>
 
                       <div className="mt-4 flex flex-wrap gap-2">
-                        <Button variant="secondary" size="sm" className="bg-white">
+                        <Button variant="secondary" size="sm" className="bg-white/88">
                           Open
                         </Button>
-                        <Button variant="secondary" size="sm" className="bg-white">
+                        <Button variant="secondary" size="sm" className="bg-white/88">
                           Edit
                         </Button>
-                        <Button variant="ghost" size="sm" className="bg-[#ede4d7]">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="border-transparent"
+                          style={{ backgroundColor: activeTheme.heroSurface }}
+                        >
                           QR
                         </Button>
                       </div>
