@@ -17,7 +17,7 @@ import {
 import { useEffect, useState } from 'react';
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { Dialog } from '@base-ui/react/dialog';
-import type { ObjectMediaRecord, ObjectRecord } from '@object-atlas/types';
+import type { CollectionRecord, ObjectMediaRecord, ObjectRecord } from '@object-atlas/types';
 
 import { ObjectQrCard } from './object-qr-card';
 import { themeStyles } from './theme-styles';
@@ -33,13 +33,15 @@ type ObjectFormState = {
   description: string;
   story: string;
   tags: string;
+  collectionId: string;
 };
 
 const emptyFormState: ObjectFormState = {
   title: '',
   description: '',
   story: '',
-  tags: ''
+  tags: '',
+  collectionId: ''
 };
 
 const fieldLimits = {
@@ -77,7 +79,8 @@ function toFormState(object: ObjectRecord): ObjectFormState {
     title: object.title,
     description: object.description ?? '',
     story: object.story ?? '',
-    tags: object.tags.join(', ')
+    tags: object.tags.join(', '),
+    collectionId: object.collection?.id ?? ''
   };
 }
 
@@ -107,8 +110,12 @@ function parseTagsInput(value: string): string[] {
 }
 
 export function ObjectWorkspace({
+  initialCollectionFilter,
+  initialCollections,
   initialObjects
 }: {
+  initialCollectionFilter?: string | null;
+  initialCollections: CollectionRecord[];
   initialObjects: ObjectRecord[];
 }) {
   const { mode, themeKey } = useTheme();
@@ -118,6 +125,7 @@ export function ObjectWorkspace({
     initialObjects[0]?.id ? 'editor' : 'list'
   );
   const [objects, setObjects] = useState<ObjectRecord[]>(initialObjects);
+  const [collections] = useState<CollectionRecord[]>(initialCollections);
   const [createFormState, setCreateFormState] = useState<ObjectFormState>(emptyFormState);
   const [editFormState, setEditFormState] = useState<ObjectFormState>(emptyFormState);
   const [selectedId, setSelectedId] = useState<string | null>(initialObjects[0]?.id ?? null);
@@ -133,6 +141,9 @@ export function ObjectWorkspace({
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
+  const [selectedCollectionFilter, setSelectedCollectionFilter] = useState<string | null>(
+    initialCollectionFilter ?? null
+  );
   const [mediaItems, setMediaItems] = useState<ObjectMediaRecord[]>([]);
   const [isLoadingMedia, setIsLoadingMedia] = useState(false);
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
@@ -143,7 +154,9 @@ export function ObjectWorkspace({
 
   const selectedObject = objects.find((object) => object.id === selectedId) ?? null;
   const editingObject = objects.find((object) => object.id === editingObjectId) ?? null;
-  const filteredObjects = filterObjectsByTitle(objects, searchQuery, selectedTagFilter);
+  const filteredObjects = filterObjectsByTitle(objects, searchQuery, selectedTagFilter).filter(
+    (object) => !selectedCollectionFilter || object.collection?.id === selectedCollectionFilter
+  );
   const availableTags = Array.from(
     new Set(
       objects.flatMap((object) => object.tags).sort((left, right) => left.localeCompare(right))
@@ -216,7 +229,8 @@ export function ObjectWorkspace({
         method: 'POST',
         body: JSON.stringify({
           ...createFormState,
-          tags: parseTagsInput(createFormState.tags)
+          tags: parseTagsInput(createFormState.tags),
+          collectionId: createFormState.collectionId || null
         })
       });
 
@@ -300,7 +314,8 @@ export function ObjectWorkspace({
         method: 'PATCH',
         body: JSON.stringify({
           ...editFormState,
-          tags: parseTagsInput(editFormState.tags)
+          tags: parseTagsInput(editFormState.tags),
+          collectionId: editFormState.collectionId || null
         })
       });
 
@@ -539,6 +554,34 @@ export function ObjectWorkspace({
             </div>
           ) : null}
 
+          {collections.length > 0 ? (
+            <label className="mt-4 block">
+              <span
+                className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em]"
+                style={{ color: workspaceSoftText }}
+              >
+                Filter by collection
+              </span>
+              <select
+                value={selectedCollectionFilter ?? ''}
+                onChange={(event) => setSelectedCollectionFilter(event.target.value || null)}
+                className="w-full rounded-2xl border px-3 py-3 text-sm"
+                style={{
+                  backgroundColor: workspaceSectionBg,
+                  borderColor: workspacePanelBorder,
+                  color: workspacePrimaryText
+                }}
+              >
+                <option value="">All collections</option>
+                {collections.map((collection) => (
+                  <option key={collection.id} value={collection.id}>
+                    {collection.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+
           <div className="mt-5 space-y-3">
             {objects.length === 0 ? (
               <div
@@ -606,6 +649,11 @@ export function ObjectWorkspace({
                               <p className="mt-1 text-sm" style={{ color: workspaceMutedText }}>
                                 {object.description ?? 'No description yet'}
                               </p>
+                              {object.collection ? (
+                                <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: activeTheme.accent }}>
+                                  Collection: {object.collection.title}
+                                </p>
+                              ) : null}
                               {object.tags.length > 0 ? (
                                 <div className="mt-3 flex flex-wrap gap-2">
                                   {object.tags.map((tag) => (
@@ -766,6 +814,18 @@ export function ObjectWorkspace({
                     </p>
                     <p className="mt-2 whitespace-pre-wrap text-sm leading-7" style={{ color: workspaceMutedText }}>
                       {selectedObject.story ?? 'No story has been added yet.'}
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl px-4 py-4" style={{ backgroundColor: workspaceSectionBg }}>
+                    <p
+                      className="text-xs font-semibold uppercase tracking-[0.16em]"
+                      style={{ color: activeTheme.badgeText }}
+                    >
+                      Collection
+                    </p>
+                    <p className="mt-2 text-sm leading-6" style={{ color: workspaceMutedText }}>
+                      {selectedObject.collection ? selectedObject.collection.title : 'No collection assigned.'}
                     </p>
                   </div>
 
@@ -1096,6 +1156,37 @@ export function ObjectWorkspace({
               </label>
 
               <label className="block">
+                <span className="mb-2 block text-sm font-semibold" style={{ color: modalFieldText }}>
+                  Collection
+                </span>
+                <select
+                  value={createFormState.collectionId}
+                  onChange={(event) =>
+                    setCreateFormState((current) => ({
+                      ...current,
+                      collectionId: event.target.value
+                    }))
+                  }
+                  className="w-full rounded-2xl border px-3 py-3 text-sm"
+                  style={{
+                    backgroundColor: modalFieldBg,
+                    borderColor: workspacePanelBorder,
+                    color: modalFieldText
+                  }}
+                >
+                  <option value="">No collection</option>
+                  {collections.map((collection) => (
+                    <option key={collection.id} value={collection.id}>
+                      {collection.title}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-2 text-xs" style={{ color: modalHelperText }}>
+                  Optional. Assign this object to an internal and public collection grouping.
+                </p>
+              </label>
+
+              <label className="block">
                 <div className="mb-2 flex items-center justify-between gap-3">
                   <span className="block text-sm font-semibold" style={{ color: modalFieldText }}>Description</span>
                   <span className="text-xs font-medium" style={{ color: modalHelperText }}>
@@ -1352,6 +1443,37 @@ export function ObjectWorkspace({
                     <p className="mt-2 text-xs" style={{ color: modalHelperText }}>
                       Comma-separated tags, up to {fieldLimits.tagsPerObject} tags and {fieldLimits.tag}{' '}
                       characters each.
+                    </p>
+                  </label>
+
+                  <label className="block">
+                    <span className="mb-2 block text-sm font-semibold" style={{ color: modalFieldText }}>
+                      Collection
+                    </span>
+                    <select
+                      value={editFormState.collectionId}
+                      onChange={(event) =>
+                        setEditFormState((current) => ({
+                          ...current,
+                          collectionId: event.target.value
+                        }))
+                      }
+                      className="w-full rounded-2xl border px-3 py-3 text-sm"
+                      style={{
+                        backgroundColor: modalFieldBg,
+                        borderColor: workspacePanelBorder,
+                        color: modalFieldText
+                      }}
+                    >
+                      <option value="">No collection</option>
+                      {collections.map((collection) => (
+                        <option key={collection.id} value={collection.id}>
+                          {collection.title}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="mt-2 text-xs" style={{ color: modalHelperText }}>
+                      Optional. Clear this field to remove the object from its collection.
                     </p>
                   </label>
 
