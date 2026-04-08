@@ -55,3 +55,4 @@ Important rule:
 - Modal forms like create-object should inherit the active theme family as well, rather than falling back to fixed white and sand inputs
 - QR and sharing dialogs should inherit the active theme family too, so auxiliary object actions feel part of the same interface
 - Edit-object flows should use the same themed modal treatment as create-object flows so object forms feel consistent
+- Public object pages should expose the same compact theme controls so visitors can switch theme without leaving the page
