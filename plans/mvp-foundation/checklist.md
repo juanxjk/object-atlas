@@ -60,3 +60,4 @@ Important rule:
 - Create and edit forms now show text-length counters and upload-size guidance that match the backend limits
 - The About page now points to the GitHub repository with a clearer call for public contribution
 - Objects now support tags for display and filtering in the management listing
+- Workspace dialogs and delete confirmation now run on Base UI primitives instead of custom modal wiring

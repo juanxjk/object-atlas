@@ -15,6 +15,8 @@ import {
   ZoomOut
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { AlertDialog } from '@base-ui/react/alert-dialog';
+import { Dialog } from '@base-ui/react/dialog';
 import type { ObjectMediaRecord, ObjectRecord } from '@object-atlas/types';
 
 import { ObjectQrCard } from './object-qr-card';
@@ -120,6 +122,7 @@ export function ObjectWorkspace({
   const [isDeleting, setIsDeleting] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
   const [mediaItems, setMediaItems] = useState<ObjectMediaRecord[]>([]);
@@ -297,9 +300,12 @@ export function ObjectWorkspace({
   };
 
   const handleDeleteObject = async (objectId: string) => {
-    if (!window.confirm('Are you sure you want to delete this object? This cannot be undone.')) {
-      return;
-    }
+    setDeleteTargetId(objectId);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTargetId) return;
+    const objectId = deleteTargetId;
     
     setIsDeleting(true);
     setEditError(null);
@@ -312,8 +318,10 @@ export function ObjectWorkspace({
       }
       setIsEditModalOpen(false);
       setEditingObjectId(null);
+      setDeleteTargetId(null);
     } catch (requestError) {
       setEditError(requestError instanceof Error ? requestError.message : 'Unable to delete object');
+      setDeleteTargetId(null);
     } finally {
       setIsDeleting(false);
     }
@@ -840,37 +848,36 @@ export function ObjectWorkspace({
         </div>
       </div>
 
-      {isCreateModalOpen ? (
-        <div
-          className="fixed inset-0 z-30 flex items-center justify-center bg-ink/35 px-4 py-6"
-          onClick={() => setIsCreateModalOpen(false)}
-        >
-          <div
-            className="w-full max-w-xl max-h-full flex flex-col rounded-soft border border-black/5 bg-white p-5 sm:p-6"
-            onClick={(event) => event.stopPropagation()}
-          >
+
+      {/* ── Create Object Dialog ── */}
+      <Dialog.Root
+        open={isCreateModalOpen}
+        onOpenChange={(open) => {
+          setIsCreateModalOpen(open);
+          if (!open) setCreateError(null);
+        }}
+      >
+        <Dialog.Portal>
+          <Dialog.Backdrop className="fixed inset-0 z-30 min-h-dvh bg-ink/35 transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 supports-[-webkit-touch-callout:none]:absolute" />
+          <Dialog.Popup className="fixed left-1/2 top-1/2 z-30 flex max-h-[calc(100dvh-3rem)] w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col rounded-soft border border-black/5 bg-white p-5 shadow-xl transition-all duration-150 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0 sm:p-6">
             <div className="flex shrink-0 items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
                   Create object
                 </p>
-                <h2 className="mt-1 font-[family-name:var(--font-display)] text-3xl text-ink">
+                <Dialog.Title className="mt-1 font-[family-name:var(--font-display)] text-3xl text-ink">
                   New object record
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-ink/70">
+                </Dialog.Title>
+                <Dialog.Description className="mt-2 text-sm leading-6 text-ink/70">
                   Start with the essentials. You can add attachments and a QR-linked public page
                   right after creation.
-                </p>
+                </Dialog.Description>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setIsCreateModalOpen(false)}
-                className="inline-flex items-center gap-2 rounded-full border border-sand px-3 py-2 text-sm font-semibold text-ink"
-              >
+              <Dialog.Close className="inline-flex items-center gap-2 rounded-full border border-sand px-3 py-2 text-sm font-semibold text-ink">
                 <X size={16} strokeWidth={2.1} />
                 Close
-              </button>
+              </Dialog.Close>
             </div>
 
             <form className="mt-6 min-h-0 space-y-4 overflow-y-auto pr-2" onSubmit={handleCreateSubmit}>
@@ -948,7 +955,6 @@ export function ObjectWorkspace({
                 </p>
               </label>
 
-
               <label className="block">
                 <div className="mb-2 flex items-center justify-between gap-3">
                   <span className="block text-sm font-semibold text-ink">Story</span>
@@ -990,269 +996,285 @@ export function ObjectWorkspace({
                   {isCreating ? 'Creating...' : 'Create object'}
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setIsCreateModalOpen(false)}
+                <Dialog.Close
                   className="inline-flex items-center gap-2 rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
                 >
                   <X size={16} strokeWidth={2.1} />
                   Cancel
-                </button>
+                </Dialog.Close>
               </div>
             </form>
-          </div>
-        </div>
-      ) : null}
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
 
-      {previewMedia ? (
-        <div
-          className="fixed inset-0 z-40 flex items-center justify-center bg-ink/70 px-4 py-6"
-          onClick={handleClosePreview}
-        >
-          <div
-            className="w-full max-w-5xl rounded-soft border border-black/5 bg-white p-5 sm:p-6"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
-                  Image preview
-                </p>
-                <h2 className="mt-1 font-[family-name:var(--font-display)] text-2xl text-ink">
-                  {previewMedia.originalFilename}
-                </h2>
-              </div>
+      {/* ── Image Preview Dialog ── */}
+      <Dialog.Root
+        open={Boolean(previewMedia)}
+        onOpenChange={(open) => { if (!open) handleClosePreview(); }}
+      >
+        <Dialog.Portal>
+          <Dialog.Backdrop className="fixed inset-0 z-40 min-h-dvh bg-ink/70 transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 supports-[-webkit-touch-callout:none]:absolute" />
+          <Dialog.Popup className="fixed left-1/2 top-1/2 z-40 w-full max-w-5xl -translate-x-1/2 -translate-y-1/2 rounded-soft border border-black/5 bg-white p-5 shadow-xl transition-all duration-150 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0 sm:p-6">
+            {previewMedia ? (
+              <>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
+                      Image preview
+                    </p>
+                    <Dialog.Title className="mt-1 font-[family-name:var(--font-display)] text-2xl text-ink">
+                      {previewMedia.originalFilename}
+                    </Dialog.Title>
+                  </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPreviewZoom((current) => Math.max(1, current - 0.25))}
-                  className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
-                >
-                  <ZoomOut size={16} strokeWidth={2.1} />
-                  Zoom out
-                </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPreviewZoom((current) => Math.max(1, current - 0.25))}
+                      className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
+                    >
+                      <ZoomOut size={16} strokeWidth={2.1} />
+                      Zoom out
+                    </button>
 
-                <button
-                  type="button"
-                  onClick={() => setPreviewZoom((current) => Math.min(3, current + 0.25))}
-                  className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
-                >
-                  <ZoomIn size={16} strokeWidth={2.1} />
-                  Zoom in
-                </button>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewZoom((current) => Math.min(3, current + 0.25))}
+                      className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
+                    >
+                      <ZoomIn size={16} strokeWidth={2.1} />
+                      Zoom in
+                    </button>
 
-                <button
-                  type="button"
-                  onClick={handleClosePreview}
-                  className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
-                >
-                  <X size={16} strokeWidth={2.1} />
-                  Close
-                </button>
-              </div>
-            </div>
+                    <Dialog.Close className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink">
+                      <X size={16} strokeWidth={2.1} />
+                      Close
+                    </Dialog.Close>
+                  </div>
+                </div>
 
-            <div className="mt-6 overflow-auto rounded-3xl bg-clay px-4 py-4">
-              <div className="flex min-h-[40vh] items-center justify-center">
-                <img
-                  src={getThumbnailUrl(previewMedia.storagePath) ?? ''}
-                  alt={previewMedia.originalFilename}
-                  className="max-h-[70vh] w-auto max-w-full origin-center rounded-2xl bg-white transition-transform duration-200"
-                  style={{ transform: `scale(${previewZoom})` }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : null}
+                <div className="mt-6 overflow-auto rounded-3xl bg-clay px-4 py-4">
+                  <div className="flex min-h-[40vh] items-center justify-center">
+                    <img
+                      src={getThumbnailUrl(previewMedia.storagePath) ?? ''}
+                      alt={previewMedia.originalFilename}
+                      className="max-h-[70vh] w-auto max-w-full origin-center rounded-2xl bg-white transition-transform duration-200"
+                      style={{ transform: `scale(${previewZoom})` }}
+                    />
+                  </div>
+                </div>
+              </>
+            ) : null}
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
 
-      {isEditModalOpen && editingObject ? (
-        <div
-          className="fixed inset-0 z-30 flex items-center justify-center bg-ink/35 px-4 py-6"
-          onClick={() => {
-            setIsEditModalOpen(false);
-            setEditingObjectId(null);
-          }}
-        >
-          <div
-            className="w-full max-w-xl max-h-full flex flex-col rounded-soft border border-black/5 bg-white p-5 sm:p-6"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="flex shrink-0 items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
-                  Edit object
-                </p>
-                <h2 className="mt-1 font-[family-name:var(--font-display)] text-3xl text-ink">
-                  {editingObject.title}
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-ink/70">
-                  Update the core information here, then return to the detail view for attachments
-                  and QR access.
-                </p>
-              </div>
+      {/* ── Edit Object Dialog ── */}
+      <Dialog.Root
+        open={isEditModalOpen && Boolean(editingObject)}
+        onOpenChange={(open) => {
+          setIsEditModalOpen(open);
+          if (!open) setEditingObjectId(null);
+        }}
+      >
+        <Dialog.Portal>
+          <Dialog.Backdrop className="fixed inset-0 z-30 min-h-dvh bg-ink/35 transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 supports-[-webkit-touch-callout:none]:absolute" />
+          <Dialog.Popup className="fixed left-1/2 top-1/2 z-30 flex max-h-[calc(100dvh-3rem)] w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col rounded-soft border border-black/5 bg-white p-5 shadow-xl transition-all duration-150 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0 sm:p-6">
+            {editingObject ? (
+              <>
+                <div className="flex shrink-0 items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
+                      Edit object
+                    </p>
+                    <Dialog.Title className="mt-1 font-[family-name:var(--font-display)] text-3xl text-ink">
+                      {editingObject.title}
+                    </Dialog.Title>
+                    <Dialog.Description className="mt-2 text-sm leading-6 text-ink/70">
+                      Update the core information here, then return to the detail view for attachments
+                      and QR access.
+                    </Dialog.Description>
+                  </div>
 
+                  <Dialog.Close className="inline-flex items-center gap-2 rounded-full border border-sand px-3 py-2 text-sm font-semibold text-ink">
+                    <X size={16} strokeWidth={2.1} />
+                    Close
+                  </Dialog.Close>
+                </div>
+
+                <form className="mt-6 min-h-0 space-y-4 overflow-y-auto pr-2" onSubmit={handleEditSubmit}>
+                  <label className="block">
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <span className="block text-sm font-semibold text-ink">Title</span>
+                      <span className="text-xs font-medium text-ink/55">
+                        {editFormState.title.length}/{fieldLimits.title}
+                      </span>
+                    </div>
+                    <input
+                      required
+                      maxLength={fieldLimits.title}
+                      value={editFormState.title}
+                      onChange={(event) =>
+                        setEditFormState((current) => ({
+                          ...current,
+                          title: event.target.value
+                        }))
+                      }
+                      className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
+                      placeholder="Object title"
+                    />
+                    <p className="mt-2 text-xs text-ink/55">
+                      Up to {fieldLimits.title} characters.
+                    </p>
+                  </label>
+
+                  <label className="block">
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <span className="block text-sm font-semibold text-ink">Description</span>
+                      <span className="text-xs font-medium text-ink/55">
+                        {editFormState.description.length}/{fieldLimits.description}
+                      </span>
+                    </div>
+                    <textarea
+                      maxLength={fieldLimits.description}
+                      value={editFormState.description}
+                      onChange={(event) =>
+                        setEditFormState((current) => ({
+                          ...current,
+                          description: event.target.value
+                        }))
+                      }
+                      rows={3}
+                      className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
+                      placeholder="Short summary for management and public display"
+                    />
+                    <p className="mt-2 text-xs text-ink/55">
+                      Up to {fieldLimits.description} characters.
+                    </p>
+                  </label>
+
+                  <label className="block">
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <span className="block text-sm font-semibold text-ink">Story</span>
+                      <span className="text-xs font-medium text-ink/55">
+                        {editFormState.story.length}/{fieldLimits.story}
+                      </span>
+                    </div>
+                    <textarea
+                      maxLength={fieldLimits.story}
+                      value={editFormState.story}
+                      onChange={(event) =>
+                        setEditFormState((current) => ({
+                          ...current,
+                          story: event.target.value
+                        }))
+                      }
+                      rows={6}
+                      className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
+                      placeholder="Historical context, significance, or narrative"
+                    />
+                    <p className="mt-2 text-xs text-ink/55">
+                      Up to {fieldLimits.story} characters.
+                    </p>
+                  </label>
+
+                  {editError ? (
+                    <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                      {editError}
+                    </div>
+                  ) : null}
+
+                  <div className="flex flex-col justify-between gap-3 pt-2 sm:flex-row">
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                      <button
+                        type="submit"
+                        disabled={isEditingFromModal || isDeleting}
+                        className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:opacity-70"
+                      >
+                        <Pencil size={16} strokeWidth={2.1} />
+                        {isEditingFromModal ? 'Saving...' : 'Save changes'}
+                      </button>
+
+                      <Dialog.Close
+                        className="inline-flex items-center gap-2 rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
+                      >
+                        <X size={16} strokeWidth={2.1} />
+                        Cancel
+                      </Dialog.Close>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteObject(editingObjectId!)}
+                      disabled={isEditingFromModal || isDeleting}
+                      className="inline-flex items-center justify-center gap-2 rounded-full border border-red-200 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-70"
+                    >
+                      <Trash2 size={16} strokeWidth={2.1} />
+                      {isDeleting ? 'Deleting...' : 'Delete object'}
+                    </button>
+                  </div>
+                </form>
+              </>
+            ) : null}
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      {/* ── QR Code Dialog ── */}
+      <Dialog.Root open={isQrModalOpen && Boolean(selectedObject)} onOpenChange={setIsQrModalOpen}>
+        <Dialog.Portal>
+          <Dialog.Backdrop className="fixed inset-0 z-30 min-h-dvh bg-ink/35 transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 supports-[-webkit-touch-callout:none]:absolute" />
+          <Dialog.Popup className="fixed left-1/2 top-1/2 z-30 w-full max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-soft transition-all duration-150 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0">
+            {selectedObject ? (
+              <ObjectQrCard
+                publicId={selectedObject.publicId}
+                title={selectedObject.title}
+                actionSlot={
+                  <Dialog.Close className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink">
+                    <X size={16} strokeWidth={2.1} />
+                    Close
+                  </Dialog.Close>
+                }
+              />
+            ) : null}
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      {/* ── Delete Confirmation AlertDialog ── */}
+      <AlertDialog.Root
+        open={Boolean(deleteTargetId)}
+        onOpenChange={(open) => { if (!open) setDeleteTargetId(null); }}
+      >
+        <AlertDialog.Portal>
+          <AlertDialog.Backdrop className="fixed inset-0 z-50 min-h-dvh bg-ink/35 transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 supports-[-webkit-touch-callout:none]:absolute" />
+          <AlertDialog.Popup className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-soft border border-black/5 bg-white p-6 shadow-xl transition-all duration-150 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0">
+            <AlertDialog.Title className="font-[family-name:var(--font-display)] text-2xl text-ink">
+              Delete this object?
+            </AlertDialog.Title>
+            <AlertDialog.Description className="mt-2 text-sm leading-6 text-ink/70">
+              This will permanently remove the object and all its attached media. This action cannot
+              be undone.
+            </AlertDialog.Description>
+
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <AlertDialog.Close className="inline-flex items-center justify-center gap-2 rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink">
+                Cancel
+              </AlertDialog.Close>
               <button
                 type="button"
-                onClick={() => {
-                  setIsEditModalOpen(false);
-                  setEditingObjectId(null);
-                }}
-                className="inline-flex items-center gap-2 rounded-full border border-sand px-3 py-2 text-sm font-semibold text-ink"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-70"
               >
-                <X size={16} strokeWidth={2.1} />
-                Close
+                <Trash2 size={16} strokeWidth={2.1} />
+                {isDeleting ? 'Deleting...' : 'Delete object'}
               </button>
             </div>
-
-            <form className="mt-6 min-h-0 space-y-4 overflow-y-auto pr-2" onSubmit={handleEditSubmit}>
-              <label className="block">
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <span className="block text-sm font-semibold text-ink">Title</span>
-                  <span className="text-xs font-medium text-ink/55">
-                    {editFormState.title.length}/{fieldLimits.title}
-                  </span>
-                </div>
-                <input
-                  required
-                  maxLength={fieldLimits.title}
-                  value={editFormState.title}
-                  onChange={(event) =>
-                    setEditFormState((current) => ({
-                      ...current,
-                      title: event.target.value
-                    }))
-                  }
-                  className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
-                  placeholder="Object title"
-                />
-                <p className="mt-2 text-xs text-ink/55">
-                  Up to {fieldLimits.title} characters.
-                </p>
-              </label>
-
-              <label className="block">
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <span className="block text-sm font-semibold text-ink">Description</span>
-                  <span className="text-xs font-medium text-ink/55">
-                    {editFormState.description.length}/{fieldLimits.description}
-                  </span>
-                </div>
-                <textarea
-                  maxLength={fieldLimits.description}
-                  value={editFormState.description}
-                  onChange={(event) =>
-                    setEditFormState((current) => ({
-                      ...current,
-                      description: event.target.value
-                    }))
-                  }
-                  rows={3}
-                  className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
-                  placeholder="Short summary for management and public display"
-                />
-                <p className="mt-2 text-xs text-ink/55">
-                  Up to {fieldLimits.description} characters.
-                </p>
-              </label>
-
-              <label className="block">
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <span className="block text-sm font-semibold text-ink">Story</span>
-                  <span className="text-xs font-medium text-ink/55">
-                    {editFormState.story.length}/{fieldLimits.story}
-                  </span>
-                </div>
-                <textarea
-                  maxLength={fieldLimits.story}
-                  value={editFormState.story}
-                  onChange={(event) =>
-                    setEditFormState((current) => ({
-                      ...current,
-                      story: event.target.value
-                    }))
-                  }
-                  rows={6}
-                  className="w-full rounded-2xl border border-sand bg-clay px-4 py-3 text-sm text-ink outline-none ring-0"
-                  placeholder="Historical context, significance, or narrative"
-                />
-                <p className="mt-2 text-xs text-ink/55">
-                  Up to {fieldLimits.story} characters.
-                </p>
-              </label>
-
-              {editError ? (
-                <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                  {editError}
-                </div>
-              ) : null}
-
-              <div className="flex flex-col sm:flex-row justify-between gap-3 pt-2">
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <button
-                    type="submit"
-                    disabled={isEditingFromModal || isDeleting}
-                    className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-white disabled:opacity-70"
-                  >
-                    <Pencil size={16} strokeWidth={2.1} />
-                    {isEditingFromModal ? 'Saving...' : 'Save changes'}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsEditModalOpen(false);
-                      setEditingObjectId(null);
-                    }}
-                    className="inline-flex items-center gap-2 rounded-full border border-sand px-5 py-3 text-sm font-semibold text-ink"
-                  >
-                    <X size={16} strokeWidth={2.1} />
-                    Cancel
-                  </button>
-                </div>
-                
-                <button
-                  type="button"
-                  onClick={() => handleDeleteObject(editingObjectId!)}
-                  disabled={isEditingFromModal || isDeleting}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-red-200 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:opacity-70"
-                >
-                  <Trash2 size={16} strokeWidth={2.1} />
-                  {isDeleting ? 'Deleting...' : 'Delete object'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      ) : null}
-
-      {isQrModalOpen && selectedObject ? (
-        <div
-          className="fixed inset-0 z-30 flex items-center justify-center bg-ink/35 px-4 py-6"
-          onClick={() => setIsQrModalOpen(false)}
-        >
-          <div
-            className="w-full max-w-xl"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <ObjectQrCard
-              publicId={selectedObject.publicId}
-              title={selectedObject.title}
-              actionSlot={
-                <button
-                  type="button"
-                  onClick={() => setIsQrModalOpen(false)}
-                  className="inline-flex items-center gap-2 rounded-full border border-sand px-4 py-2 text-sm font-semibold text-ink"
-                >
-                  <X size={16} strokeWidth={2.1} />
-                  Close
-                </button>
-              }
-            />
-          </div>
-        </div>
-      ) : null}
+          </AlertDialog.Popup>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
     </section>
   );
 }

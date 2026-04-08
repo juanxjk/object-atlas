@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${fraunces.variable} ${inter.variable}`}>
       <body className="font-[family-name:var(--font-body)] antialiased">
-        <div className="flex min-h-screen flex-col">
+        <div style={{ isolation: 'isolate' }} className="flex min-h-screen flex-col">
           <div className="flex-1">{children}</div>
           <SiteFooter />
         </div>
