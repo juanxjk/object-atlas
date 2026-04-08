@@ -11,7 +11,8 @@ Important rule:
 
 ## Planned Commits
 
-- [ ] `docs:` Define the UI refresh scope, redesign goals, and acceptance criteria
+- [x] `docs:` Define the UI refresh scope, redesign goals, and acceptance criteria
+- [x] `feat:` Add a draft page to explore the new layout direction before wiring behavior
 - [ ] `feat:` Add theme tokens and client-side light/dark theme state
 - [ ] `feat:` Add a Base UI-backed theme toggle in the shared navigation
 - [ ] `refactor:` Redesign the home page and shared shell with a bento-style layout
@@ -26,3 +27,4 @@ Important rule:
 - MVP should focus on shell, layout, color system, and theme behavior before deeper page restyling
 - Keep existing object-management behavior intact during the first redesign pass
 - If the redesign becomes too large, split shell/layout changes from workspace-surface changes into separate commits
+- The first concrete deliverable after planning is a visual draft page with non-functional controls so layout direction can be reviewed before behavior is wired
