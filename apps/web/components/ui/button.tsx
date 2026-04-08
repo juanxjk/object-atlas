@@ -65,6 +65,7 @@ export function Button({
     return (
       <BaseButton
         {...props}
+        nativeButton={false}
         className={classes}
         render={<Link href={href} />}
       >
@@ -77,6 +78,7 @@ export function Button({
     return (
       <BaseButton
         {...props}
+        nativeButton={false}
         className={classes}
         render={<a href={href} target={target} rel={rel} />}
       >
