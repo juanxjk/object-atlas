@@ -42,7 +42,7 @@ export function ObjectQrCard({
   }, [publicObjectUrl]);
 
   return (
-    <div className="rounded-soft border border-black/5 bg-white/85 p-5 sm:p-6">
+    <div className="rounded-soft border border-black/8 bg-white p-5 sm:p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember">
@@ -59,7 +59,7 @@ export function ObjectQrCard({
         {actionSlot ? <div className="shrink-0">{actionSlot}</div> : null}
       </div>
 
-      <div className="mt-5 flex flex-col items-center gap-4 rounded-3xl bg-clay px-4 py-5">
+      <div className="mt-5 flex flex-col items-center gap-4 rounded-3xl border border-black/5 bg-[#f5efe7] px-4 py-5">
         {qrDataUrl ? (
           <Image
             src={qrDataUrl}
