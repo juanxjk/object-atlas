@@ -1,5 +1,6 @@
 import { ObjectWorkspacePage } from '../../components/object-workspace-page';
-import { getCollections, getObjects } from '../../lib/object-api';
+import { getCollections } from '../../lib/collection-api';
+import { getObjects } from '../../lib/object-api';
 
 export default async function ObjectsPage({
   searchParams

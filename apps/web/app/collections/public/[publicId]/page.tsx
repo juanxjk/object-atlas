@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { PublicCollectionPage } from '../../../../components/public-collection-page';
-import { getPublicCollection } from '../../../../lib/object-api';
+import { getPublicCollection } from '../../../../lib/collection-api';
 
 export default async function PublicCollectionRoute({
   params

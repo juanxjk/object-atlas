@@ -1,8 +1,5 @@
 import type {
-  CollectionRecord,
-  CollectionWithObjectsRecord,
   ObjectRecord,
-  PublicCollectionRecord,
   PublicObjectRecord
 } from '@object-atlas/types';
 
@@ -47,54 +44,6 @@ export async function getPublicObject(publicId: string): Promise<PublicObjectRec
 
   try {
     return await readJsonResponse<PublicObjectRecord>(response);
-  } catch {
-    return null;
-  }
-}
-
-export async function getCollections(): Promise<CollectionRecord[]> {
-  const response = await fetch(`${apiBaseUrl}/api/collections`, {
-    cache: 'no-store'
-  });
-
-  if (!response.ok) {
-    return [];
-  }
-
-  try {
-    return await readJsonResponse<CollectionRecord[]>(response);
-  } catch {
-    return [];
-  }
-}
-
-export async function getCollection(id: string): Promise<CollectionWithObjectsRecord | null> {
-  const response = await fetch(`${apiBaseUrl}/api/collections/${id}`, {
-    cache: 'no-store'
-  });
-
-  if (!response.ok) {
-    return null;
-  }
-
-  try {
-    return await readJsonResponse<CollectionWithObjectsRecord>(response);
-  } catch {
-    return null;
-  }
-}
-
-export async function getPublicCollection(publicId: string): Promise<PublicCollectionRecord | null> {
-  const response = await fetch(`${apiBaseUrl}/api/public/collections/${publicId}`, {
-    cache: 'no-store'
-  });
-
-  if (!response.ok) {
-    return null;
-  }
-
-  try {
-    return await readJsonResponse<PublicCollectionRecord>(response);
   } catch {
     return null;
   }

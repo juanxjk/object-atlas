@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { getCollection, getObjects, getPublicCollection, getPublicObject } from './object-api';
+import { getObjects, getPublicObject } from './object-api';
 
 describe('object api helpers', () => {
   afterEach(() => {
@@ -32,16 +32,5 @@ describe('object api helpers', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     await expect(getPublicObject('missing')).resolves.toBeNull();
-  });
-
-  it('returns null when the collection endpoint is unavailable', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: false
-    });
-
-    vi.stubGlobal('fetch', fetchMock);
-
-    await expect(getCollection('missing')).resolves.toBeNull();
-    await expect(getPublicCollection('missing')).resolves.toBeNull();
   });
 });

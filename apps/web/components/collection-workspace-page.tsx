@@ -1,9 +1,9 @@
 'use client';
 
 import { ExternalLink, PackageOpen, Pencil, Plus, QrCode } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Dialog } from '@base-ui/react/dialog';
-import type { CollectionRecord } from '@object-atlas/types';
+import type { CollectionRecord, ObjectRecord } from '@object-atlas/types';
 
 import { ObjectQrCard } from './object-qr-card';
 import { themeStyles } from './theme-styles';
@@ -20,7 +20,7 @@ type CollectionFormState = {
   visibility: 'private' | 'unlisted' | 'public';
 };
 
-const emptyFormState: CollectionFormState = {
+const emptyCollectionFormState: CollectionFormState = {
   title: '',
   description: '',
   visibility: 'private'
@@ -29,7 +29,7 @@ const emptyFormState: CollectionFormState = {
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 const publicAppUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
-async function requestCollection<T>(path: string, options?: RequestInit): Promise<T> {
+async function requestJson<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${apiBaseUrl}${path}`, {
     headers: {
       'Content-Type': 'application/json'
@@ -48,14 +48,6 @@ function getPublicCollectionUrl(publicId: string): string {
   return `${publicAppUrl}/collections/public/${publicId}`;
 }
 
-function toFormState(collection: CollectionRecord): CollectionFormState {
-  return {
-    title: collection.title,
-    description: collection.description ?? '',
-    visibility: collection.visibility
-  };
-}
-
 function visibilityLabel(visibility: CollectionRecord['visibility']): string {
   if (visibility === 'private') return 'Private';
   if (visibility === 'unlisted') return 'Unlisted';
@@ -63,25 +55,37 @@ function visibilityLabel(visibility: CollectionRecord['visibility']): string {
 }
 
 export function CollectionWorkspacePage({
-  initialCollections
+  initialCollections,
+  initialObjects
 }: {
   initialCollections: CollectionRecord[];
+  initialObjects: ObjectRecord[];
 }) {
   const { mode, themeKey } = useTheme();
   const activeTheme = themeStyles[themeKey];
   const isDark = mode === 'dark';
   const [collections, setCollections] = useState(initialCollections);
-  const [createFormState, setCreateFormState] = useState<CollectionFormState>(emptyFormState);
-  const [editFormState, setEditFormState] = useState<CollectionFormState>(emptyFormState);
+  const [createFormState, setCreateFormState] = useState<CollectionFormState>(
+    emptyCollectionFormState
+  );
   const [createError, setCreateError] = useState<string | null>(null);
-  const [editError, setEditError] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [editingCollectionId, setEditingCollectionId] = useState<string | null>(null);
   const [qrCollection, setQrCollection] = useState<CollectionRecord | null>(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
 
-  const editingCollection = collections.find((collection) => collection.id === editingCollectionId) ?? null;
+  const collectionCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+
+    for (const object of initialObjects) {
+      if (!object.collection?.id) {
+        continue;
+      }
+
+      counts.set(object.collection.id, (counts.get(object.collection.id) ?? 0) + 1);
+    }
+
+    return counts;
+  }, [initialObjects]);
 
   return (
     <main
@@ -115,8 +119,7 @@ export function CollectionWorkspacePage({
                   Group objects into internal and public sets.
                 </h1>
                 <p className="mt-2 text-sm leading-6" style={{ color: activeTheme.cardMetaText }}>
-                  Create a collection, choose its visibility, and open its internal page when you
-                  want to manage the grouped objects in one place.
+                  Create collections here, then press edit to open the full collection management view.
                 </p>
               </div>
 
@@ -136,12 +139,12 @@ export function CollectionWorkspacePage({
                     color: activeTheme.cardMetaText
                   }}
                 >
-                  No collections yet. Start with a title, set visibility, then assign objects from
-                  the object workspace.
+                  No collections yet. Start with a title and visibility, then manage items from the full collection view.
                 </div>
               ) : (
                 collections.map((collection) => {
                   const canShare = collection.visibility !== 'private';
+                  const collectionObjectCount = collectionCounts.get(collection.id) ?? 0;
 
                   return (
                     <article
@@ -166,15 +169,7 @@ export function CollectionWorkspacePage({
                           </h2>
                         </div>
 
-                        <Button
-                          type="button"
-                          onClick={() => {
-                            setEditingCollectionId(collection.id);
-                            setEditFormState(toFormState(collection));
-                            setEditError(null);
-                          }}
-                          variant="secondary"
-                        >
+                        <Button href={`/collections/${collection.id}`} variant="secondary">
                           <Pencil size={16} strokeWidth={2.1} />
                           Edit
                         </Button>
@@ -184,10 +179,19 @@ export function CollectionWorkspacePage({
                         {collection.description ?? 'No collection description yet.'}
                       </p>
 
+                      <div className="mt-4 flex items-center justify-between gap-3">
+                        <p
+                          className="text-xs font-semibold uppercase tracking-[0.16em]"
+                          style={{ color: activeTheme.badgeText }}
+                        >
+                          {collectionObjectCount} item{collectionObjectCount === 1 ? '' : 's'}
+                        </p>
+                      </div>
+
                       <div className="mt-5 flex flex-wrap gap-2">
                         <Button href={`/collections/${collection.id}`} variant="secondary">
                           <PackageOpen size={16} strokeWidth={2.1} />
-                          Open internal page
+                          Open full view
                         </Button>
 
                         {canShare ? (
@@ -201,7 +205,11 @@ export function CollectionWorkspacePage({
                               <ExternalLink size={16} strokeWidth={2.1} />
                               Open public page
                             </Button>
-                            <Button type="button" onClick={() => setQrCollection(collection)} variant="secondary">
+                            <Button
+                              type="button"
+                              onClick={() => setQrCollection(collection)}
+                              variant="secondary"
+                            >
                               <QrCode size={16} strokeWidth={2.1} />
                               Show QR
                             </Button>
@@ -223,17 +231,26 @@ export function CollectionWorkspacePage({
           setIsCreateOpen(open);
           if (!open) {
             setCreateError(null);
-            setCreateFormState(emptyFormState);
+            setCreateFormState(emptyCollectionFormState);
           }
         }}
       >
         <Dialog.Portal>
           <Dialog.Backdrop className="fixed inset-0 z-30 bg-ink/35" />
-          <Dialog.Popup className="fixed left-1/2 top-1/2 z-30 w-full max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-soft border p-5 shadow-xl sm:p-6" style={{ backgroundColor: isDark ? activeTheme.metricsPanel : activeTheme.badgeBg, borderColor: activeTheme.cardBorder }}>
+          <Dialog.Popup
+            className="fixed left-1/2 top-1/2 z-30 w-full max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-soft border p-5 shadow-xl sm:p-6"
+            style={{
+              backgroundColor: isDark ? activeTheme.metricsPanel : activeTheme.badgeBg,
+              borderColor: activeTheme.cardBorder
+            }}
+          >
             <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: activeTheme.accent }}>
               Create collection
             </p>
-            <Dialog.Title className="mt-1 font-[family-name:var(--font-display)] text-3xl" style={{ color: isDark ? '#f7f3ee' : '#17181d' }}>
+            <Dialog.Title
+              className="mt-1 font-[family-name:var(--font-display)] text-3xl"
+              style={{ color: isDark ? '#f7f3ee' : '#17181d' }}
+            >
               New grouped set
             </Dialog.Title>
 
@@ -245,16 +262,18 @@ export function CollectionWorkspacePage({
                 setCreateError(null);
 
                 try {
-                  const created = await requestCollection<CollectionRecord>('/api/collections', {
+                  const created = await requestJson<CollectionRecord>('/api/collections', {
                     method: 'POST',
                     body: JSON.stringify(createFormState)
                   });
 
                   setCollections((current) => [created, ...current]);
                   setIsCreateOpen(false);
-                  setCreateFormState(emptyFormState);
+                  setCreateFormState(emptyCollectionFormState);
                 } catch (error) {
-                  setCreateError(error instanceof Error ? error.message : 'Unable to create collection');
+                  setCreateError(
+                    error instanceof Error ? error.message : 'Unable to create collection'
+                  );
                 } finally {
                   setIsCreating(false);
                 }
@@ -262,12 +281,27 @@ export function CollectionWorkspacePage({
             >
               <label className="block">
                 <span className="mb-2 block text-sm font-semibold">Title</span>
-                <Input value={createFormState.title} onChange={(event) => setCreateFormState((current) => ({ ...current, title: event.target.value }))} required />
+                <Input
+                  value={createFormState.title}
+                  onChange={(event) =>
+                    setCreateFormState((current) => ({ ...current, title: event.target.value }))
+                  }
+                  required
+                />
               </label>
 
               <label className="block">
                 <span className="mb-2 block text-sm font-semibold">Description</span>
-                <Textarea value={createFormState.description} onChange={(event) => setCreateFormState((current) => ({ ...current, description: event.target.value }))} rows={4} />
+                <Textarea
+                  value={createFormState.description}
+                  onChange={(event) =>
+                    setCreateFormState((current) => ({
+                      ...current,
+                      description: event.target.value
+                    }))
+                  }
+                  rows={4}
+                />
               </label>
 
               <label className="block">
@@ -304,116 +338,14 @@ export function CollectionWorkspacePage({
                   <Plus size={16} strokeWidth={2.1} />
                   {isCreating ? 'Creating...' : 'Create collection'}
                 </Button>
-                <Dialog.Close className="inline-flex items-center rounded-full border px-5 py-3 text-sm font-semibold" style={{ borderColor: activeTheme.cardBorder }}>
+                <Dialog.Close
+                  className="inline-flex items-center rounded-full border px-5 py-3 text-sm font-semibold"
+                  style={{ borderColor: activeTheme.cardBorder }}
+                >
                   Cancel
                 </Dialog.Close>
               </div>
             </form>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
-
-      <Dialog.Root
-        open={Boolean(editingCollection)}
-        onOpenChange={(open) => {
-          if (!open) {
-            setEditingCollectionId(null);
-            setEditError(null);
-          }
-        }}
-      >
-        <Dialog.Portal>
-          <Dialog.Backdrop className="fixed inset-0 z-30 bg-ink/35" />
-          <Dialog.Popup className="fixed left-1/2 top-1/2 z-30 w-full max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-soft border p-5 shadow-xl sm:p-6" style={{ backgroundColor: isDark ? activeTheme.metricsPanel : activeTheme.badgeBg, borderColor: activeTheme.cardBorder }}>
-            {editingCollection ? (
-              <>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: activeTheme.accent }}>
-                  Edit collection
-                </p>
-                <Dialog.Title className="mt-1 font-[family-name:var(--font-display)] text-3xl" style={{ color: isDark ? '#f7f3ee' : '#17181d' }}>
-                  {editingCollection.title}
-                </Dialog.Title>
-
-                <form
-                  className="mt-6 space-y-4"
-                  onSubmit={async (event) => {
-                    event.preventDefault();
-                    setIsSaving(true);
-                    setEditError(null);
-
-                    try {
-                      const updated = await requestCollection<CollectionRecord>(
-                        `/api/collections/${editingCollection.id}`,
-                        {
-                          method: 'PATCH',
-                          body: JSON.stringify(editFormState)
-                        }
-                      );
-
-                      setCollections((current) =>
-                        current.map((collection) =>
-                          collection.id === updated.id ? updated : collection
-                        )
-                      );
-                      setEditingCollectionId(null);
-                    } catch (error) {
-                      setEditError(error instanceof Error ? error.message : 'Unable to save collection');
-                    } finally {
-                      setIsSaving(false);
-                    }
-                  }}
-                >
-                  <label className="block">
-                    <span className="mb-2 block text-sm font-semibold">Title</span>
-                    <Input value={editFormState.title} onChange={(event) => setEditFormState((current) => ({ ...current, title: event.target.value }))} required />
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-2 block text-sm font-semibold">Description</span>
-                    <Textarea value={editFormState.description} onChange={(event) => setEditFormState((current) => ({ ...current, description: event.target.value }))} rows={4} />
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-2 block text-sm font-semibold">Visibility</span>
-                    <select
-                      value={editFormState.visibility}
-                      onChange={(event) =>
-                        setEditFormState((current) => ({
-                          ...current,
-                          visibility: event.target.value as CollectionFormState['visibility']
-                        }))
-                      }
-                      className="w-full rounded-2xl border px-3 py-3 text-sm"
-                      style={{
-                        backgroundColor: isDark ? activeTheme.secondaryPanel : activeTheme.cardMuted,
-                        borderColor: activeTheme.cardBorder,
-                        color: isDark ? '#f7f3ee' : '#17181d'
-                      }}
-                    >
-                      <option value="private">Private</option>
-                      <option value="unlisted">Unlisted</option>
-                      <option value="public">Public</option>
-                    </select>
-                  </label>
-
-                  {editError ? (
-                    <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                      {editError}
-                    </div>
-                  ) : null}
-
-                  <div className="flex flex-wrap gap-3">
-                    <Button type="submit" disabled={isSaving} variant="primary" size="lg">
-                      <Pencil size={16} strokeWidth={2.1} />
-                      {isSaving ? 'Saving...' : 'Save collection'}
-                    </Button>
-                    <Dialog.Close className="inline-flex items-center rounded-full border px-5 py-3 text-sm font-semibold" style={{ borderColor: activeTheme.cardBorder }}>
-                      Cancel
-                    </Dialog.Close>
-                  </div>
-                </form>
-              </>
-            ) : null}
           </Dialog.Popup>
         </Dialog.Portal>
       </Dialog.Root>
