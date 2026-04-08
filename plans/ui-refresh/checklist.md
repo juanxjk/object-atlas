@@ -30,3 +30,4 @@ Important rule:
 - The first concrete deliverable after planning is a visual draft page with non-functional controls so layout direction can be reviewed before behavior is wired
 - The draft page should be rich enough to evaluate layout treatment for both simple object cards and multi-image object detail states
 - The first working theme implementation can land on the draft page before the same toggle is moved into the shared navigation
+- Theme foundations now include both a light/dark mode and a persisted theme-family key so multiple visual directions can be tested without changing code

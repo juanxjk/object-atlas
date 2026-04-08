@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Moon,
   Package2,
+  Palette,
   QrCode,
   Search,
   Sparkles,
@@ -12,7 +13,11 @@ import {
 } from 'lucide-react';
 
 import { Button } from '../../components/ui/button';
-import { useTheme } from '../../components/theme-provider';
+import {
+  themeOptions,
+  type ThemeKey,
+  useTheme
+} from '../../components/theme-provider';
 import { Input } from '../../components/ui/input';
 
 const collectionCards = [
@@ -41,26 +46,119 @@ const quickStats = [
 
 const tags = ['Bronze', 'Ceramic', 'Colonial', 'Portrait', 'Restoration'];
 
+const draftThemeClasses: Record<
+  ThemeKey,
+  {
+    accent: string;
+    heroPanel: string;
+    heroSurface: string;
+    listingPanel: string;
+    mainBg: {
+      dark: string;
+      light: string;
+    };
+    metricsPanel: string;
+    previewPanel: string;
+    secondaryPanel: string;
+    shellPanel: {
+      dark: string;
+      light: string;
+    };
+    surface: {
+      dark: string;
+      light: string;
+    };
+  }
+> = {
+  atlas: {
+    accent: '#d9b48a',
+    heroPanel: '#0f1218',
+    heroSurface: '#f0e5d6',
+    listingPanel: '#f4ede3',
+    mainBg: {
+      light: 'bg-[#efe6d9] text-[#17181d]',
+      dark: 'bg-[#14181f] text-[#f5eee6]'
+    },
+    metricsPanel: '#171c24',
+    previewPanel: '#10141b',
+    secondaryPanel: '#222834',
+    shellPanel: {
+      light: 'border-black/6 bg-[#12141a] text-white',
+      dark: 'border-white/8 bg-[#0f1218] text-white'
+    },
+    surface: {
+      light: 'border-black/6 bg-[#f7f0e7]',
+      dark: 'border-white/8 bg-[#1b2028]'
+    }
+  },
+  gallery: {
+    accent: '#a8c2ac',
+    heroPanel: '#102019',
+    heroSurface: '#e6eee5',
+    listingPanel: '#edf3ec',
+    mainBg: {
+      light: 'bg-[#e8efe7] text-[#172019]',
+      dark: 'bg-[#111b16] text-[#edf4ee]'
+    },
+    metricsPanel: '#163026',
+    previewPanel: '#13251d',
+    secondaryPanel: '#244235',
+    shellPanel: {
+      light: 'border-black/6 bg-[#102019] text-white',
+      dark: 'border-white/8 bg-[#0d1813] text-white'
+    },
+    surface: {
+      light: 'border-black/6 bg-[#eef4ea]',
+      dark: 'border-white/8 bg-[#18241e]'
+    }
+  },
+  nocturne: {
+    accent: '#9caee6',
+    heroPanel: '#111421',
+    heroSurface: '#e6e9f4',
+    listingPanel: '#eceff8',
+    mainBg: {
+      light: 'bg-[#e8ebf5] text-[#171b27]',
+      dark: 'bg-[#111420] text-[#eef1fb]'
+    },
+    metricsPanel: '#1a1f33',
+    previewPanel: '#151a2c',
+    secondaryPanel: '#252c46',
+    shellPanel: {
+      light: 'border-black/6 bg-[#111421] text-white',
+      dark: 'border-white/8 bg-[#0d1019] text-white'
+    },
+    surface: {
+      light: 'border-black/6 bg-[#eef1fa]',
+      dark: 'border-white/8 bg-[#191e31]'
+    }
+  }
+};
+
 export default function DraftPage() {
-  const { theme, setTheme } = useTheme();
-  const isDark = theme === 'dark';
+  const { mode, setMode, setThemeKey, themeKey } = useTheme();
+  const isDark = mode === 'dark';
+  const activeTheme = draftThemeClasses[themeKey];
 
   return (
     <main
       className={`min-h-screen px-4 py-6 sm:px-6 ${
-        isDark ? 'bg-[#14181f] text-[#f5eee6]' : 'bg-[#efe6d9] text-[#17181d]'
+        isDark ? activeTheme.mainBg.dark : activeTheme.mainBg.light
       }`}
     >
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
         <section
           className={`overflow-hidden rounded-[2rem] border ${
-            isDark ? 'border-white/8 bg-[#0f1218] text-white' : 'border-black/6 bg-[#12141a] text-white'
+            isDark ? activeTheme.shellPanel.dark : activeTheme.shellPanel.light
           }`}
         >
           <div className="flex flex-col gap-5 px-5 py-5 sm:px-7 sm:py-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#d9b48a]">
+                <p
+                  className="text-xs font-semibold uppercase tracking-[0.22em]"
+                  style={{ color: activeTheme.accent }}
+                >
                   ObjectAtlas Draft
                 </p>
                 <p className="mt-2 text-sm text-white/66">
@@ -80,7 +178,7 @@ export default function DraftPage() {
                 <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 p-1">
                   <Button
                     type="button"
-                    onClick={() => setTheme('light')}
+                    onClick={() => setMode('light')}
                     variant="ghost"
                     size="sm"
                     className={`border-0 ${
@@ -94,7 +192,7 @@ export default function DraftPage() {
                   </Button>
                   <Button
                     type="button"
-                    onClick={() => setTheme('dark')}
+                    onClick={() => setMode('dark')}
                     variant="ghost"
                     size="sm"
                     className={`border-0 ${
@@ -110,13 +208,77 @@ export default function DraftPage() {
               </div>
             </div>
 
+            <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+              <div className="flex items-start gap-3">
+                <div className="rounded-full border border-white/10 bg-white/6 p-2 text-white">
+                  <Palette size={16} strokeWidth={2.1} />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/58">
+                    Theme selector
+                  </p>
+                  <p className="mt-2 text-sm text-white/74">
+                    Choose a theme family. Each one includes both a light and dark presentation,
+                    and the selected theme key is saved locally.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                {themeOptions.map((option) => {
+                  const isSelected = option.key === themeKey;
+                  const optionTheme = draftThemeClasses[option.key];
+
+                  return (
+                    <Button
+                      key={option.key}
+                      type="button"
+                      onClick={() => setThemeKey(option.key)}
+                      variant="ghost"
+                      className={`h-auto flex-col items-start rounded-[1.25rem] border p-4 text-left ${
+                        isSelected
+                          ? 'border-white/18 bg-white/12 text-white'
+                          : 'border-white/10 bg-white/5 text-white/76 hover:bg-white/8'
+                      }`}
+                    >
+                      <div className="flex w-full items-center justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-semibold">{option.label}</p>
+                          <p className="mt-1 text-xs uppercase tracking-[0.14em] text-white/52">
+                            {option.description}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className="h-4 w-4 rounded-full border border-white/15"
+                            style={{ backgroundColor: optionTheme.heroSurface }}
+                          />
+                          <span
+                            className="h-4 w-4 rounded-full border border-white/15"
+                            style={{ backgroundColor: optionTheme.heroPanel }}
+                          />
+                        </div>
+                      </div>
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="grid gap-3 lg:grid-cols-[1.4fr_0.85fr]">
               <div
                 className={`rounded-[1.75rem] px-5 py-6 sm:px-6 ${
-                  isDark ? 'bg-[#f0e5d6] text-[#17181d]' : 'bg-[#f4ede3] text-[#17181d]'
+                  isDark
+                    ? `text-[#17181d]`
+                    : `text-[#17181d]`
                 }`}
+                style={{ backgroundColor: activeTheme.heroSurface }}
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b05d33]">
+                <p
+                  className="text-xs font-semibold uppercase tracking-[0.22em]"
+                  style={{ color: activeTheme.accent }}
+                >
                   Bento layout draft
                 </p>
                 <h1 className="mt-3 max-w-2xl font-[family-name:var(--font-display)] text-4xl leading-tight sm:text-5xl">
@@ -141,11 +303,13 @@ export default function DraftPage() {
 
               <div className="grid gap-3">
                 <div
-                  className={`rounded-[1.75rem] border px-5 py-5 ${
-                    isDark ? 'border-white/10 bg-[#171c24]' : 'border-white/10 bg-[#1b202a]'
-                  }`}
+                  className="rounded-[1.75rem] border border-white/10 px-5 py-5"
+                  style={{ backgroundColor: activeTheme.metricsPanel }}
                 >
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d9b48a]">
+                  <p
+                    className="text-xs font-semibold uppercase tracking-[0.2em]"
+                    style={{ color: activeTheme.accent }}
+                  >
                     Quick metrics
                   </p>
                   <div className="mt-4 grid grid-cols-3 gap-3">
@@ -161,11 +325,13 @@ export default function DraftPage() {
                 </div>
 
                 <div
-                  className={`rounded-[1.75rem] border px-5 py-5 ${
-                    isDark ? 'border-white/10 bg-[#222834]' : 'border-white/10 bg-[#262c38]'
-                  }`}
+                  className="rounded-[1.75rem] border border-white/10 px-5 py-5"
+                  style={{ backgroundColor: activeTheme.secondaryPanel }}
                 >
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d9b48a]">
+                  <p
+                    className="text-xs font-semibold uppercase tracking-[0.2em]"
+                    style={{ color: activeTheme.accent }}
+                  >
                     Visual tone
                   </p>
                   <p className="mt-3 text-sm leading-6 text-white/72">
@@ -181,14 +347,12 @@ export default function DraftPage() {
         <section className="grid gap-4 lg:grid-cols-[1.1fr_0.95fr]">
           <article
             className={`rounded-[2rem] border p-4 sm:p-5 ${
-              isDark ? 'border-white/8 bg-[#1b2028]' : 'border-black/6 bg-[#f7f0e7]'
+              isDark ? activeTheme.surface.dark : activeTheme.surface.light
             }`}
           >
             <div className="grid gap-4 md:grid-cols-[1fr_0.9fr]">
               <div
-                className={`rounded-[1.5rem] px-4 py-4 ${
-                  isDark ? 'bg-[#f5eee6] text-[#17181d]' : 'bg-white'
-                }`}
+                className="rounded-[1.5rem] bg-white px-4 py-4 text-[#17181d]"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -231,11 +395,13 @@ export default function DraftPage() {
               </div>
 
               <div
-                className={`rounded-[1.5rem] px-4 py-4 text-white ${
-                  isDark ? 'bg-[#10141b]' : 'bg-[#15181f]'
-                }`}
+                className="rounded-[1.5rem] px-4 py-4 text-white"
+                style={{ backgroundColor: activeTheme.previewPanel }}
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d9b48a]">
+                <p
+                  className="text-xs font-semibold uppercase tracking-[0.2em]"
+                  style={{ color: activeTheme.accent }}
+                >
                   Public preview
                 </p>
                 <div className="mt-4 rounded-[1.25rem] bg-white/6 p-4">
@@ -260,9 +426,7 @@ export default function DraftPage() {
             </div>
 
             <div
-              className={`mt-4 rounded-[1.5rem] px-4 py-4 ${
-                isDark ? 'bg-[#f5eee6] text-[#17181d]' : 'bg-white'
-              }`}
+              className="mt-4 rounded-[1.5rem] bg-white px-4 py-4 text-[#17181d]"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -340,7 +504,7 @@ export default function DraftPage() {
 
           <aside
             className={`rounded-[2rem] border p-4 sm:p-5 ${
-              isDark ? 'border-white/8 bg-[#f5eee6] text-[#17181d]' : 'border-black/6 bg-white'
+              isDark ? activeTheme.surface.dark : 'border-black/6 bg-white'
             }`}
           >
             <div className="flex items-center justify-between gap-3">

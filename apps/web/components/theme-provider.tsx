@@ -9,47 +9,86 @@ import {
   type ReactNode
 } from 'react';
 
-export type Theme = 'light' | 'dark';
+export type ThemeMode = 'light' | 'dark';
+export type ThemeKey = 'atlas' | 'gallery' | 'nocturne';
 
-const storageKey = 'object-atlas-theme';
+const modeStorageKey = 'object-atlas-theme-mode';
+const themeKeyStorageKey = 'object-atlas-theme-key';
+
+export const themeOptions: Array<{
+  description: string;
+  key: ThemeKey;
+  label: string;
+}> = [
+  {
+    key: 'atlas',
+    label: 'Atlas',
+    description: 'Warm editorial neutrals'
+  },
+  {
+    key: 'gallery',
+    label: 'Gallery',
+    description: 'Soft museum greens and stone'
+  },
+  {
+    key: 'nocturne',
+    label: 'Nocturne',
+    description: 'Deeper contrast with blue-charcoal accents'
+  }
+];
 
 type ThemeContextValue = {
-  setTheme: (theme: Theme) => void;
-  theme: Theme;
+  mode: ThemeMode;
+  setMode: (mode: ThemeMode) => void;
+  setThemeKey: (themeKey: ThemeKey) => void;
+  themeKey: ThemeKey;
 };
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
+  const [mode, setModeState] = useState<ThemeMode>('light');
+  const [themeKey, setThemeKeyState] = useState<ThemeKey>('atlas');
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(storageKey);
+    const storedMode = window.localStorage.getItem(modeStorageKey);
+    const storedThemeKey = window.localStorage.getItem(themeKeyStorageKey);
 
-    if (stored === 'light' || stored === 'dark') {
-      setThemeState(stored);
-      return;
+    if (storedMode === 'light' || storedMode === 'dark') {
+      setModeState(storedMode);
+    } else {
+      const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+
+      setModeState(preferredTheme);
     }
 
-    const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light';
-
-    setThemeState(preferredTheme);
+    if (
+      storedThemeKey === 'atlas' ||
+      storedThemeKey === 'gallery' ||
+      storedThemeKey === 'nocturne'
+    ) {
+      setThemeKeyState(storedThemeKey);
+    }
   }, []);
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    document.documentElement.style.colorScheme = theme;
-    window.localStorage.setItem(storageKey, theme);
-  }, [theme]);
+    document.documentElement.dataset.theme = mode;
+    document.documentElement.dataset.themeKey = themeKey;
+    document.documentElement.style.colorScheme = mode;
+    window.localStorage.setItem(modeStorageKey, mode);
+    window.localStorage.setItem(themeKeyStorageKey, themeKey);
+  }, [mode, themeKey]);
 
   const value = useMemo(
     () => ({
-      setTheme: setThemeState,
-      theme
+      mode,
+      setMode: setModeState,
+      setThemeKey: setThemeKeyState,
+      themeKey
     }),
-    [theme]
+    [mode, themeKey]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
