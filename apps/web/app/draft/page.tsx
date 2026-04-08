@@ -197,7 +197,10 @@ export default function DraftPage() {
                         Read story, images, notes
                       </p>
                     </div>
-                    <Button variant="ghost" className="border-white/10 bg-white/6 text-white">
+                    <Button
+                      variant="ghost"
+                      className="border-[#d9b48a]/20 bg-[#d9b48a]/12 text-[#f3d5b4] hover:bg-[#d9b48a]/18"
+                    >
                       <QrCode size={16} strokeWidth={2.1} />
                       Open
                     </Button>
