@@ -2,9 +2,11 @@
 
 import { Button as BaseButton } from '@base-ui/react/button';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import { cn } from '../../lib/cn';
+import { themeStyles } from '../theme-styles';
+import { useTheme } from '../theme-provider';
 
 type ButtonVariant =
   | 'primary'
@@ -19,14 +21,14 @@ type ButtonVariant =
 type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-ink text-white hover:opacity-95',
-  secondary: 'border border-sand bg-white text-ink',
-  ghost: 'border border-sand bg-clay text-ink',
-  danger: 'border border-red-200 bg-white text-red-700 hover:bg-red-50',
-  soft: 'bg-ember text-white hover:opacity-95',
-  chip: 'bg-clay text-ink/70',
-  'chip-active': 'bg-ember text-white',
-  link: 'text-ember underline-offset-4 hover:underline'
+  primary: '',
+  secondary: 'border',
+  ghost: 'border',
+  danger: 'border',
+  soft: '',
+  chip: '',
+  'chip-active': '',
+  link: 'underline-offset-4 hover:underline'
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -42,6 +44,7 @@ export function Button({
   href,
   target,
   rel,
+  style,
   variant = 'secondary',
   size = 'md',
   ...props
@@ -54,6 +57,51 @@ export function Button({
   variant?: ButtonVariant;
   size?: ButtonSize;
 }) {
+  const { mode, themeKey } = useTheme();
+  const activeTheme = themeStyles[themeKey];
+  const isDark = mode === 'dark';
+
+  const variantThemeStyles: Record<ButtonVariant, CSSProperties> = {
+    primary: {
+      backgroundColor: activeTheme.chipActiveBg,
+      color: activeTheme.chipActiveText,
+      borderColor: activeTheme.chipActiveBg
+    },
+    secondary: {
+      backgroundColor: isDark ? activeTheme.secondaryPanel : activeTheme.badgeBg,
+      color: isDark ? '#f7f3ee' : '#17181d',
+      borderColor: activeTheme.cardBorder
+    },
+    ghost: {
+      backgroundColor: isDark ? activeTheme.cardMuted : activeTheme.cardMuted,
+      color: isDark ? '#f7f3ee' : '#17181d',
+      borderColor: activeTheme.cardBorder
+    },
+    danger: {
+      backgroundColor: isDark ? 'rgba(248, 81, 73, 0.14)' : '#fff5f5',
+      color: '#d1242f',
+      borderColor: isDark ? 'rgba(248, 81, 73, 0.35)' : '#f3b7bd'
+    },
+    soft: {
+      backgroundColor: activeTheme.accent,
+      color: themeKey === 'dreamland' ? '#352a45' : '#ffffff',
+      borderColor: activeTheme.accent
+    },
+    chip: {
+      backgroundColor: activeTheme.chipBg,
+      color: activeTheme.chipText,
+      borderColor: activeTheme.cardBorder
+    },
+    'chip-active': {
+      backgroundColor: activeTheme.chipActiveBg,
+      color: activeTheme.chipActiveText,
+      borderColor: activeTheme.chipActiveBg
+    },
+    link: {
+      color: activeTheme.accent
+    }
+  };
+
   const classes = cn(
     'inline-flex items-center justify-center gap-2 rounded-full font-semibold transition disabled:opacity-60',
     variantStyles[variant],
@@ -61,12 +109,18 @@ export function Button({
     className
   );
 
+  const mergedStyle = {
+    ...variantThemeStyles[variant],
+    ...style
+  };
+
   if (href?.startsWith('/')) {
     return (
       <BaseButton
         {...props}
         nativeButton={false}
         className={classes}
+        style={mergedStyle}
         render={<Link href={href} />}
       >
         {children}
@@ -80,6 +134,7 @@ export function Button({
         {...props}
         nativeButton={false}
         className={classes}
+        style={mergedStyle}
         render={<a href={href} target={target} rel={rel} />}
       >
         {children}
@@ -88,7 +143,7 @@ export function Button({
   }
 
   return (
-    <BaseButton {...props} className={classes}>
+    <BaseButton {...props} className={classes} style={mergedStyle}>
       {children}
     </BaseButton>
   );

@@ -51,6 +51,7 @@ Important rule:
 - User-facing shell copy should avoid internal labels like "MVP" when the same message can be expressed in product language
 - The object listing and detail workspace should inherit the active theme family too, rather than keeping the earlier hardcoded clay and sand surfaces
 - Interactive chips inside the live workspace, including tag filters, should use the active theme family's selected and unselected colors instead of generic shared chip styling
+- Shared button variants should derive their colors from the active theme layer so individual screens do not drift with hardcoded button colors
 - Modal forms like create-object should inherit the active theme family as well, rather than falling back to fixed white and sand inputs
 - QR and sharing dialogs should inherit the active theme family too, so auxiliary object actions feel part of the same interface
 - Edit-object flows should use the same themed modal treatment as create-object flows so object forms feel consistent
