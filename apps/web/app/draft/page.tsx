@@ -126,6 +126,27 @@ const draftThemeClasses: Record<
       light: 'border-black/6 bg-[#eef1fa]',
       dark: 'border-white/8 bg-[#191e31]'
     }
+  },
+  dreamland: {
+    accent: '#ffafcc',
+    heroPanel: '#6e5a84',
+    heroSurface: '#ffc8dd',
+    listingPanel: '#bde0fe',
+    mainBg: {
+      light: 'bg-[#fff3f8] text-[#352a45]',
+      dark: 'bg-[#2f2540] text-[#fdf3fa]'
+    },
+    metricsPanel: '#8d74aa',
+    previewPanel: '#5f4d7c',
+    secondaryPanel: '#7a68a0',
+    shellPanel: {
+      light: 'border-[#ffafcc]/30 bg-[#6e5a84] text-white',
+      dark: 'border-[#ffc8dd]/18 bg-[#4f4068] text-white'
+    },
+    surface: {
+      light: 'border-[#ffafcc]/28 bg-[#ffeaf3]',
+      dark: 'border-[#ffc8dd]/18 bg-[#43365a]'
+    }
   }
 };
 

@@ -27,6 +27,11 @@ const themeSwatches: Record<
     accent: '#9caee6',
     dark: '#111421',
     light: '#e6e9f4'
+  },
+  dreamland: {
+    accent: '#ffafcc',
+    dark: '#6e5a84',
+    light: '#ffc8dd'
   }
 };
 

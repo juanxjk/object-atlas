@@ -10,7 +10,7 @@ import {
 } from 'react';
 
 export type ThemeMode = 'light' | 'dark';
-export type ThemeKey = 'atlas' | 'gallery' | 'nocturne';
+export type ThemeKey = 'atlas' | 'gallery' | 'nocturne' | 'dreamland';
 
 const modeStorageKey = 'object-atlas-theme-mode';
 const themeKeyStorageKey = 'object-atlas-theme-key';
@@ -34,6 +34,11 @@ export const themeOptions: Array<{
     key: 'nocturne',
     label: 'Nocturne',
     description: 'Deeper contrast with blue-charcoal accents'
+  },
+  {
+    key: 'dreamland',
+    label: 'Pastel Dreamland Adventure',
+    description: 'Playful pastels from the provided Coolors palette'
   }
 ];
 
@@ -67,7 +72,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (
       storedThemeKey === 'atlas' ||
       storedThemeKey === 'gallery' ||
-      storedThemeKey === 'nocturne'
+      storedThemeKey === 'nocturne' ||
+      storedThemeKey === 'dreamland'
     ) {
       setThemeKeyState(storedThemeKey);
     }
