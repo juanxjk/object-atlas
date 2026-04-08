@@ -92,11 +92,18 @@ export function ThemeSelector({ compact = false }: { compact?: boolean }) {
         </Button>
       </div>
 
-      <div className={`mt-4 grid gap-3 ${compact ? 'md:grid-cols-3' : 'md:grid-cols-1 lg:grid-cols-3'}`}>
+      <div className={`mt-4 grid gap-3 ${compact ? 'md:grid-cols-3' : 'grid-cols-1'}`}>
         {themeOptions.map((option) => {
           const isSelected = option.key === themeKey;
           const swatch = themeSwatches[option.key];
           const themeStyle = themeStyles[option.key];
+          const itemStyle = isSelected
+            ? {
+                backgroundColor: themeStyle.heroSurface,
+                borderColor: themeStyle.cardBorder,
+                color: '#17181d'
+              }
+            : undefined;
 
           return (
             <Button
@@ -104,20 +111,14 @@ export function ThemeSelector({ compact = false }: { compact?: boolean }) {
               type="button"
               onClick={() => setThemeKey(option.key)}
               variant="ghost"
-              className={`h-auto flex-col items-start rounded-[1.25rem] border p-4 text-left transition ${
+              className={`h-auto rounded-[1.25rem] border p-4 text-left transition ${
+                compact ? 'flex-col items-start' : 'items-center'
+              } ${
                 isSelected
                   ? ''
                   : 'border-white/10 bg-white/5 text-white/76 hover:bg-white/8'
               }`}
-              style={
-                isSelected
-                  ? {
-                      backgroundColor: themeStyle.heroSurface,
-                      borderColor: themeStyle.cardBorder,
-                      color: '#17181d'
-                    }
-                  : undefined
-              }
+              style={compact ? itemStyle : { ...itemStyle, justifyContent: 'space-between' }}
             >
               <div className="flex w-full items-center justify-between gap-3">
                 <div>
@@ -143,7 +144,7 @@ export function ThemeSelector({ compact = false }: { compact?: boolean }) {
               </div>
 
               <span
-                className="mt-4 text-xs font-semibold uppercase tracking-[0.16em]"
+                className={`${compact ? 'mt-4' : 'ml-4 shrink-0'} text-xs font-semibold uppercase tracking-[0.16em]`}
                 style={{ color: isSelected ? themeStyle.badgeText : swatch.accent }}
               >
                 {isSelected ? 'Selected' : 'Apply theme'}

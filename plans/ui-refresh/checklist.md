@@ -46,6 +46,7 @@ Important rule:
 - Shared informational pages like About should inherit the same theme system and shell language as the main app instead of keeping fixed legacy surfaces
 - Config and other secondary pages should use the same themed page frame as the home shell so the shared navbar does not appear visually detached
 - Theme-selector active states on the config page should preview the selected family with that family's own surface and accent colors rather than a generic highlight
+- The config-page theme selector should use a vertical list layout so it reads like settings, while compact surfaces can keep the denser card layout
 - The shared navbar should keep a clear Home action so secondary pages never trap the user away from the main object workspace
 - User-facing shell copy should avoid internal labels like "MVP" when the same message can be expressed in product language
 - The object listing and detail workspace should inherit the active theme family too, rather than keeping the earlier hardcoded clay and sand surfaces
