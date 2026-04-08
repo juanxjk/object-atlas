@@ -1,4 +1,4 @@
-import type { ObjectRecord, PublicObjectSummary } from './object';
+import type { ObjectRecord, PublicObjectSummary } from './object.js';
 
 export const COLLECTION_VISIBILITY = ['private', 'unlisted', 'public'] as const;
 

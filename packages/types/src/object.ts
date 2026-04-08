@@ -1,4 +1,4 @@
-import type { CollectionSummary } from './collection';
+import type { CollectionSummary } from './collection.js';
 
 export type ObjectRecord = {
   id: string;

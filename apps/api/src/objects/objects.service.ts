@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 
 import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { sql } from 'drizzle-orm';
-import { PublicObjectRecord } from '@object-atlas/types';
+import type { PublicObjectRecord } from '@object-atlas/types';
 
 import { CollectionsService } from '../collections/collections.service';
 import { ensureCollectionsSchema } from '../collections/collections.schema';
