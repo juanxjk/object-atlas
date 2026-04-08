@@ -34,6 +34,7 @@ Important rule:
 - Theme foundations now include both a light/dark mode and a persisted theme-family key so multiple visual directions can be tested without changing code
 - Theme exploration now has a dedicated config page so the selector can live outside the draft surface while shared-navigation controls are still being designed
 - The theme-family system should stay open to curated palettes, including externally provided palettes that need both light and dark variants
+- The theme-family set now includes a GitHub-inspired option for a cleaner neutral engineering-oriented visual direction
 - The draft theme style map is now shared with the real home page so the redesign can move from exploration into the live shell without duplicating palette logic
 - The home page now keeps only a compact theme-family dropdown in the navbar, while the full selector stays on the config page
 - The shared navbar now includes both a compact theme-family dropdown and a light/dark toggle for quick theme changes without opening config

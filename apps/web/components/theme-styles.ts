@@ -171,5 +171,39 @@ export const themeStyles: Record<ThemeKey, DraftThemeStyle> = {
       light: 'border-[#ffafcc]/28 bg-[#ffeaf3]',
       dark: 'border-[#ffc8dd]/18 bg-[#43365a]'
     }
+  },
+  github: {
+    accent: '#2f81f7',
+    badgeBg: '#ffffff',
+    badgeText: '#1f6feb',
+    cardBorder: '#d0d7de',
+    cardMetaText: '#57606a',
+    cardMuted: '#f6f8fa',
+    cardPrimary: '#ffffff',
+    chipActiveBg: '#1f6feb',
+    chipActiveText: '#ffffff',
+    chipBg: '#f6f8fa',
+    chipText: '#57606a',
+    heroPanel: '#0d1117',
+    heroSurface: '#eaeef2',
+    imageDetailBg: '#ffffff',
+    imageDetailPanel: '#f6f8fa',
+    imageThumbs: ['#1f6feb', '#6e7681', '#d0d7de', '#30363d'],
+    listingPanel: '#f6f8fa',
+    mainBg: {
+      light: 'bg-[#f6f8fa] text-[#24292f]',
+      dark: 'bg-[#0d1117] text-[#f0f6fc]'
+    },
+    metricsPanel: '#161b22',
+    previewPanel: '#21262d',
+    secondaryPanel: '#30363d',
+    shellPanel: {
+      light: 'border-[#d0d7de] bg-[#0d1117] text-white',
+      dark: 'border-[#30363d] bg-[#161b22] text-white'
+    },
+    surface: {
+      light: 'border-[#d0d7de] bg-[#ffffff]',
+      dark: 'border-[#30363d] bg-[#161b22]'
+    }
   }
 };

@@ -33,6 +33,11 @@ const themeSwatches: Record<
     accent: '#ffafcc',
     dark: '#6e5a84',
     light: '#ffc8dd'
+  },
+  github: {
+    accent: '#2f81f7',
+    dark: '#0d1117',
+    light: '#f6f8fa'
   }
 };
 
