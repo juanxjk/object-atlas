@@ -495,6 +495,17 @@ export function ObjectWorkspace({
                   variant={!selectedTagFilter ? 'chip-active' : 'chip'}
                   size="sm"
                   className="text-xs uppercase tracking-[0.12em]"
+                  style={{
+                    backgroundColor: !selectedTagFilter
+                      ? activeTheme.chipActiveBg
+                      : activeTheme.chipBg,
+                    borderColor: !selectedTagFilter
+                      ? activeTheme.chipActiveBg
+                      : activeTheme.cardBorder,
+                    color: !selectedTagFilter
+                      ? activeTheme.chipActiveText
+                      : activeTheme.chipText
+                  }}
                 >
                   All tags
                 </Button>
@@ -506,6 +517,20 @@ export function ObjectWorkspace({
                     variant={selectedTagFilter === tag ? 'chip-active' : 'chip'}
                     size="sm"
                     className="text-xs uppercase tracking-[0.12em]"
+                    style={{
+                      backgroundColor:
+                        selectedTagFilter === tag
+                          ? activeTheme.chipActiveBg
+                          : activeTheme.chipBg,
+                      borderColor:
+                        selectedTagFilter === tag
+                          ? activeTheme.chipActiveBg
+                          : activeTheme.cardBorder,
+                      color:
+                        selectedTagFilter === tag
+                          ? activeTheme.chipActiveText
+                          : activeTheme.chipText
+                    }}
                   >
                     {tag}
                   </Button>
