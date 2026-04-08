@@ -1,8 +1,8 @@
-import { HomePageRefresh } from '../components/home-page-refresh';
+import { LandingPage } from '../components/landing-page';
 import { getObjects } from '../lib/object-api';
 
 export default async function HomePage() {
   const objects = await getObjects();
 
-  return <HomePageRefresh initialObjects={objects} />;
+  return <LandingPage initialObjects={objects} />;
 }

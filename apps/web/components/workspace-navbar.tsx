@@ -16,7 +16,7 @@ const navigationItems = [
     icon: Home
   },
   {
-    href: '/#object-listing',
+    href: '/objects',
     label: 'Object listing',
     icon: Package2
   },

@@ -1,13 +1,8 @@
 'use client';
 
-import {
-  ArrowUpRight,
-  LayoutDashboard,
-  Package2
-} from 'lucide-react';
+import { ArrowUpRight, LayoutDashboard, Package2 } from 'lucide-react';
 import type { ObjectRecord } from '@object-atlas/types';
 
-import { ObjectWorkspace } from './object-workspace';
 import { themeStyles } from './theme-styles';
 import { useTheme } from './theme-provider';
 import { WorkspaceNavbar } from './workspace-navbar';
@@ -17,7 +12,7 @@ function formatCount(value: number): string {
   return value.toString().padStart(2, '0');
 }
 
-export function HomePageRefresh({
+export function LandingPage({
   initialObjects
 }: {
   initialObjects: ObjectRecord[];
@@ -70,7 +65,7 @@ export function HomePageRefresh({
                   <LayoutDashboard size={16} strokeWidth={2.1} />
                   Overview
                 </Button>
-                <Button variant="ghost" className="border-white/10 bg-white/5 text-white">
+                <Button href="/objects" variant="ghost" className="border-white/10 bg-white/5 text-white">
                   <Package2 size={16} strokeWidth={2.1} />
                   Objects
                 </Button>
@@ -100,11 +95,11 @@ export function HomePageRefresh({
                 </p>
 
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <Button href="/#object-listing" variant="primary" size="lg">
+                  <Button href="/objects" variant="primary" size="lg">
                     Open object listing
                     <ArrowUpRight size={16} strokeWidth={2.1} />
                   </Button>
-                  <Button href="/config" variant="secondary" size="lg" className="bg-white">
+                  <Button href="/config" variant="secondary" size="lg">
                     Theme settings
                   </Button>
                 </div>
@@ -141,29 +136,28 @@ export function HomePageRefresh({
           }`}
         >
           <div
-            className="rounded-[1.5rem] px-4 py-4 text-[#17181d] sm:px-5"
+            className="rounded-[1.5rem] px-4 py-5 sm:px-5"
             style={{ backgroundColor: activeTheme.listingPanel }}
           >
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <p
-                  className="text-xs font-semibold uppercase tracking-[0.2em]"
-                  style={{ color: activeTheme.badgeText }}
-                >
-                  Live workspace
-                </p>
-                <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl">
-                  The real object management flow, inside the new shell.
-                </h2>
-                <p className="mt-2 text-sm leading-6" style={{ color: activeTheme.cardMetaText }}>
-                  Create and update records, manage media, and move through the collection from a
-                  calmer, more structured workspace.
-                </p>
-              </div>
-            </div>
+            <p
+              className="text-xs font-semibold uppercase tracking-[0.2em]"
+              style={{ color: activeTheme.badgeText }}
+            >
+              Object workspace
+            </p>
+            <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl">
+              Keep the landing page focused, and move collection work to its own route.
+            </h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: activeTheme.cardMetaText }}>
+              Browse the collection, edit objects, manage files, and generate QR access from a
+              dedicated object listing page instead of mixing those workflows into the home page.
+            </p>
 
             <div className="mt-5">
-              <ObjectWorkspace initialObjects={initialObjects} />
+              <Button href="/objects" variant="primary">
+                Go to object listing
+                <ArrowUpRight size={16} strokeWidth={2.1} />
+              </Button>
             </div>
           </div>
         </section>
