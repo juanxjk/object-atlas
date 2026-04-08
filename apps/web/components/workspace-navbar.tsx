@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, LayoutDashboard, Menu, Package2, Settings2 } from 'lucide-react';
+import { BookOpen, Menu, Package2, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { ThemeNavSelect } from './theme-nav-select';
@@ -16,11 +16,6 @@ const navigationItems = [
     href: '/about',
     label: 'About',
     icon: BookOpen
-  },
-  {
-    href: '/draft',
-    label: 'Draft UI',
-    icon: LayoutDashboard
   },
   {
     href: '/config',

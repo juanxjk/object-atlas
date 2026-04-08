@@ -28,7 +28,7 @@ export default function ConfigPage() {
             <p className="max-w-3xl text-sm leading-7 text-white/72 sm:text-base">
               Use this page to switch between the current theme families and light or dark mode.
               These selections are saved locally so you can compare interface directions without
-              resetting the draft page each time.
+              resetting the app each time.
             </p>
 
             <ThemeSelector />

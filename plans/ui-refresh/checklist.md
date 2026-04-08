@@ -28,11 +28,12 @@ Important rule:
 - MVP should focus on shell, layout, color system, and theme behavior before deeper page restyling
 - Keep existing object-management behavior intact during the first redesign pass
 - If the redesign becomes too large, split shell/layout changes from workspace-surface changes into separate commits
-- The first concrete deliverable after planning is a visual draft page with non-functional controls so layout direction can be reviewed before behavior is wired
-- The draft page should be rich enough to evaluate layout treatment for both simple object cards and multi-image object detail states
-- The first working theme implementation can land on the draft page before the same toggle is moved into the shared navigation
+- The first concrete deliverable after planning was a visual draft page with non-functional controls so layout direction could be reviewed before behavior was wired
+- The draft exploration covered both simple object cards and multi-image object detail states before the refreshed shell moved into the live app
+- The first working theme implementation landed on the draft page before the same controls moved into shared navigation and config
 - Theme foundations now include both a light/dark mode and a persisted theme-family key so multiple visual directions can be tested without changing code
 - Theme exploration now has a dedicated config page so the selector can live outside the draft surface while shared-navigation controls are still being designed
 - The theme-family system should stay open to curated palettes, including externally provided palettes that need both light and dark variants
 - The draft theme style map is now shared with the real home page so the redesign can move from exploration into the live shell without duplicating palette logic
 - The home page now keeps only a compact theme-family dropdown in the navbar, while the full selector stays on the config page
+- The draft route has been removed now that the refreshed shell is the primary home experience
