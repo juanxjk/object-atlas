@@ -50,6 +50,10 @@ const draftThemeClasses: Record<
     cardMetaText: string;
     cardMuted: string;
     cardPrimary: string;
+    chipActiveBg: string;
+    chipActiveText: string;
+    chipBg: string;
+    chipText: string;
     heroPanel: string;
     heroSurface: string;
     imageDetailBg: string;
@@ -81,6 +85,10 @@ const draftThemeClasses: Record<
     cardMetaText: '#5c5145',
     cardMuted: '#f7f1e9',
     cardPrimary: '#fff8ef',
+    chipActiveBg: '#c96a37',
+    chipActiveText: '#ffffff',
+    chipBg: '#f1e9dc',
+    chipText: '#6a6257',
     heroPanel: '#0f1218',
     heroSurface: '#f0e5d6',
     imageDetailBg: '#fffaf3',
@@ -111,6 +119,10 @@ const draftThemeClasses: Record<
     cardMetaText: '#415647',
     cardMuted: '#edf3ec',
     cardPrimary: '#f4faf4',
+    chipActiveBg: '#5f8a68',
+    chipActiveText: '#ffffff',
+    chipBg: '#dde8dc',
+    chipText: '#4f6654',
     heroPanel: '#102019',
     heroSurface: '#e6eee5',
     imageDetailBg: '#f7fbf6',
@@ -141,6 +153,10 @@ const draftThemeClasses: Record<
     cardMetaText: '#4e5878',
     cardMuted: '#eef1fa',
     cardPrimary: '#f7f8fd',
+    chipActiveBg: '#6277bd',
+    chipActiveText: '#ffffff',
+    chipBg: '#dde4f8',
+    chipText: '#5a6488',
     heroPanel: '#111421',
     heroSurface: '#e6e9f4',
     imageDetailBg: '#fbfbff',
@@ -171,6 +187,10 @@ const draftThemeClasses: Record<
     cardMetaText: '#7e5873',
     cardMuted: '#ffeaf3',
     cardPrimary: '#fff4fa',
+    chipActiveBg: '#ff7eb0',
+    chipActiveText: '#ffffff',
+    chipBg: '#ffe3ef',
+    chipText: '#92677f',
     heroPanel: '#6e5a84',
     heroSurface: '#ffc8dd',
     imageDetailBg: '#fff7fb',
@@ -366,9 +386,14 @@ export default function DraftPage() {
                   {tags.map((tag, index) => (
                     <Button
                       key={tag}
-                      variant={index === 0 ? 'chip-active' : 'chip'}
+                      variant="ghost"
                       size="sm"
-                      className="text-xs uppercase tracking-[0.12em]"
+                      className="text-xs uppercase tracking-[0.12em] border-transparent"
+                      style={{
+                        backgroundColor:
+                          index === 0 ? activeTheme.chipActiveBg : activeTheme.chipBg,
+                        color: index === 0 ? activeTheme.chipActiveText : activeTheme.chipText
+                      }}
                     >
                       {tag}
                     </Button>
