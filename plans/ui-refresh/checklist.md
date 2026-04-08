@@ -39,3 +39,4 @@ Important rule:
 - The draft route has been removed now that the refreshed shell is the primary home experience
 - Low-value shell cards should be removed when they do not communicate anything actionable, even if they looked useful in the earlier draft phase
 - Shared informational pages like About should inherit the same theme system and shell language as the main app instead of keeping fixed legacy surfaces
+- Theme-selector active states on the config page should preview the selected family with that family's own surface and accent colors rather than a generic highlight

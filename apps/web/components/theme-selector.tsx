@@ -2,6 +2,7 @@
 
 import { Moon, Palette, SunMedium } from 'lucide-react';
 
+import { themeStyles } from './theme-styles';
 import { Button } from './ui/button';
 import { themeOptions, type ThemeKey, useTheme } from './theme-provider';
 
@@ -90,6 +91,7 @@ export function ThemeSelector({ compact = false }: { compact?: boolean }) {
         {themeOptions.map((option) => {
           const isSelected = option.key === themeKey;
           const swatch = themeSwatches[option.key];
+          const themeStyle = themeStyles[option.key];
 
           return (
             <Button
@@ -97,16 +99,28 @@ export function ThemeSelector({ compact = false }: { compact?: boolean }) {
               type="button"
               onClick={() => setThemeKey(option.key)}
               variant="ghost"
-              className={`h-auto flex-col items-start rounded-[1.25rem] border p-4 text-left ${
+              className={`h-auto flex-col items-start rounded-[1.25rem] border p-4 text-left transition ${
                 isSelected
-                  ? 'border-white/18 bg-white/12 text-white'
+                  ? ''
                   : 'border-white/10 bg-white/5 text-white/76 hover:bg-white/8'
               }`}
+              style={
+                isSelected
+                  ? {
+                      backgroundColor: themeStyle.heroSurface,
+                      borderColor: themeStyle.cardBorder,
+                      color: '#17181d'
+                    }
+                  : undefined
+              }
             >
               <div className="flex w-full items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-semibold">{option.label}</p>
-                  <p className="mt-1 text-xs uppercase tracking-[0.14em] text-white/52">
+                  <p
+                    className="mt-1 text-xs uppercase tracking-[0.14em]"
+                    style={{ color: isSelected ? themeStyle.cardMetaText : 'rgba(255,255,255,0.52)' }}
+                  >
                     {option.description}
                   </p>
                 </div>
@@ -125,7 +139,7 @@ export function ThemeSelector({ compact = false }: { compact?: boolean }) {
 
               <span
                 className="mt-4 text-xs font-semibold uppercase tracking-[0.16em]"
-                style={{ color: swatch.accent }}
+                style={{ color: isSelected ? themeStyle.badgeText : swatch.accent }}
               >
                 {isSelected ? 'Selected' : 'Apply theme'}
               </span>
