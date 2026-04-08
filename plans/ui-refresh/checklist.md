@@ -38,6 +38,7 @@ Important rule:
 - The home page now keeps only a compact theme-family dropdown in the navbar, while the full selector stays on the config page
 - The shared navbar now includes both a compact theme-family dropdown and a light/dark toggle for quick theme changes without opening config
 - The shared navbar chrome, quick theme controls, and nav actions should all inherit the active theme family instead of keeping fixed neutral styling
+- The shared footer should inherit the active theme family too, so the app chrome feels consistent from top to bottom
 - On desktop, navbar links should stay grouped separately from quick theme controls so navigation reads left-to-right and theme actions stay on the right edge
 - The draft route has been removed now that the refreshed shell is the primary home experience
 - Low-value shell cards should be removed when they do not communicate anything actionable, even if they looked useful in the earlier draft phase
