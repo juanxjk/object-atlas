@@ -13,7 +13,7 @@ Important rule:
 
 - [x] `docs:` Define the UI refresh scope, redesign goals, and acceptance criteria
 - [x] `feat:` Add a draft page to explore the new layout direction before wiring behavior
-- [ ] `feat:` Add theme tokens and client-side light/dark theme state
+- [x] `feat:` Add theme tokens and client-side light/dark theme state
 - [ ] `feat:` Add a Base UI-backed theme toggle in the shared navigation
 - [ ] `refactor:` Redesign the home page and shared shell with a bento-style layout
 - [ ] `refactor:` Align shared surfaces and navigation styling with the new color system
@@ -29,3 +29,4 @@ Important rule:
 - If the redesign becomes too large, split shell/layout changes from workspace-surface changes into separate commits
 - The first concrete deliverable after planning is a visual draft page with non-functional controls so layout direction can be reviewed before behavior is wired
 - The draft page should be rich enough to evaluate layout treatment for both simple object cards and multi-image object detail states
+- The first working theme implementation can land on the draft page before the same toggle is moved into the shared navigation

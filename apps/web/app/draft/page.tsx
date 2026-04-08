@@ -1,3 +1,5 @@
+'use client';
+
 import {
   ArrowUpRight,
   LayoutDashboard,
@@ -10,6 +12,7 @@ import {
 } from 'lucide-react';
 
 import { Button } from '../../components/ui/button';
+import { useTheme } from '../../components/theme-provider';
 import { Input } from '../../components/ui/input';
 
 const collectionCards = [
@@ -39,10 +42,21 @@ const quickStats = [
 const tags = ['Bronze', 'Ceramic', 'Colonial', 'Portrait', 'Restoration'];
 
 export default function DraftPage() {
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === 'dark';
+
   return (
-    <main className="min-h-screen bg-[#efe6d9] px-4 py-6 text-[#17181d] sm:px-6">
+    <main
+      className={`min-h-screen px-4 py-6 sm:px-6 ${
+        isDark ? 'bg-[#14181f] text-[#f5eee6]' : 'bg-[#efe6d9] text-[#17181d]'
+      }`}
+    >
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-        <section className="overflow-hidden rounded-[2rem] border border-black/6 bg-[#12141a] text-white">
+        <section
+          className={`overflow-hidden rounded-[2rem] border ${
+            isDark ? 'border-white/8 bg-[#0f1218] text-white' : 'border-black/6 bg-[#12141a] text-white'
+          }`}
+        >
           <div className="flex flex-col gap-5 px-5 py-5 sm:px-7 sm:py-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
@@ -65,17 +79,29 @@ export default function DraftPage() {
                 </Button>
                 <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 p-1">
                   <Button
+                    type="button"
+                    onClick={() => setTheme('light')}
                     variant="ghost"
                     size="sm"
-                    className="border-0 bg-white text-[#17181d] hover:bg-white"
+                    className={`border-0 ${
+                      !isDark
+                        ? 'bg-white text-[#17181d] hover:bg-white'
+                        : 'bg-transparent text-white hover:bg-white/8'
+                    }`}
                   >
                     <SunMedium size={15} strokeWidth={2.1} />
                     Light
                   </Button>
                   <Button
+                    type="button"
+                    onClick={() => setTheme('dark')}
                     variant="ghost"
                     size="sm"
-                    className="border-0 bg-transparent text-white hover:bg-white/8"
+                    className={`border-0 ${
+                      isDark
+                        ? 'bg-white text-[#17181d] hover:bg-white'
+                        : 'bg-transparent text-white hover:bg-white/8'
+                    }`}
                   >
                     <Moon size={15} strokeWidth={2.1} />
                     Dark
@@ -85,7 +111,11 @@ export default function DraftPage() {
             </div>
 
             <div className="grid gap-3 lg:grid-cols-[1.4fr_0.85fr]">
-              <div className="rounded-[1.75rem] bg-[#f4ede3] px-5 py-6 text-[#17181d] sm:px-6">
+              <div
+                className={`rounded-[1.75rem] px-5 py-6 sm:px-6 ${
+                  isDark ? 'bg-[#f0e5d6] text-[#17181d]' : 'bg-[#f4ede3] text-[#17181d]'
+                }`}
+              >
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b05d33]">
                   Bento layout draft
                 </p>
@@ -110,7 +140,11 @@ export default function DraftPage() {
               </div>
 
               <div className="grid gap-3">
-                <div className="rounded-[1.75rem] border border-white/10 bg-[#1b202a] px-5 py-5">
+                <div
+                  className={`rounded-[1.75rem] border px-5 py-5 ${
+                    isDark ? 'border-white/10 bg-[#171c24]' : 'border-white/10 bg-[#1b202a]'
+                  }`}
+                >
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d9b48a]">
                     Quick metrics
                   </p>
@@ -126,7 +160,11 @@ export default function DraftPage() {
                   </div>
                 </div>
 
-                <div className="rounded-[1.75rem] border border-white/10 bg-[#262c38] px-5 py-5">
+                <div
+                  className={`rounded-[1.75rem] border px-5 py-5 ${
+                    isDark ? 'border-white/10 bg-[#222834]' : 'border-white/10 bg-[#262c38]'
+                  }`}
+                >
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d9b48a]">
                     Visual tone
                   </p>
@@ -141,9 +179,17 @@ export default function DraftPage() {
         </section>
 
         <section className="grid gap-4 lg:grid-cols-[1.1fr_0.95fr]">
-          <article className="rounded-[2rem] border border-black/6 bg-[#f7f0e7] p-4 sm:p-5">
+          <article
+            className={`rounded-[2rem] border p-4 sm:p-5 ${
+              isDark ? 'border-white/8 bg-[#1b2028]' : 'border-black/6 bg-[#f7f0e7]'
+            }`}
+          >
             <div className="grid gap-4 md:grid-cols-[1fr_0.9fr]">
-              <div className="rounded-[1.5rem] bg-white px-4 py-4">
+              <div
+                className={`rounded-[1.5rem] px-4 py-4 ${
+                  isDark ? 'bg-[#f5eee6] text-[#17181d]' : 'bg-white'
+                }`}
+              >
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#4d6c57]">
@@ -184,7 +230,11 @@ export default function DraftPage() {
                 </div>
               </div>
 
-              <div className="rounded-[1.5rem] bg-[#15181f] px-4 py-4 text-white">
+              <div
+                className={`rounded-[1.5rem] px-4 py-4 text-white ${
+                  isDark ? 'bg-[#10141b]' : 'bg-[#15181f]'
+                }`}
+              >
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#d9b48a]">
                   Public preview
                 </p>
@@ -209,7 +259,11 @@ export default function DraftPage() {
               </div>
             </div>
 
-            <div className="mt-4 rounded-[1.5rem] bg-white px-4 py-4">
+            <div
+              className={`mt-4 rounded-[1.5rem] px-4 py-4 ${
+                isDark ? 'bg-[#f5eee6] text-[#17181d]' : 'bg-white'
+              }`}
+            >
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#4d6c57]">
@@ -284,7 +338,11 @@ export default function DraftPage() {
             </div>
           </article>
 
-          <aside className="rounded-[2rem] border border-black/6 bg-white p-4 sm:p-5">
+          <aside
+            className={`rounded-[2rem] border p-4 sm:p-5 ${
+              isDark ? 'border-white/8 bg-[#f5eee6] text-[#17181d]' : 'border-black/6 bg-white'
+            }`}
+          >
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#4d6c57]">

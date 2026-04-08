@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Fraunces, Inter } from 'next/font/google';
 
 import { SiteFooter } from '../components/site-footer';
+import { ThemeProvider } from '../components/theme-provider';
 import './globals.css';
 
 const fraunces = Fraunces({
@@ -25,12 +26,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${inter.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${fraunces.variable} ${inter.variable}`}
+    >
       <body className="font-[family-name:var(--font-body)] antialiased">
-        <div style={{ isolation: 'isolate' }} className="flex min-h-screen flex-col">
-          <div className="flex-1">{children}</div>
-          <SiteFooter />
-        </div>
+        <ThemeProvider>
+          <div style={{ isolation: 'isolate' }} className="flex min-h-screen flex-col">
+            <div className="flex-1">{children}</div>
+            <SiteFooter />
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );
