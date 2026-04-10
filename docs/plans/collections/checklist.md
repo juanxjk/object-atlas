@@ -11,13 +11,13 @@ Important rule:
 
 ## Planned Commits
 
-- [ ] `docs:` Define collections scope, object grouping rules, and MVP constraints
-- [ ] `feat:` Add Drizzle schema and API endpoints for collections
-- [ ] `feat:` Extend object create and edit flows with collection assignment
-- [ ] `feat:` Add collection visibility states and enforce `private`, `unlisted`, and `public` behavior
-- [ ] `feat:` Add internal collection listing and detail page to the management workspace using Lucide `PackageOpen`
-- [ ] `feat:` Add public collection page that combines assigned public objects
-- [ ] `feat:` Add collection QR code support for public collection pages
+- [x] `docs:` Define collections scope, object grouping rules, and MVP constraints
+- [x] `feat:` Add Drizzle schema and API endpoints for collections
+- [x] `feat:` Extend object create and edit flows with collection assignment
+- [x] `feat:` Add collection visibility states and enforce `private`, `unlisted`, and `public` behavior
+- [x] `feat:` Add internal collection listing and detail page to the management workspace using Lucide `PackageOpen`
+- [x] `feat:` Add public collection page that combines assigned public objects
+- [x] `feat:` Add collection QR code support for public collection pages
 - [ ] `test:` Add backend and frontend coverage for collection creation, assignment, page rendering, and QR behavior
 - [ ] `chore:` Final UI cleanup and responsive pass for collection flows
 - [ ] `refactor:` Optional post-MVP migration from one-to-many collections to many-to-many membership
