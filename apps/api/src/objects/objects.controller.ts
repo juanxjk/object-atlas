@@ -38,8 +38,8 @@ export class ObjectsController {
   }
 
   @Get()
-  listObjects(@Query('q') searchQuery?: string) {
-    return this.objectsService.list(searchQuery);
+  listObjects(@Query('q') searchQuery?: string, @Query('collectionId') collectionId?: string) {
+    return this.objectsService.list(searchQuery, collectionId);
   }
 
   @Get(':id')

@@ -1,6 +1,6 @@
 'use client';
 
-import type { ObjectRecord } from '@object-atlas/types';
+import type { CollectionRecord, ObjectRecord } from '@object-atlas/types';
 
 import { ObjectWorkspace } from './object-workspace';
 import { themeStyles } from './theme-styles';
@@ -8,8 +8,12 @@ import { useTheme } from './theme-provider';
 import { WorkspaceNavbar } from './workspace-navbar';
 
 export function ObjectWorkspacePage({
+  initialCollectionFilter,
+  initialCollections,
   initialObjects
 }: {
+  initialCollectionFilter?: string | null;
+  initialCollections: CollectionRecord[];
   initialObjects: ObjectRecord[];
 }) {
   const { mode, themeKey } = useTheme();
@@ -53,7 +57,11 @@ export function ObjectWorkspacePage({
             </div>
 
             <div className="mt-5">
-              <ObjectWorkspace initialObjects={initialObjects} />
+              <ObjectWorkspace
+                initialCollectionFilter={initialCollectionFilter}
+                initialCollections={initialCollections}
+                initialObjects={initialObjects}
+              />
             </div>
           </div>
         </section>

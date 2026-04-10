@@ -1,14 +1,21 @@
-import type { ObjectRecord, PublicObjectRecord } from '@object-atlas/types';
+import type {
+  ObjectRecord,
+  PublicObjectRecord
+} from '@object-atlas/types';
 
 import { readJsonResponse } from './http-response';
 
 const apiBaseUrl = process.env.API_URL ?? 'http://localhost:3001';
 
-export async function getObjects(searchQuery?: string): Promise<ObjectRecord[]> {
+export async function getObjects(searchQuery?: string, collectionId?: string): Promise<ObjectRecord[]> {
   const url = new URL(`${apiBaseUrl}/api/objects`);
 
   if (searchQuery?.trim()) {
     url.searchParams.set('q', searchQuery.trim());
+  }
+
+  if (collectionId?.trim()) {
+    url.searchParams.set('collectionId', collectionId.trim());
   }
 
   const response = await fetch(url, {

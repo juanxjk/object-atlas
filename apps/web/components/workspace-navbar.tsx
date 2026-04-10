@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Home, Menu, Package2, Settings2 } from 'lucide-react';
+import { BookOpen, Home, Menu, Package2, PackageOpen, Settings2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { themeStyles } from './theme-styles';
@@ -19,6 +19,11 @@ const navigationItems = [
     href: '/objects',
     label: 'Object listing',
     icon: Package2
+  },
+  {
+    href: '/collections',
+    label: 'Collections',
+    icon: PackageOpen
   },
   {
     href: '/about',

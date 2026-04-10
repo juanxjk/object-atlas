@@ -1,3 +1,5 @@
+import type { CollectionSummary } from './collection.js';
+
 export type ObjectRecord = {
   id: string;
   publicId: string;
@@ -7,6 +9,7 @@ export type ObjectRecord = {
   tags: string[];
   primaryFileId: string | null;
   thumbnailPath: string | null;
+  collection: CollectionSummary | null;
   metadata: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
@@ -30,3 +33,8 @@ export type PublicObjectRecord = Pick<
 > & {
   media: ObjectMediaRecord[];
 };
+
+export type PublicObjectSummary = Pick<
+  ObjectRecord,
+  'id' | 'publicId' | 'title' | 'description' | 'thumbnailPath' | 'createdAt' | 'updatedAt'
+>;

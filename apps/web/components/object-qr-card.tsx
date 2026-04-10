@@ -10,11 +10,15 @@ import { useTheme } from './theme-provider';
 
 export function ObjectQrCard({
   publicId,
+  publicUrl,
   title,
+  entityLabel = 'object',
   actionSlot
 }: {
-  publicId: string;
+  publicId?: string;
+  publicUrl?: string;
   title: string;
+  entityLabel?: string;
   actionSlot?: ReactNode;
 }) {
   const { mode, themeKey } = useTheme();
@@ -24,12 +28,12 @@ export function ObjectQrCard({
   const [qrError, setQrError] = useState<string | null>(null);
 
   const publicAppUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-  const publicObjectUrl = `${publicAppUrl}/objects/${publicId}`;
+  const resolvedPublicUrl = publicUrl ?? `${publicAppUrl}/objects/${publicId}`;
 
   useEffect(() => {
     async function generateQr(): Promise<void> {
       try {
-        const dataUrl = await QRCode.toDataURL(publicObjectUrl, {
+        const dataUrl = await QRCode.toDataURL(resolvedPublicUrl, {
           margin: 1,
           width: 240,
           color: {
@@ -45,7 +49,7 @@ export function ObjectQrCard({
     }
 
     void generateQr();
-  }, [publicObjectUrl]);
+  }, [resolvedPublicUrl]);
 
   return (
     <div
@@ -68,13 +72,13 @@ export function ObjectQrCard({
             className="mt-2 font-[family-name:var(--font-display)] text-2xl"
             style={{ color: isDark ? '#f7f3ee' : '#17181d' }}
           >
-            Public object link
+            Public {entityLabel} link
           </h3>
           <p
             className="mt-2 text-sm leading-6"
             style={{ color: isDark ? 'rgba(255,255,255,0.72)' : activeTheme.cardMetaText }}
           >
-            Use this QR code on the physical object so visitors can open the public page directly.
+            Use this QR code so visitors can open the public {entityLabel} page directly.
           </p>
         </div>
 
@@ -125,7 +129,7 @@ export function ObjectQrCard({
             <Link2 size={14} strokeWidth={2.1} />
             Public URL
           </p>
-          <p className="mt-2 break-all">{publicObjectUrl}</p>
+          <p className="mt-2 break-all">{resolvedPublicUrl}</p>
         </div>
       </div>
     </div>

@@ -15,10 +15,12 @@ describe('object api helpers', () => {
 
     vi.stubGlobal('fetch', fetchMock);
 
-    await getObjects('lamp');
+    await getObjects('lamp', 'collection-1');
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock.mock.calls[0]?.[0]?.toString()).toBe('http://localhost:3001/api/objects?q=lamp');
+    expect(fetchMock.mock.calls[0]?.[0]?.toString()).toBe(
+      'http://localhost:3001/api/objects?q=lamp&collectionId=collection-1'
+    );
     expect(fetchMock.mock.calls[0]?.[1]).toEqual({ cache: 'no-store' });
   });
 
