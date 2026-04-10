@@ -106,4 +106,4 @@ If a future decision conflicts with this file, prefer the simpler path unless th
 ## Commit Convention
 
 - Always use semantic commit prefixes such as `feat`, `fix`, `refactor`, `chore`, `docs`, or `test`
-- Always add a `Co-authored-by` trailer to commits made by AI
+- Always add a `Co-authored-by: <Current Model Name> <ai@example.com>` trailer to commits made by AI, replacing `<Current Model Name>` with the active AI model building the commit
