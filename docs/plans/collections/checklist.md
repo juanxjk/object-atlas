@@ -18,8 +18,8 @@ Important rule:
 - [x] `feat:` Add internal collection listing and detail page to the management workspace using Lucide `PackageOpen`
 - [x] `feat:` Add public collection page that combines assigned public objects
 - [x] `feat:` Add collection QR code support for public collection pages
-- [ ] `test:` Add backend and frontend coverage for collection creation, assignment, page rendering, and QR behavior
-- [ ] `chore:` Final UI cleanup and responsive pass for collection flows
+- [x] `test:` Add backend and frontend coverage for collection creation, assignment, page rendering, and QR behavior
+- [x] `chore:` Final UI cleanup and responsive pass for collection flows
 - [ ] `refactor:` Optional post-MVP migration from one-to-many collections to many-to-many membership
 
 ## Notes
