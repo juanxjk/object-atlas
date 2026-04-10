@@ -1,27 +1,23 @@
+import { InferSelectModel } from 'drizzle-orm';
+
+import { objectFilesTable, filesTable } from '../database/schema';
 import { ObjectMediaRecord } from './object.types';
 
-type DatabaseObjectMediaRow = {
-  id: string;
-  object_id: string;
-  file_id: string;
-  original_filename: string;
-  storage_path: string;
-  mime_type: string;
-  size: number;
-  is_primary?: boolean;
-  created_at: Date | string;
+type DatabaseObjectMediaRow = InferSelectModel<typeof objectFilesTable> & 
+  Pick<InferSelectModel<typeof filesTable>, 'originalFilename' | 'storagePath' | 'mimeType' | 'size'> & {
+  isPrimary?: boolean;
 };
 
 export function mapObjectMediaRow(row: DatabaseObjectMediaRow): ObjectMediaRecord {
   return {
     id: row.id,
-    objectId: row.object_id,
-    fileId: row.file_id,
-    originalFilename: row.original_filename,
-    storagePath: row.storage_path,
-    mimeType: row.mime_type,
+    objectId: row.objectId,
+    fileId: row.fileId,
+    originalFilename: row.originalFilename,
+    storagePath: row.storagePath,
+    mimeType: row.mimeType,
     size: Number(row.size),
-    isPrimary: Boolean(row.is_primary),
-    createdAt: new Date(row.created_at).toISOString()
+    isPrimary: Boolean(row.isPrimary),
+    createdAt: row.createdAt.toISOString()
   };
 }

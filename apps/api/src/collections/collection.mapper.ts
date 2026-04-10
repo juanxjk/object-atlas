@@ -1,33 +1,28 @@
+import { InferSelectModel } from 'drizzle-orm';
+
+import { collectionsTable } from '../database/schema';
 import { CollectionRecord, CollectionSummary } from './collection.types';
 
-type DatabaseCollectionRow = {
-  id: string;
-  public_id: string;
-  title: string;
-  description: string | null;
-  visibility: 'private' | 'unlisted' | 'public';
-  created_at: Date | string;
-  updated_at: Date | string;
-};
+type DatabaseCollectionRow = InferSelectModel<typeof collectionsTable>;
 
 export function mapCollectionRow(row: DatabaseCollectionRow): CollectionRecord {
   return {
     id: row.id,
-    publicId: row.public_id,
+    publicId: row.publicId,
     title: row.title,
     description: row.description,
-    visibility: row.visibility,
-    createdAt: new Date(row.created_at).toISOString(),
-    updatedAt: new Date(row.updated_at).toISOString()
+    visibility: row.visibility as 'private' | 'unlisted' | 'public',
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString()
   };
 }
 
 export function mapCollectionSummary(row: DatabaseCollectionRow): CollectionSummary {
   return {
     id: row.id,
-    publicId: row.public_id,
+    publicId: row.publicId,
     title: row.title,
     description: row.description,
-    visibility: row.visibility
+    visibility: row.visibility as 'private' | 'unlisted' | 'public'
   };
 }

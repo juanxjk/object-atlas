@@ -7,12 +7,12 @@ describe('collection mapper', () => {
     it('maps a database collection row into the API shape', () => {
       const mapped = mapCollectionRow({
         id: 'c1',
-        public_id: 'pub-c1',
+        publicId: 'pub-c1',
         title: 'Rare Items',
         description: 'A collection of rare items',
         visibility: 'public',
-        created_at: '2026-04-01T00:00:00.000Z',
-        updated_at: '2026-04-02T00:00:00.000Z'
+        createdAt: new Date('2026-04-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-04-02T00:00:00.000Z')
       });
 
       expect(mapped).toEqual({
@@ -31,12 +31,12 @@ describe('collection mapper', () => {
     it('maps a database collection row into the summary shape', () => {
       const mapped = mapCollectionSummary({
         id: 'c2',
-        public_id: 'pub-c2',
+        publicId: 'pub-c2',
         title: 'Hidden Items',
         description: null,
         visibility: 'unlisted',
-        created_at: '2026-04-01T00:00:00.000Z',
-        updated_at: '2026-04-02T00:00:00.000Z'
+        createdAt: new Date('2026-04-01T00:00:00.000Z'),
+        updatedAt: new Date('2026-04-02T00:00:00.000Z')
       });
 
       expect(mapped).toEqual({

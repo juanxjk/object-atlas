@@ -2,13 +2,14 @@ import { createHash, randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 
 import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
-import { sql } from 'drizzle-orm';
+import { and, asc, desc, eq, ilike, isNull, like, sql, SQL } from 'drizzle-orm';
 import type { PublicObjectRecord } from '@object-atlas/types';
 
 import { CollectionsService } from '../collections/collections.service';
 import { ensureCollectionsSchema } from '../collections/collections.schema';
 import { FILES_LIMITS, OBJECTS_LIMITS } from '../database/schema-limits';
 import { DatabaseService } from '../database/database.service';
+import { collectionsTable, filesTable, objectFilesTable, objectsTable } from '../database/schema';
 import { STORAGE_SERVICE } from '../storage/storage.constants';
 import { StorageService } from '../storage/storage.types';
 import { mapObjectMediaRow } from './object-media.mapper';
@@ -19,47 +20,6 @@ import {
   ObjectRecord,
   UpdateObjectInput
 } from './object.types';
-
-type DatabaseObjectRow = {
-  id: string;
-  public_id: string;
-  title: string;
-  description: string | null;
-  story: string | null;
-  tags: string[] | null;
-  collection_id?: string | null;
-  collection_public_id?: string | null;
-  collection_title?: string | null;
-  collection_description?: string | null;
-  collection_visibility?: 'private' | 'unlisted' | 'public' | null;
-  primary_file_id: string | null;
-  thumbnail_path?: string | null;
-  metadata: Record<string, unknown> | null;
-  created_at: Date | string;
-  updated_at: Date | string;
-};
-
-type DatabaseObjectMediaRow = {
-  id: string;
-  object_id: string;
-  file_id: string;
-  original_filename: string;
-  storage_path: string;
-  mime_type: string;
-  size: number;
-  is_primary?: boolean;
-  created_at: Date | string;
-};
-
-type DatabaseFileRow = {
-  id: string;
-  original_filename: string;
-  storage_path: string;
-  content_hash: string | null;
-  mime_type: string;
-  size: number;
-  created_at: Date | string;
-};
 
 @Injectable()
 export class ObjectsService implements OnModuleInit {
@@ -204,50 +164,50 @@ export class ObjectsService implements OnModuleInit {
 
   private async backfillFileHashes(): Promise<void> {
     const db = this.databaseService.getDb();
-    const filesWithoutHash = await db.execute<DatabaseFileRow>(sql`
-      SELECT id, original_filename, storage_path, content_hash, mime_type, size, created_at
-      FROM files
-      WHERE content_hash IS NULL
-    `);
+    const filesWithoutHash = await db.query.filesTable.findMany({
+      where: isNull(filesTable.contentHash)
+    });
 
-    for (const file of filesWithoutHash.rows) {
+    for (const file of filesWithoutHash) {
       try {
-        const fileBuffer = await readFile(this.storageService.resolvePath(file.storage_path));
+        const fileBuffer = await readFile(this.storageService.resolvePath(file.storagePath));
         const contentHash = this.computeFileHash(fileBuffer);
 
-        await db.execute(sql`
-          UPDATE files
-          SET content_hash = ${contentHash}
-          WHERE id = ${file.id}
-        `);
+        await db.update(filesTable).set({ contentHash }).where(eq(filesTable.id, file.id));
       } catch {
         continue;
       }
     }
   }
 
-  private objectSelectSql() {
-    return sql`
-      SELECT
-        objects.*,
-        collections.id AS collection_id,
-        collections.public_id AS collection_public_id,
-        collections.title AS collection_title,
-        collections.description AS collection_description,
-        collections.visibility AS collection_visibility,
-        COALESCE(
-          primary_file.storage_path,
-          (
-            SELECT files.storage_path
-            FROM object_files
-            INNER JOIN files ON files.id = object_files.file_id
-            WHERE object_files.object_id = objects.id
-              AND files.mime_type LIKE 'image/%'
-            ORDER BY object_files.created_at ASC
-            LIMIT 1
-          )
-        ) AS thumbnail_path
-    `;
+  private getObjectsBaseQuery() {
+    const db = this.databaseService.getDb();
+    return db.select({
+      object: objectsTable,
+      collection: collectionsTable,
+      primaryFileStoragePath: filesTable.storagePath,
+      thumbnailPath: sql<string | null>`(
+        SELECT files.storage_path
+        FROM object_files
+        INNER JOIN files ON files.id = object_files.file_id
+        WHERE object_files.object_id = ${objectsTable.id}
+          AND files.mime_type LIKE 'image/%'
+        ORDER BY object_files.created_at ASC
+        LIMIT 1
+      )`
+    })
+    .from(objectsTable)
+    .leftJoin(collectionsTable, eq(objectsTable.collectionId, collectionsTable.id))
+    .leftJoin(filesTable, eq(objectsTable.primaryFileId, filesTable.id));
+  }
+
+  private mapObjectQueryResult(row: { object: any; collection: any; primaryFileStoragePath: string | null; thumbnailPath: string | null }): ObjectRecord {
+    const thumbnailPath = row.primaryFileStoragePath ?? row.thumbnailPath ?? null;
+    return mapObjectRow({
+      ...row.object,
+      thumbnailPath,
+      collection: row.collection
+    });
   }
 
   getModuleStatus() {
@@ -266,82 +226,53 @@ export class ObjectsService implements OnModuleInit {
       await this.collectionsService.ensureCollectionExists(input.collectionId);
     }
     
-    const tagsSql = input.tags && input.tags.length > 0
-      ? sql`ARRAY[${sql.join(input.tags.map(t => sql`${t}`), sql`, `)}]::VARCHAR[]`
-      : sql`ARRAY[]::VARCHAR[]`;
-
-    await db.execute<DatabaseObjectRow>(sql`
-      INSERT INTO objects (
-        id,
-        public_id,
-        title,
-        description,
-        story,
-        tags,
-        collection_id,
-        metadata
-      )
-      VALUES (
-        ${id},
-        ${publicId},
-        ${input.title},
-        ${input.description},
-        ${input.story},
-        ${tagsSql},
-        ${input.collectionId},
-        ${JSON.stringify(input.metadata ?? {})}::jsonb
-      )
-      RETURNING *, NULL::text AS thumbnail_path
-    `);
+    await db.insert(objectsTable).values({
+      id,
+      publicId,
+      title: input.title,
+      description: input.description,
+      story: input.story,
+      tags: input.tags ?? [],
+      collectionId: input.collectionId,
+      metadata: input.metadata ?? {}
+    });
 
     return this.getById(id);
   }
 
   async list(searchQuery?: string, collectionId?: string): Promise<ObjectRecord[]> {
-    const db = this.databaseService.getDb();
     const normalizedQuery = searchQuery?.trim();
-    const hasQuery = Boolean(normalizedQuery);
     const normalizedCollectionId = collectionId?.trim();
-    const hasCollectionId = Boolean(normalizedCollectionId);
 
     if (normalizedCollectionId) {
       await this.collectionsService.ensureCollectionExists(normalizedCollectionId);
     }
 
-    const result = await db.execute<DatabaseObjectRow>(sql`
-      ${this.objectSelectSql()}
-      FROM objects
-      LEFT JOIN files AS primary_file ON primary_file.id = objects.primary_file_id
-      LEFT JOIN collections ON collections.id = objects.collection_id
-      WHERE (${hasQuery ? normalizedQuery : null}::text IS NULL OR objects.title ILIKE '%' || ${
-        hasQuery ? normalizedQuery : null
-      } || '%')
-        AND (${hasCollectionId ? normalizedCollectionId : null}::uuid IS NULL OR objects.collection_id = ${
-          hasCollectionId ? normalizedCollectionId : null
-        }::uuid)
-      ORDER BY objects.updated_at DESC
-    `);
+    const conditions: SQL[] = [];
+    if (normalizedQuery) {
+      conditions.push(ilike(objectsTable.title, `%${normalizedQuery}%`));
+    }
+    if (normalizedCollectionId) {
+      conditions.push(eq(objectsTable.collectionId, normalizedCollectionId));
+    }
 
-    return result.rows.map(mapObjectRow);
+    const query = this.getObjectsBaseQuery();
+    if (conditions.length > 0) {
+      query.where(and(...conditions));
+    }
+    query.orderBy(desc(objectsTable.updatedAt));
+
+    const rows = await query;
+    return rows.map(r => this.mapObjectQueryResult(r));
   }
 
   async getById(id: string): Promise<ObjectRecord> {
-    const db = this.databaseService.getDb();
-    const result = await db.execute<DatabaseObjectRow>(sql`
-      ${this.objectSelectSql()}
-      FROM objects
-      LEFT JOIN files AS primary_file ON primary_file.id = objects.primary_file_id
-      LEFT JOIN collections ON collections.id = objects.collection_id
-      WHERE objects.id = ${id}
-    `);
-
-    const object = result.rows[0];
-
-    if (!object) {
+    const rows = await this.getObjectsBaseQuery().where(eq(objectsTable.id, id));
+    if (!rows[0]) {
       throw new NotFoundException(`object ${id} was not found`);
     }
 
-    return mapObjectRow(object);
+    return this.mapObjectQueryResult(rows[0]);
   }
 
   async update(id: string, input: UpdateObjectInput): Promise<ObjectRecord> {
@@ -360,23 +291,17 @@ export class ObjectsService implements OnModuleInit {
       await this.collectionsService.ensureCollectionExists(next.collectionId);
     }
 
-    const tagsSql = next.tags && next.tags.length > 0
-      ? sql`ARRAY[${sql.join(next.tags.map(t => sql`${t}`), sql`, `)}]::VARCHAR[]`
-      : sql`ARRAY[]::VARCHAR[]`;
-
-    await db.execute<DatabaseObjectRow>(sql`
-      UPDATE objects
-      SET
-        title = ${next.title},
-        description = ${next.description},
-        story = ${next.story},
-        tags = ${tagsSql},
-        collection_id = ${next.collectionId},
-        metadata = ${JSON.stringify(next.metadata ?? {})}::jsonb,
-        updated_at = NOW()
-      WHERE id = ${id}
-      RETURNING *, ${current.thumbnailPath}::text AS thumbnail_path
-    `);
+    await db.update(objectsTable)
+      .set({
+        title: next.title,
+        description: next.description,
+        story: next.story,
+        tags: next.tags ?? [],
+        collectionId: next.collectionId,
+        metadata: next.metadata ?? {},
+        updatedAt: new Date()
+      })
+      .where(eq(objectsTable.id, id));
 
     return this.getById(id);
   }
@@ -390,10 +315,7 @@ export class ObjectsService implements OnModuleInit {
       await this.deleteMedia(id, item.id);
     }
 
-    await db.execute(sql`
-      DELETE FROM objects
-      WHERE id = ${id}
-    `);
+    await db.delete(objectsTable).where(eq(objectsTable.id, id));
   }
 
   async addMedia(
@@ -409,17 +331,14 @@ export class ObjectsService implements OnModuleInit {
     const object = await this.getById(objectId);
     const contentHash = this.computeFileHash(file.buffer);
 
-    const existingFileResult = await db.execute<DatabaseFileRow>(sql`
-      SELECT id, original_filename, storage_path, content_hash, mime_type, size, created_at
-      FROM files
-      WHERE content_hash = ${contentHash}
-      LIMIT 1
-    `);
+    const existingFileResult = await db.query.filesTable.findFirst({
+      where: eq(filesTable.contentHash, contentHash)
+    });
 
-    let fileId = existingFileResult.rows[0]?.id ?? null;
-    let storagePath = existingFileResult.rows[0]?.storage_path ?? null;
-    let mimeType = existingFileResult.rows[0]?.mime_type ?? file.mimetype;
-    let size = existingFileResult.rows[0]?.size ?? file.size;
+    let fileId = existingFileResult?.id ?? null;
+    let storagePath = existingFileResult?.storagePath ?? null;
+    let mimeType = existingFileResult?.mimeType ?? file.mimetype;
+    let size = existingFileResult?.size ?? file.size;
     const mediaId = randomUUID();
 
     if (!fileId || !storagePath) {
@@ -435,75 +354,45 @@ export class ObjectsService implements OnModuleInit {
       mimeType = file.mimetype;
       size = file.size;
 
-      await db.execute(sql`
-        INSERT INTO files (
-          id,
-          original_filename,
-          storage_path,
-          content_hash,
-          mime_type,
-          size
-        )
-        VALUES (
-          ${fileId},
-          ${file.originalname},
-          ${storagePath},
-          ${contentHash},
-          ${mimeType},
-          ${size}
-        )
-      `);
+      await db.insert(filesTable).values({
+        id: fileId,
+        originalFilename: file.originalname,
+        storagePath,
+        contentHash,
+        mimeType,
+        size
+      });
     }
 
-    const relation = await db.execute<
-      Pick<DatabaseObjectMediaRow, 'id' | 'object_id' | 'file_id' | 'created_at'>
-    >(sql`
-      INSERT INTO object_files (
-        id,
-        object_id,
-        file_id
-      )
-      VALUES (
-        ${mediaId},
-        ${objectId},
-        ${fileId}
-      )
-      ON CONFLICT (object_id, file_id) DO NOTHING
-      RETURNING id, object_id, file_id, created_at
-    `);
+    await db.insert(objectFilesTable).values({
+      id: mediaId,
+      objectId,
+      fileId
+    }).onConflictDoNothing();
 
-    const resolvedRelation =
-      relation.rows[0] ??
-      (
-        await db.execute<
-          Pick<DatabaseObjectMediaRow, 'id' | 'object_id' | 'file_id' | 'created_at'>
-        >(sql`
-          SELECT id, object_id, file_id, created_at
-          FROM object_files
-          WHERE object_id = ${objectId}
-            AND file_id = ${fileId}
-          LIMIT 1
-        `)
-      ).rows[0];
+    const relation = await db.query.objectFilesTable.findFirst({
+      where: and(eq(objectFilesTable.objectId, objectId), eq(objectFilesTable.fileId, fileId))
+    });
+
+    if (!relation) {
+      throw new Error('Failed to resolve object relation with file');
+    }
 
     const shouldBecomePrimary = !object.primaryFileId && mimeType.startsWith('image/');
 
     if (shouldBecomePrimary) {
-      await db.execute(sql`
-        UPDATE objects
-        SET primary_file_id = ${fileId},
-            updated_at = NOW()
-        WHERE id = ${objectId}
-      `);
+      await db.update(objectsTable)
+        .set({ primaryFileId: fileId, updatedAt: new Date() })
+        .where(eq(objectsTable.id, objectId));
     }
 
     return mapObjectMediaRow({
-      ...resolvedRelation,
-      original_filename: existingFileResult.rows[0]?.original_filename ?? file.originalname,
-      storage_path: storagePath,
-      mime_type: mimeType,
+      ...relation,
+      originalFilename: existingFileResult?.originalFilename ?? file.originalname,
+      storagePath,
+      mimeType,
       size,
-      is_primary: shouldBecomePrimary
+      isPrimary: shouldBecomePrimary
     });
   }
 
@@ -511,60 +400,54 @@ export class ObjectsService implements OnModuleInit {
     const db = this.databaseService.getDb();
     await this.getById(objectId);
 
-    const result = await db.execute<DatabaseObjectMediaRow>(sql`
-      SELECT
-        object_files.id,
-        object_files.object_id,
-        object_files.file_id,
-        files.original_filename,
-        files.storage_path,
-        files.mime_type,
-        files.size,
-        object_files.created_at,
-        (objects.primary_file_id = object_files.file_id) AS is_primary
-      FROM object_files
-      INNER JOIN files ON files.id = object_files.file_id
-      INNER JOIN objects ON objects.id = object_files.object_id
-      WHERE object_files.object_id = ${objectId}
-      ORDER BY object_files.created_at DESC
-    `);
+    const result = await db.select({
+      objectFile: objectFilesTable,
+      file: filesTable,
+      isPrimary: sql<boolean>`(${objectsTable.primaryFileId} = ${objectFilesTable.fileId})`
+    })
+    .from(objectFilesTable)
+    .innerJoin(filesTable, eq(filesTable.id, objectFilesTable.fileId))
+    .innerJoin(objectsTable, eq(objectsTable.id, objectFilesTable.objectId))
+    .where(eq(objectFilesTable.objectId, objectId))
+    .orderBy(desc(objectFilesTable.createdAt));
 
-    return result.rows.map(mapObjectMediaRow);
+    return result.map(r => mapObjectMediaRow({
+      ...r.objectFile,
+      originalFilename: r.file.originalFilename,
+      storagePath: r.file.storagePath,
+      mimeType: r.file.mimeType,
+      size: r.file.size,
+      isPrimary: r.isPrimary
+    }));
   }
 
   async setPrimaryMedia(objectId: string, mediaId: string): Promise<ObjectRecord> {
     const db = this.databaseService.getDb();
     await this.getById(objectId);
 
-    const result = await db.execute<{
-      file_id: string;
-      mime_type: string;
-      storage_path: string;
-    }>(sql`
-      SELECT object_files.file_id, files.mime_type, files.storage_path
-      FROM object_files
-      INNER JOIN files ON files.id = object_files.file_id
-      WHERE object_files.id = ${mediaId}
-        AND object_files.object_id = ${objectId}
-    `);
+    const rows = await db.select({
+      fileId: objectFilesTable.fileId,
+      mimeType: filesTable.mimeType,
+      storagePath: filesTable.storagePath
+    })
+    .from(objectFilesTable)
+    .innerJoin(filesTable, eq(filesTable.id, objectFilesTable.fileId))
+    .where(and(eq(objectFilesTable.id, mediaId), eq(objectFilesTable.objectId, objectId)))
+    .limit(1);
 
-    const media = result.rows[0];
+    const media = rows[0];
 
     if (!media) {
       throw new NotFoundException(`media ${mediaId} was not found for object ${objectId}`);
     }
 
-    if (!media.mime_type.startsWith('image/')) {
+    if (!media.mimeType.startsWith('image/')) {
       throw new NotFoundException(`media ${mediaId} is not an image`);
     }
 
-    await db.execute<DatabaseObjectRow>(sql`
-      UPDATE objects
-      SET primary_file_id = ${media.file_id},
-          updated_at = NOW()
-      WHERE id = ${objectId}
-      RETURNING *, ${media.storage_path}::text AS thumbnail_path
-    `);
+    await db.update(objectsTable)
+      .set({ primaryFileId: media.fileId, updatedAt: new Date() })
+      .where(eq(objectsTable.id, objectId));
 
     return this.getById(objectId);
   }
@@ -573,93 +456,64 @@ export class ObjectsService implements OnModuleInit {
     const db = this.databaseService.getDb();
     await this.getById(objectId);
 
-    const mediaResult = await db.execute<{
-      file_id: string;
-      storage_path: string;
-      is_primary: boolean;
-    }>(sql`
-      SELECT
-        object_files.file_id,
-        files.storage_path,
-        (objects.primary_file_id = object_files.file_id) AS is_primary
-      FROM object_files
-      INNER JOIN files ON files.id = object_files.file_id
-      INNER JOIN objects ON objects.id = object_files.object_id
-      WHERE object_files.id = ${mediaId}
-        AND object_files.object_id = ${objectId}
-    `);
+    const mediaResult = await db.select({
+      fileId: objectFilesTable.fileId,
+      storagePath: filesTable.storagePath,
+      isPrimary: sql<boolean>`(${objectsTable.primaryFileId} = ${objectFilesTable.fileId})`
+    })
+    .from(objectFilesTable)
+    .innerJoin(filesTable, eq(filesTable.id, objectFilesTable.fileId))
+    .innerJoin(objectsTable, eq(objectsTable.id, objectFilesTable.objectId))
+    .where(and(eq(objectFilesTable.id, mediaId), eq(objectFilesTable.objectId, objectId)))
+    .limit(1);
 
-    const media = mediaResult.rows[0];
+    const media = mediaResult[0];
 
     if (!media) {
       throw new NotFoundException(`media ${mediaId} was not found for object ${objectId}`);
     }
 
-    await db.execute(sql`
-      DELETE FROM object_files
-      WHERE id = ${mediaId}
-    `);
+    await db.delete(objectFilesTable).where(eq(objectFilesTable.id, mediaId));
 
-    const remainingReferences = await db.execute<{ reference_count: number }>(sql`
-      SELECT COUNT(*)::int AS reference_count
-      FROM object_files
-      WHERE file_id = ${media.file_id}
-    `);
+    const remainingReferences = await db.select({
+      referenceCount: sql<number>`cast(count(*) as int)`
+    })
+    .from(objectFilesTable)
+    .where(eq(objectFilesTable.fileId, media.fileId));
 
-    if (remainingReferences.rows[0]?.reference_count === 0) {
-      await db.execute(sql`
-        DELETE FROM files
-        WHERE id = ${media.file_id}
-      `);
-
-      await this.storageService.delete(media.storage_path);
+    if (remainingReferences[0]?.referenceCount === 0) {
+      await db.delete(filesTable).where(eq(filesTable.id, media.fileId));
+      await this.storageService.delete(media.storagePath);
     }
 
-    if (media.is_primary) {
-      const nextPrimary = await db.execute<{ file_id: string | null }>(sql`
-        SELECT object_files.file_id
-        FROM object_files
-        INNER JOIN files ON files.id = object_files.file_id
-        WHERE object_files.object_id = ${objectId}
-          AND files.mime_type LIKE 'image/%'
-        ORDER BY object_files.created_at ASC
-        LIMIT 1
-      `);
+    if (media.isPrimary) {
+      const nextPrimary = await db.select({ fileId: objectFilesTable.fileId })
+        .from(objectFilesTable)
+        .innerJoin(filesTable, eq(filesTable.id, objectFilesTable.fileId))
+        .where(and(eq(objectFilesTable.objectId, objectId), like(filesTable.mimeType, 'image/%')))
+        .orderBy(asc(objectFilesTable.createdAt))
+        .limit(1);
 
-      await db.execute(sql`
-        UPDATE objects
-        SET primary_file_id = ${nextPrimary.rows[0]?.file_id ?? null},
-            updated_at = NOW()
-        WHERE id = ${objectId}
-      `);
+      await db.update(objectsTable)
+        .set({ primaryFileId: nextPrimary[0]?.fileId ?? null, updatedAt: new Date() })
+        .where(eq(objectsTable.id, objectId));
     } else {
-      await db.execute(sql`
-        UPDATE objects
-        SET updated_at = NOW()
-        WHERE id = ${objectId}
-      `);
+      await db.update(objectsTable)
+        .set({ updatedAt: new Date() })
+        .where(eq(objectsTable.id, objectId));
     }
 
     return this.getById(objectId);
   }
 
   async getByPublicId(publicId: string): Promise<ObjectRecord> {
-    const db = this.databaseService.getDb();
-    const result = await db.execute<DatabaseObjectRow>(sql`
-      ${this.objectSelectSql()}
-      FROM objects
-      LEFT JOIN files AS primary_file ON primary_file.id = objects.primary_file_id
-      LEFT JOIN collections ON collections.id = objects.collection_id
-      WHERE objects.public_id = ${publicId}
-    `);
+    const rows = await this.getObjectsBaseQuery().where(eq(objectsTable.publicId, publicId)).limit(1);
 
-    const object = result.rows[0];
-
-    if (!object) {
+    if (!rows[0]) {
       throw new NotFoundException(`public object ${publicId} was not found`);
     }
 
-    return mapObjectRow(object);
+    return this.mapObjectQueryResult(rows[0]);
   }
 
   async getPublicObject(publicId: string): Promise<PublicObjectRecord> {

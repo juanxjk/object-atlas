@@ -6,21 +6,20 @@ describe('mapObjectRow', () => {
   it('maps a database object row into the API shape', () => {
     const mapped = mapObjectRow({
       id: '1',
-      public_id: 'public-1',
+      publicId: 'public-1',
       title: 'Archive box',
       description: 'Storage box',
       story: 'Used in the first office',
       tags: ['archive', 'office'],
-      collection_id: null,
-      collection_public_id: null,
-      collection_title: null,
-      collection_description: null,
-      collection_visibility: null,
+      primaryFileId: null,
+      thumbnailPath: null,
+      collectionId: null,
+      collection: null,
       metadata: {
         shelf: 'A-2'
       },
-      created_at: '2026-04-01T00:00:00.000Z',
-      updated_at: '2026-04-02T00:00:00.000Z'
+      createdAt: new Date('2026-04-01T00:00:00.000Z'),
+      updatedAt: new Date('2026-04-02T00:00:00.000Z')
     });
 
     expect(mapped).toEqual({

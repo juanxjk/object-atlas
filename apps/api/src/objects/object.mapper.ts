@@ -1,49 +1,35 @@
+import { InferSelectModel } from 'drizzle-orm';
+
+import { collectionsTable, objectsTable } from '../database/schema';
 import { ObjectRecord } from './object.types';
 
-type DatabaseObjectRow = {
-  id: string;
-  public_id: string;
-  title: string;
-  description: string | null;
-  story: string | null;
-  tags?: string[] | null;
-  primary_file_id?: string | null;
-  thumbnail_path?: string | null;
-  collection_id?: string | null;
-  collection_public_id?: string | null;
-  collection_title?: string | null;
-  collection_description?: string | null;
-  collection_visibility?: 'private' | 'unlisted' | 'public' | null;
-  metadata: Record<string, unknown> | null;
-  created_at: Date | string;
-  updated_at: Date | string;
+type DatabaseObjectRow = InferSelectModel<typeof objectsTable> & {
+  thumbnailPath?: string | null;
+  collection?: InferSelectModel<typeof collectionsTable> | null;
 };
 
 export function mapObjectRow(row: DatabaseObjectRow): ObjectRecord {
   return {
     id: row.id,
-    publicId: row.public_id,
+    publicId: row.publicId,
     title: row.title,
     description: row.description,
     story: row.story,
     tags: row.tags ?? [],
-    primaryFileId: row.primary_file_id ?? null,
-    thumbnailPath: row.thumbnail_path ?? null,
+    primaryFileId: row.primaryFileId ?? null,
+    thumbnailPath: row.thumbnailPath ?? null,
     collection:
-      row.collection_id &&
-      row.collection_public_id &&
-      row.collection_title &&
-      row.collection_visibility
+      row.collection
         ? {
-            id: row.collection_id,
-            publicId: row.collection_public_id,
-            title: row.collection_title,
-            description: row.collection_description ?? null,
-            visibility: row.collection_visibility
+            id: row.collection.id,
+            publicId: row.collection.publicId,
+            title: row.collection.title,
+            description: row.collection.description ?? null,
+            visibility: row.collection.visibility as 'private' | 'unlisted' | 'public'
           }
         : null,
     metadata: row.metadata ?? {},
-    createdAt: new Date(row.created_at).toISOString(),
-    updatedAt: new Date(row.updated_at).toISOString()
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString()
   };
 }
