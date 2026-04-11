@@ -6,6 +6,20 @@ ObjectAtlas is designed for the web, but with a phone-first mindset. The experie
 
 This project is being built with AI-assisted code generation under human guidance. The goal is to use AI to accelerate the base implementation while keeping product direction, technical decisions, and review visible and intentional.
 
+## ‼️ Experimental AI-assisted Project
+
+```
+This is a experimental project made by AI-assisted code generation under human guidance.
+The goal is to use AI to accelerate the base implementation while keeping product direction, technical decisions, and review visible and intentional.
+Some code may appear broken or incomplete, and there may be inconsistencies or areas that need further development.
+
+The project is under alpha stage development, so it is not yet ready for production use,
+the database schema and API are expected to change, and there may be bugs or security issues.
+
+The code is provided as-is without warranty, and the project is licensed under MIT.
+Use at your own risk, and please contribute improvements or report issues if you find any.
+```
+
 ---
 
 ## ✨ Features
