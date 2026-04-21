@@ -9,9 +9,15 @@ import { readJsonResponse } from './http-response';
 const apiBaseUrl = process.env.API_URL ?? 'http://localhost:3001';
 
 export async function getCollections(): Promise<CollectionRecord[]> {
-  const response = await fetch(`${apiBaseUrl}/api/collections`, {
-    cache: 'no-store'
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${apiBaseUrl}/api/collections`, {
+      cache: 'no-store'
+    });
+  } catch {
+    return [];
+  }
 
   if (!response.ok) {
     return [];
@@ -25,9 +31,15 @@ export async function getCollections(): Promise<CollectionRecord[]> {
 }
 
 export async function getCollection(id: string): Promise<CollectionWithObjectsRecord | null> {
-  const response = await fetch(`${apiBaseUrl}/api/collections/${id}`, {
-    cache: 'no-store'
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${apiBaseUrl}/api/collections/${id}`, {
+      cache: 'no-store'
+    });
+  } catch {
+    return null;
+  }
 
   if (!response.ok) {
     return null;
@@ -41,9 +53,15 @@ export async function getCollection(id: string): Promise<CollectionWithObjectsRe
 }
 
 export async function getPublicCollection(publicId: string): Promise<PublicCollectionRecord | null> {
-  const response = await fetch(`${apiBaseUrl}/api/public/collections/${publicId}`, {
-    cache: 'no-store'
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${apiBaseUrl}/api/public/collections/${publicId}`, {
+      cache: 'no-store'
+    });
+  } catch {
+    return null;
+  }
 
   if (!response.ok) {
     return null;

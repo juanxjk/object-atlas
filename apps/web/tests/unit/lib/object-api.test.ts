@@ -33,4 +33,13 @@ describe('object api helpers', () => {
 
     await expect(getPublicObject('missing')).resolves.toBeNull();
   });
+
+  it('returns fallback values when fetch throws', async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new Error('offline'));
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(getObjects()).resolves.toEqual([]);
+    await expect(getPublicObject('missing')).resolves.toBeNull();
+  });
 });

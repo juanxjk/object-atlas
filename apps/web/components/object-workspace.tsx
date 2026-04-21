@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  Download,
   ExternalLink,
   ImageIcon,
   Pencil,
@@ -14,18 +15,23 @@ import {
   ZoomIn,
   ZoomOut
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { Dialog } from '@base-ui/react/dialog';
 import type { CollectionRecord, ObjectMediaRecord, ObjectRecord } from '@object-atlas/types';
 
-import { ObjectQrCard } from './object-qr-card';
 import { themeStyles } from './theme-styles';
 import { useTheme } from './theme-provider';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
-import { readErrorMessage, readJsonResponse } from '../lib/http-response';
+import { createLocalObjectRecord, updateLocalObjectRecord } from '../lib/local-session/session';
+import { clearLocalSessionSnapshot, loadOrCreateLocalSessionSnapshot, saveLocalSessionSnapshot } from '../lib/local-session/store';
+import {
+  createLocalSessionSnapshot,
+  parseLocalSession,
+  serializeLocalSession
+} from '../lib/local-session/serialization';
 import { filterObjectsByTitle } from '../lib/object-search';
 
 type ObjectFormState = {
@@ -54,25 +60,6 @@ const fieldLimits = {
 } as const;
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
-const publicAppUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
-
-async function requestObject<T>(
-  path: string,
-  options?: RequestInit
-): Promise<T> {
-  const response = await fetch(`${apiBaseUrl}${path}`, {
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    ...options
-  });
-
-  if (!response.ok) {
-    throw new Error(await readErrorMessage(response));
-  }
-
-  return await readJsonResponse<T>(response);
-}
 
 function toFormState(object: ObjectRecord): ObjectFormState {
   return {
@@ -90,10 +77,6 @@ function getThumbnailUrl(thumbnailPath: string | null): string | null {
   }
 
   return `${apiBaseUrl}/uploads/${thumbnailPath}`;
-}
-
-function getPublicObjectUrl(publicId: string): string {
-  return `${publicAppUrl}/objects/${publicId}`;
 }
 
 function parseTagsInput(value: string): string[] {
@@ -121,14 +104,21 @@ export function ObjectWorkspace({
   const { mode, themeKey } = useTheme();
   const activeTheme = themeStyles[themeKey];
   const isDark = mode === 'dark';
+  const importInputRef = useRef<HTMLInputElement | null>(null);
   const [mobileView, setMobileView] = useState<'list' | 'editor'>(
     initialObjects[0]?.id ? 'editor' : 'list'
   );
   const [objects, setObjects] = useState<ObjectRecord[]>(initialObjects);
-  const [collections] = useState<CollectionRecord[]>(initialCollections);
+  const [collections, setCollections] = useState<CollectionRecord[]>(initialCollections);
   const [createFormState, setCreateFormState] = useState<ObjectFormState>(emptyFormState);
   const [editFormState, setEditFormState] = useState<ObjectFormState>(emptyFormState);
   const [selectedId, setSelectedId] = useState<string | null>(initialObjects[0]?.id ?? null);
+  const [sessionCreatedAt, setSessionCreatedAt] = useState<string | null>(null);
+  const [sessionMessage, setSessionMessage] = useState<{
+    tone: 'error' | 'info' | 'success';
+    text: string;
+  } | null>(null);
+  const [isSessionReady, setIsSessionReady] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -137,7 +127,6 @@ export function ObjectWorkspace({
   const [isEditingFromModal, setIsEditingFromModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
-  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
@@ -176,30 +165,41 @@ export function ObjectWorkspace({
   const modalHelperText = isDark ? 'rgba(255,255,255,0.58)' : activeTheme.cardMetaText;
 
   useEffect(() => {
-    async function loadMedia(): Promise<void> {
-      if (!selectedId) {
-        setMediaItems([]);
-        setMediaError(null);
-        return;
-      }
+    const { snapshot, source } = loadOrCreateLocalSessionSnapshot({
+      seedCollections: initialCollections,
+      seedObjects: initialObjects
+    });
 
-      setIsLoadingMedia(true);
-      setMediaError(null);
+    setCollections(snapshot.collections);
+    setSessionCreatedAt(snapshot.meta.createdAt);
+    setObjects(snapshot.objects);
+    setSelectedId(snapshot.objects[0]?.id ?? null);
+    setMobileView(snapshot.objects[0]?.id ? 'editor' : 'list');
+    setMediaItems([]);
+    setMediaError(null);
+    setIsSessionReady(true);
 
-      try {
-        const items = await requestObject<ObjectMediaRecord[]>(`/api/objects/${selectedId}/media`);
-        setMediaItems(items);
-      } catch (requestError) {
-        setMediaError(
-          requestError instanceof Error ? requestError.message : 'Unable to load attachments'
-        );
-      } finally {
-        setIsLoadingMedia(false);
-      }
+    if (source === 'seed') {
+      setSessionMessage({
+        text: 'Local session initialized from the available starting data for this workspace.',
+        tone: 'info'
+      });
+    }
+  }, [initialCollections, initialObjects]);
+
+  useEffect(() => {
+    if (!isSessionReady) {
+      return;
     }
 
-    void loadMedia();
-  }, [selectedId]);
+    saveLocalSessionSnapshot(
+      createLocalSessionSnapshot({
+        collections,
+        createdAt: sessionCreatedAt ?? undefined,
+        objects
+      })
+    );
+  }, [collections, isSessionReady, objects, sessionCreatedAt]);
 
   const handleSelect = (object: ObjectRecord) => {
     setSelectedId(object.id);
@@ -225,14 +225,22 @@ export function ObjectWorkspace({
     setCreateError(null);
 
     try {
-      const created = await requestObject<ObjectRecord>('/api/objects', {
-        method: 'POST',
-        body: JSON.stringify({
-          ...createFormState,
+      const title = createFormState.title.trim();
+
+      if (!title) {
+        throw new Error('Title is required');
+      }
+
+      const created = createLocalObjectRecord(
+        {
+          collectionId: createFormState.collectionId || null,
+          description: createFormState.description,
+          story: createFormState.story,
           tags: parseTagsInput(createFormState.tags),
-          collectionId: createFormState.collectionId || null
-        })
-      });
+          title
+        },
+        collections
+      );
 
       setObjects((current) => [created, ...current]);
       setSelectedId(created.id);
@@ -241,6 +249,10 @@ export function ObjectWorkspace({
       setMobileView('editor');
       setIsCreateModalOpen(false);
       setCreateFormState(emptyFormState);
+      setSessionMessage({
+        text: `Saved "${created.title}" to this local session.`,
+        tone: 'success'
+      });
     } catch (requestError) {
       setCreateError(
         requestError instanceof Error ? requestError.message : 'Unable to create object'
@@ -257,46 +269,11 @@ export function ObjectWorkspace({
       return;
     }
 
-    setIsUploadingMedia(true);
     setMediaError(null);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const response = await fetch(`${apiBaseUrl}/api/objects/${selectedId}/media`, {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) {
-        throw new Error(await readErrorMessage(response));
-      }
-
-      const uploaded = await readJsonResponse<ObjectMediaRecord>(response);
-      setMediaItems((current) => [uploaded, ...current]);
-      if (uploaded.mimeType.startsWith('image/')) {
-        setObjects((current) =>
-          current.map((object) =>
-            object.id === selectedId
-              ? {
-                  ...object,
-                  primaryFileId: uploaded.isPrimary ? uploaded.fileId : object.primaryFileId,
-                  thumbnailPath:
-                    uploaded.isPrimary || !object.thumbnailPath
-                      ? uploaded.storagePath
-                      : object.thumbnailPath
-                }
-              : object
-          )
-        );
-      }
-      event.target.value = '';
-    } catch (requestError) {
-      setMediaError(requestError instanceof Error ? requestError.message : 'Unable to upload media');
-    } finally {
-      setIsUploadingMedia(false);
-    }
+    setMediaError(
+      `"${file.name}" was not uploaded. Attachments are not available in local-session mode yet.`
+    );
+    event.target.value = '';
   };
 
   const handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -310,14 +287,27 @@ export function ObjectWorkspace({
     setEditError(null);
 
     try {
-      const updated = await requestObject<ObjectRecord>(`/api/objects/${editingObjectId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({
-          ...editFormState,
+      const title = editFormState.title.trim();
+
+      if (!title) {
+        throw new Error('Title is required');
+      }
+
+      if (!editingObject) {
+        throw new Error('Object not found in this local session');
+      }
+
+      const updated = updateLocalObjectRecord(
+        editingObject,
+        {
+          collectionId: editFormState.collectionId || null,
+          description: editFormState.description,
+          story: editFormState.story,
           tags: parseTagsInput(editFormState.tags),
-          collectionId: editFormState.collectionId || null
-        })
-      });
+          title
+        },
+        collections
+      );
 
       setObjects((current) =>
         current.map((object) => (object.id === updated.id ? updated : object))
@@ -326,6 +316,10 @@ export function ObjectWorkspace({
       setIsEditModalOpen(false);
       setEditingObjectId(null);
       setMobileView('editor');
+      setSessionMessage({
+        text: `Saved updates to "${updated.title}" in this local session.`,
+        tone: 'success'
+      });
     } catch (requestError) {
       setEditError(requestError instanceof Error ? requestError.message : 'Unable to save object');
     } finally {
@@ -344,15 +338,23 @@ export function ObjectWorkspace({
     setIsDeleting(true);
     setEditError(null);
     try {
-      await requestObject(`/api/objects/${objectId}`, { method: 'DELETE' });
+      const deletedObject = objects.find((object) => object.id === objectId);
+
       setObjects((current) => current.filter((o) => o.id !== objectId));
       if (selectedId === objectId) {
-        setSelectedId(null);
-        setMobileView('list');
+        const nextSelectedId = objects.find((object) => object.id !== objectId)?.id ?? null;
+        setSelectedId(nextSelectedId);
+        setMobileView(nextSelectedId ? 'editor' : 'list');
       }
       setIsEditModalOpen(false);
       setEditingObjectId(null);
       setDeleteTargetId(null);
+      setSessionMessage({
+        text: deletedObject
+          ? `Removed "${deletedObject.title}" from this local session.`
+          : 'Removed the object from this local session.',
+        tone: 'success'
+      });
     } catch (requestError) {
       setEditError(requestError instanceof Error ? requestError.message : 'Unable to delete object');
       setDeleteTargetId(null);
@@ -366,28 +368,7 @@ export function ObjectWorkspace({
       return;
     }
 
-    try {
-      const updated = await requestObject<ObjectRecord>(
-        `/api/objects/${selectedId}/primary-media/${mediaItem.id}`,
-        {
-          method: 'PATCH'
-        }
-      );
-
-      setObjects((current) =>
-        current.map((object) => (object.id === updated.id ? updated : object))
-      );
-      setMediaItems((current) =>
-        current.map((item) => ({
-          ...item,
-          isPrimary: item.id === mediaItem.id
-        }))
-      );
-    } catch (requestError) {
-      setMediaError(
-        requestError instanceof Error ? requestError.message : 'Unable to set main image'
-      );
-    }
+    setMediaError('Main-image changes are not available in local-session mode yet.');
   };
 
   const handleDeleteMedia = async (mediaItem: ObjectMediaRecord) => {
@@ -398,25 +379,8 @@ export function ObjectWorkspace({
     setDeletingMediaId(mediaItem.id);
     setMediaError(null);
 
-    try {
-      const updated = await requestObject<ObjectRecord>(
-        `/api/objects/${selectedId}/media/${mediaItem.id}`,
-        {
-          method: 'DELETE'
-        }
-      );
-
-      setObjects((current) =>
-        current.map((object) => (object.id === updated.id ? updated : object))
-      );
-      setMediaItems((current) => current.filter((item) => item.id !== mediaItem.id));
-    } catch (requestError) {
-      setMediaError(
-        requestError instanceof Error ? requestError.message : 'Unable to remove attachment'
-      );
-    } finally {
-      setDeletingMediaId(null);
-    }
+    setMediaError('Attachment removal is not available in local-session mode yet.');
+    setDeletingMediaId(null);
   };
 
   const handleOpenPreview = (mediaItem: ObjectMediaRecord) => {
@@ -429,8 +393,171 @@ export function ObjectWorkspace({
     setPreviewZoom(1);
   };
 
+  const handleExportSession = () => {
+    const serializedSession = serializeLocalSession(
+      createLocalSessionSnapshot({
+        collections,
+        createdAt: sessionCreatedAt ?? undefined,
+        objects
+      })
+    );
+    const sessionBlob = new Blob([serializedSession], {
+      type: 'application/json'
+    });
+    const sessionUrl = window.URL.createObjectURL(sessionBlob);
+    const link = document.createElement('a');
+    const exportDate = new Date().toISOString().slice(0, 10);
+
+    link.href = sessionUrl;
+    link.download = `object-atlas-local-session-${exportDate}.json`;
+    link.click();
+    window.URL.revokeObjectURL(sessionUrl);
+
+    setSessionMessage({
+      text: 'Exported the current local session to a file.',
+      tone: 'success'
+    });
+  };
+
+  const handleImportClick = () => {
+    importInputRef.current?.click();
+  };
+
+  const handleImportSession = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      const serializedSession = await file.text();
+      const snapshot = parseLocalSession(serializedSession);
+
+      setCollections(snapshot.collections);
+      setObjects(snapshot.objects);
+      setSessionCreatedAt(snapshot.meta.createdAt);
+      setSearchQuery('');
+      setSelectedCollectionFilter(null);
+      setSelectedTagFilter(null);
+      setSelectedId(snapshot.objects[0]?.id ?? null);
+      setMobileView(snapshot.objects[0]?.id ? 'editor' : 'list');
+      setMediaItems([]);
+      setMediaError(null);
+      setSessionMessage({
+        text: `Imported "${file.name}" into this local session.`,
+        tone: 'success'
+      });
+    } catch (error) {
+      setSessionMessage({
+        text: error instanceof Error ? error.message : 'Unable to import the selected file.',
+        tone: 'error'
+      });
+    } finally {
+      event.target.value = '';
+    }
+  };
+
+  const handleResetSession = () => {
+    clearLocalSessionSnapshot();
+    setCollections(initialCollections);
+    setObjects([]);
+    setSessionCreatedAt(new Date().toISOString());
+    setSearchQuery('');
+    setSelectedCollectionFilter(initialCollectionFilter ?? null);
+    setSelectedTagFilter(null);
+    setSelectedId(null);
+    setMobileView('list');
+    setMediaItems([]);
+    setMediaError(null);
+    setSessionMessage({
+      text: 'Cleared the current local session on this browser.',
+      tone: 'success'
+    });
+  };
+
   return (
     <section className="space-y-4">
+      <div
+        className="rounded-2xl border px-4 py-4"
+        style={{
+          backgroundColor: workspaceSectionBg,
+          borderColor: workspacePanelBorder,
+          color: workspacePrimaryText
+        }}
+      >
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p
+              className="text-xs font-semibold uppercase tracking-[0.16em]"
+              style={{ color: activeTheme.accent }}
+            >
+              Local session
+            </p>
+            <p className="mt-2 text-sm leading-6" style={{ color: workspaceMutedText }}>
+              Records in this workspace are stored in this browser. Export to a file if you want a
+              portable backup, or import a saved local-session file to restore it here.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              ref={importInputRef}
+              type="file"
+              accept="application/json"
+              onChange={handleImportSession}
+              className="hidden"
+            />
+            <Button type="button" onClick={handleExportSession} variant="secondary">
+              <Download size={16} strokeWidth={2.1} />
+              Export file
+            </Button>
+            <Button type="button" onClick={handleImportClick} variant="secondary">
+              <Upload size={16} strokeWidth={2.1} />
+              Import file
+            </Button>
+            <Button type="button" onClick={handleResetSession} variant="danger">
+              <Trash2 size={16} strokeWidth={2.1} />
+              Reset session
+            </Button>
+          </div>
+        </div>
+
+        {sessionMessage ? (
+          <div
+            className="mt-4 rounded-2xl border px-4 py-3 text-sm"
+            style={{
+              backgroundColor:
+                sessionMessage.tone === 'error'
+                  ? isDark
+                    ? 'rgba(248, 81, 73, 0.12)'
+                    : '#fff5f5'
+                  : sessionMessage.tone === 'success'
+                    ? isDark
+                      ? 'rgba(78, 163, 107, 0.16)'
+                      : '#edf5ef'
+                    : isDark
+                      ? activeTheme.metricsPanel
+                      : activeTheme.badgeBg,
+              borderColor:
+                sessionMessage.tone === 'error'
+                  ? isDark
+                    ? 'rgba(248, 81, 73, 0.35)'
+                    : '#f3b7bd'
+                  : workspacePanelBorder,
+              color:
+                sessionMessage.tone === 'error'
+                  ? '#d1242f'
+                  : sessionMessage.tone === 'success'
+                    ? '#1e6b37'
+                    : workspacePrimaryText
+            }}
+          >
+            {sessionMessage.text}
+          </div>
+        ) : null}
+      </div>
+
       <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
         <article
           id="object-listing"
@@ -759,25 +886,14 @@ export function ObjectWorkspace({
                   </div>
 
                   <div className="flex flex-col gap-3 sm:flex-row">
-                    <Button
-                      href={getPublicObjectUrl(selectedObject.publicId)}
-                      target="_blank"
-                      rel="noreferrer"
-                      variant="secondary"
-                      size="lg"
-                    >
+                    <Button type="button" variant="secondary" size="lg" disabled>
                       <ExternalLink size={16} strokeWidth={2.1} />
-                      Open public page
+                      Public page unavailable
                     </Button>
 
-                    <Button
-                      type="button"
-                      onClick={() => setIsQrModalOpen(true)}
-                      variant="secondary"
-                      size="lg"
-                    >
+                    <Button type="button" variant="secondary" size="lg" disabled>
                       <QrCode size={16} strokeWidth={2.1} />
-                      Show QR code
+                      QR unavailable
                     </Button>
 
                     <Button
@@ -885,16 +1001,14 @@ export function ObjectWorkspace({
                   </p>
                   <p className="mt-1 text-sm" style={{ color: workspaceMutedText }}>
                     {selectedObject
-                      ? `Upload images or PDFs for this object record. Files up to ${fieldLimits.uploadSizeMb} MB.`
-                      : 'Create an object first, then attach media.'}
+                      ? 'Attachments are not available in local-session mode yet. Export the session file to preserve object metadata.'
+                      : 'Create an object first. Attachments will stay unavailable in local-session mode.'}
                   </p>
                 </div>
 
                 <label
                   className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ${
-                    selectedObject
-                      ? 'cursor-pointer bg-moss text-white'
-                      : 'cursor-not-allowed bg-sand text-ink/55'
+                    'cursor-not-allowed bg-sand text-ink/55'
                   }`}
                 >
                   <Upload size={16} strokeWidth={2.1} />
@@ -902,7 +1016,7 @@ export function ObjectWorkspace({
                   <Input
                     type="file"
                     accept="image/png,image/jpeg,image/webp,application/pdf"
-                    disabled={!selectedObject || isUploadingMedia}
+                    disabled
                     onChange={handleUpload}
                     className="hidden"
                   />
@@ -934,7 +1048,7 @@ export function ObjectWorkspace({
                   </div>
                 ) : mediaItems.length === 0 && !isLoadingMedia ? (
                   <div className="rounded-2xl px-4 py-3 text-sm" style={{ backgroundColor: workspaceSectionBg, color: workspaceMutedText }}>
-                    No attachments yet. Upload the first image or document.
+                    Attachments are unavailable in local-session mode. This object currently stores metadata only.
                   </div>
                 ) : (
                   mediaItems.map((mediaItem) => (
@@ -1083,8 +1197,8 @@ export function ObjectWorkspace({
                   className="mt-2 text-sm leading-6"
                   style={{ color: workspaceMutedText }}
                 >
-                  Start with the essentials. You can add attachments and a QR-linked public page
-                  right after creation.
+                  Start with the essentials. The record will be saved into this local session on
+                  this browser.
                 </Dialog.Description>
               </div>
 
@@ -1182,7 +1296,7 @@ export function ObjectWorkspace({
                   ))}
                 </select>
                 <p className="mt-2 text-xs" style={{ color: modalHelperText }}>
-                  Optional. Assign this object to an internal and public collection grouping.
+                  Optional. Assign this object to a local collection grouping in this workspace.
                 </p>
               </label>
 
@@ -1374,8 +1488,8 @@ export function ObjectWorkspace({
                       className="mt-2 text-sm leading-6"
                       style={{ color: workspaceMutedText }}
                     >
-                      Update the core information here, then return to the detail view for attachments
-                      and QR access.
+                      Update the core information here. Changes are saved into this local session
+                      on this browser.
                     </Dialog.Description>
                   </div>
 
@@ -1575,30 +1689,6 @@ export function ObjectWorkspace({
                   </div>
                 </form>
               </>
-            ) : null}
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
-
-      {/* ── QR Code Dialog ── */}
-      <Dialog.Root open={isQrModalOpen && Boolean(selectedObject)} onOpenChange={setIsQrModalOpen}>
-        <Dialog.Portal>
-          <Dialog.Backdrop className="fixed inset-0 z-30 min-h-dvh bg-ink/35 transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 supports-[-webkit-touch-callout:none]:absolute" />
-          <Dialog.Popup className="fixed left-1/2 top-1/2 z-30 w-full max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-soft transition-all duration-150 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0">
-            {selectedObject ? (
-              <ObjectQrCard
-                publicId={selectedObject.publicId}
-                title={selectedObject.title}
-                actionSlot={
-                  <Dialog.Close
-                    className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold"
-                    style={{ borderColor: workspacePanelBorder, color: modalFieldText }}
-                  >
-                    <X size={16} strokeWidth={2.1} />
-                    Close
-                  </Dialog.Close>
-                }
-              />
             ) : null}
           </Dialog.Popup>
         </Dialog.Portal>

@@ -31,4 +31,14 @@ describe('collection api helpers', () => {
     await expect(getCollection('missing')).resolves.toBeNull();
     await expect(getPublicCollection('missing')).resolves.toBeNull();
   });
+
+  it('returns fallback values when fetch throws', async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new Error('offline'));
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(getCollections()).resolves.toEqual([]);
+    await expect(getCollection('missing')).resolves.toBeNull();
+    await expect(getPublicCollection('missing')).resolves.toBeNull();
+  });
 });
