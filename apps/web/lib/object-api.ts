@@ -18,9 +18,15 @@ export async function getObjects(searchQuery?: string, collectionId?: string): P
     url.searchParams.set('collectionId', collectionId.trim());
   }
 
-  const response = await fetch(url, {
-    cache: 'no-store'
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(url, {
+      cache: 'no-store'
+    });
+  } catch {
+    return [];
+  }
 
   if (!response.ok) {
     return [];
@@ -34,9 +40,15 @@ export async function getObjects(searchQuery?: string, collectionId?: string): P
 }
 
 export async function getPublicObject(publicId: string): Promise<PublicObjectRecord | null> {
-  const response = await fetch(`${apiBaseUrl}/api/public/objects/${publicId}`, {
-    cache: 'no-store'
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${apiBaseUrl}/api/public/objects/${publicId}`, {
+      cache: 'no-store'
+    });
+  } catch {
+    return null;
+  }
 
   if (!response.ok) {
     return null;

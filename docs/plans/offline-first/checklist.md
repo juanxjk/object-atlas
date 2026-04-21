@@ -12,13 +12,13 @@ Important rule:
 ## Planned Commits
 
 - [x] `docs:` Define offline-first local-session scope and future authenticated-session boundaries
-- [ ] `feat:` Add a browser-side persistent storage layer for local-session objects, collections, and session metadata
-- [ ] `feat:` Refactor the object workspace data flow to hydrate from local-session storage
-- [ ] `feat:` Add offline local-session object create and edit flows with local-save feedback
-- [ ] `feat:` Add local-session export and import through a versioned file-serialization API
-- [ ] `feat:` Add local-session messaging and a clear local-session reset flow
-- [ ] `feat:` Explicitly gate unsupported offline actions such as media upload and publishing
-- [ ] `test:` Add coverage for local-session persistence, file serialization, import validation, and reset behavior
+- [x] `feat:` Add a browser-side persistent storage layer for local-session objects, collections, and session metadata
+- [x] `feat:` Refactor the object workspace data flow to hydrate from local-session storage
+- [x] `feat:` Add offline local-session object create and edit flows with local-save feedback
+- [x] `feat:` Add local-session export and import through a versioned file-serialization API
+- [x] `feat:` Add local-session messaging and a clear local-session reset flow
+- [x] `feat:` Explicitly gate unsupported offline actions such as media upload and publishing
+- [x] `test:` Add coverage for local-session persistence, file serialization, import validation, and reset behavior
 - [ ] `chore:` Run a mobile-first UX pass on local-session entry, local-save messaging, file actions, and reset confirmation
 - [ ] `refactor:` Optional follow-up for authenticated sessions, local-to-account migration, and offline media support
 
