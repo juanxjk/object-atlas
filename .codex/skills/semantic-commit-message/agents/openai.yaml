@@ -1,0 +1,4 @@
+interface:
+  display_name: "Semantic Commit Message"
+  short_description: "Draft semantic commits with AI trailer"
+  default_prompt: "Use $semantic-commit-message to draft a semantic commit message for the current changes and include the active model in a Co-authored-by trailer."
