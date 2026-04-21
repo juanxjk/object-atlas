@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapCollectionRow, mapCollectionSummary } from './collection.mapper';
+import {
+  mapCollectionRow,
+  mapCollectionSummary
+} from '../../../src/collections/collection.mapper';
 
 describe('collection mapper', () => {
   describe('mapCollectionRow', () => {

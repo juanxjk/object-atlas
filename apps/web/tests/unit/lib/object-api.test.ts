@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { getObjects, getPublicObject } from './object-api';
+import { getObjects, getPublicObject } from '../../../lib/object-api';
 
 describe('object api helpers', () => {
   afterEach(() => {

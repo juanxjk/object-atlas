@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { getCollection, getCollections, getPublicCollection } from './collection-api';
+import {
+  getCollection,
+  getCollections,
+  getPublicCollection
+} from '../../../lib/collection-api';
 
 describe('collection api helpers', () => {
   afterEach(() => {

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { COLLECTIONS_LIMITS } from '../database/schema-limits';
-import { validateCreateCollection, validateUpdateCollection } from './collection.validation';
+import { COLLECTIONS_LIMITS } from '../../../src/database/schema-limits';
+import {
+  validateCreateCollection,
+  validateUpdateCollection
+} from '../../../src/collections/collection.validation';
 
 describe('collection validation', () => {
   it('accepts a valid create payload', () => {

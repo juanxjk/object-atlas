@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapObjectMediaRow } from './object-media.mapper';
+import { mapObjectMediaRow } from '../../../src/objects/object-media.mapper';
 
 describe('mapObjectMediaRow', () => {
   it('maps a database media row into the API shape', () => {

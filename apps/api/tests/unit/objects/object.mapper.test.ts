@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapObjectRow } from './object.mapper';
+import { mapObjectRow } from '../../../src/objects/object.mapper';
 
 describe('mapObjectRow', () => {
   it('maps a database object row into the API shape', () => {

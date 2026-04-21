@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { OBJECTS_LIMITS } from '../database/schema-limits';
-import { validateCreateObject, validateUpdateObject } from './object.validation';
+import { OBJECTS_LIMITS } from '../../../src/database/schema-limits';
+import {
+  validateCreateObject,
+  validateUpdateObject
+} from '../../../src/objects/object.validation';
 
 describe('object validation', () => {
   it('accepts a valid create payload', () => {

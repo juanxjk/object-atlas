@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { filterObjectsByTitle } from './object-search';
+import { filterObjectsByTitle } from '../../../lib/object-search';
 
 const objects = [
   {
